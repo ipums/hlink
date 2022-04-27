@@ -1,0 +1,6 @@
+﻿histid,birthyr,yearp,age,bpl,state1,state2
+a01,1999,1900,36,3300,washington,washington
+b02,,1900,42,3043,washington,
+b00,,1900,,4799,washington,washington dc
+c03,1901,1900,,40000,,washington
+d04,1850,1900,50,100,,

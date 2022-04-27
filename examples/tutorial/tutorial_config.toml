@@ -1,0 +1,64 @@
+id_column = "id"
+feature_selections = []
+
+[datasource_a]
+alias = "a"
+file = "data/A.csv"
+
+[datasource_b]
+alias = "b"
+file = "data/B.csv"
+
+[[column_mappings]]
+column_name = "NAMEFRST"
+transforms = [
+    {type = "lowercase_strip"}
+]
+
+[[column_mappings]]
+column_name = "NAMELAST"
+transforms = [
+    {type = "lowercase_strip"}
+]
+
+[[column_mappings]]
+column_name = "AGE"
+transforms = [
+    {type = "add_to_a", value = 10}
+]
+
+[[column_mappings]]
+column_name = "SEX"
+
+[[blocking]]
+column_name = "SEX"
+
+[[blocking]]
+column_name = "AGE_2"
+dataset = "a"
+derived_from = "AGE"
+expand_length = 2
+explode = true
+
+[[comparison_features]]
+alias = "NAMEFRST_JW"
+column_name = "NAMEFRST"
+comparison_type = "jaro_winkler"
+
+[[comparison_features]]
+alias = "NAMELAST_JW"
+column_name = "NAMELAST"
+comparison_type = "jaro_winkler"
+
+[comparisons]
+operator = "AND"
+
+[comparisons.comp_a]
+comparison_type = "threshold"
+feature_name = "NAMEFRST_JW"
+threshold = 0.79
+
+[comparisons.comp_b]
+comparison_type = "threshold"
+feature_name = "NAMELAST_JW"
+threshold = 0.84

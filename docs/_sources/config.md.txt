@@ -1,0 +1,749 @@
+# Configuration
+1. [Basic Example Config File](#basic-config-file)
+2. [Advanced Example Config File](#advanced-config-file)
+3. [Top level configs](#top-level-configs)
+4. [Data sources](#data-sources)
+5. [Filter](#filter)
+6. [Column mappings](#column-mappings)
+7. [Substitution columns](#subsitution-columns)
+8. [Feature selections](#feature-selections)
+9. [Potential matches universe](#potential-matches-universe)
+10. [Blocking](#blocking)
+11. [Comparisons](#comparisons)
+12. [Household comparisons](#household-comparisons)
+13. [Comparison features](#comparison-features)
+14. [Pipeline-generated features](#pipeline-generated-features)
+15. [Training and models](#training-and-models)
+16. [Household training and models](#household-training-and-models)
+
+## Basic Config File
+
+The config file tells the hlink program what to link and how to link it. A description of the different sections of
+a configuration file are below. For reference, here is an example of a relatively basic config file. This config file
+is used by the `examples/tutorial/tutorial.py` script for linking, and there is a more detailed discussion of the config
+file in the README in `examples/tutorial`.
+
+Note that this config is written in TOML, but hlink is also able to work with JSON config files.
+
+```
+id_column = "id"
+feature_selections = []
+
+[datasource_a]
+alias = "a"
+file = "data/A.csv"
+
+[datasource_b]
+alias = "b"
+file = "data/B.csv"
+
+[[column_mappings]]
+column_name = "NAMEFRST"
+transforms = [
+    {type = "lowercase_strip"}
+]
+
+[[column_mappings]]
+column_name = "NAMELAST"
+transforms = [
+    {type = "lowercase_strip"}
+]
+
+[[column_mappings]]
+column_name = "AGE"
+transforms = [
+    {type = "add_to_a", value = 10}
+]
+
+[[column_mappings]]
+column_name = "SEX"
+
+[[blocking]]
+column_name = "SEX"
+
+[[blocking]]
+column_name = "AGE_2"
+dataset = "a"
+derived_from = "AGE"
+expand_length = 2
+explode = true
+
+[[comparison_features]]
+alias = "NAMEFRST_JW"
+column_name = "NAMEFRST"
+comparison_type = "jaro_winkler"
+
+[[comparison_features]]
+alias = "NAMELAST_JW"
+column_name = "NAMELAST"
+comparison_type = "jaro_winkler"
+
+[comparisons]
+operator = "AND"
+
+[comparisons.comp_a]
+comparison_type = "threshold"
+feature_name = "NAMEFRST_JW"
+threshold = 0.79
+
+[comparisons.comp_b]
+comparison_type = "threshold"
+feature_name = "NAMELAST_JW"
+threshold = 0.84
+```
+
+## Advanced Config File
+
+Here is an example of a more complex config file that makes use of more of hlink's features.
+It uses machine learning to probabilistically link the two datasets.
+
+```
+id_column = "histid"
+drop_data_from_scored_matches = false
+
+# --------- DATASOURCES --------------
+[datasource_a]
+alias = "us1900"
+file = "/path/to/us1900m_usa.P.parquet"
+
+[datasource_b]
+alias = "us1910"
+file = "/path/to/us1910m_usa.P.parquet"
+
+# --------- FILTERS --------------
+
+[[filter]]
+expression = "NAMELAST is not null and NAMELAST != ''"
+
+[[filter]]
+training_data_subset = true
+datasource = "a"
+
+[[filter]]
+expression = "age >= 5"
+datasource = "b"
+
+# --------- COLUMN MAPPINGS --------------
+
+[[column_mappings]]
+column_name = "serialp"
+
+[[column_mappings]]
+column_name = "sex"
+
+[[column_mappings]]
+column_name = "age"
+
+[[column_mappings]]
+column_name = "namelast"
+
+[[column_mappings]]
+alias = "namefrst_clean"
+column_name = "namefrst"
+transforms = [
+  { type = "lowercase_strip" },
+  { type = "rationalize_name_words" },
+  { type = "remove_qmark_hyphen"},
+  { type = "replace_apostrophe"},
+  { type = "remove_suffixes",  values = ["jr", "sr", "ii", "iii"] },
+  { type = "remove_alternate_names"},
+  { type = "condense_strip_whitespace"},
+]
+
+[[column_mappings]]
+alias = "namefrst_split"
+column_name = "namefrst_clean"
+transforms = [ { type = "split" } ]
+
+[[column_mappings]]
+alias = "namefrst_std"
+column_name = "namefrst_split"
+transforms = [
+  { type = "array_index", value = 0 }
+]
+
+[[column_mappings]]
+alias = "bpl_orig"
+column_name = "bpl"
+transforms = [
+  { type = "divide_by_int", value = 100 },
+  { type = "get_floor" }
+]
+
+[[column_mappings]]
+alias = "statefip"
+column_name = "statefip_h"
+
+[[column_mappings]]
+column_name = "birthyr"
+alias = "clean_birthyr"
+[[column_mappings.transforms]]
+type = "mapping"
+mappings = {9999 = "", 1999 = ""}
+output_type = "int"
+
+[[column_mappings]]
+alias = "relate_div_100"
+column_name = "relate"
+transforms = [
+  { type = "divide_by_int", value = 100 },
+  { type = "get_floor" }
+]
+
+# --------- SUBSTITUTIONS --------------
+
+[[substitution_columns]]
+column_name = "namefrst_std"
+
+[[substitution_columns.substitutions]]
+join_column = "sex"
+join_value = "1"
+substitution_file = "/path/to/name_std/male.csv"
+
+[[substitution_columns.substitutions]]
+join_column = "sex"
+join_value = "2"
+substitution_file = "/path/to/name_std/female.csv"
+
+# --------- FEATURE SELECTIONS --------------
+
+[[feature_selections]]
+input_column = "clean_birthyr"
+output_column = "replaced_birthyr"
+condition = "case when clean_birthyr is null or clean_birthyr == '' then year - age else clean_birthyr end"
+transform = "sql_condition"
+
+[[feature_selections]]
+input_column = "namelast"
+output_column = "namelast_bigrams"
+transform = "bigrams"
+
+[[feature_selections]]
+input_column = "bpl_orig"
+output_column = "bpl_clean"
+condition = "case when bpl_str == 'washington' and bpl2_str=='washington' then 53 when (bpl_str is null or bpl_str == '') and bpl2_str=='washington' then 53 when bpl_str == 'washington' and (bpl2_str=='' or bpl2_str is null) then 53 else bpl_orig end"
+transform = "sql_condition"
+
+[[feature_selections]]
+input_column = "bpl_clean"
+output_column = "region"
+transform = "attach_variable"
+region_dict = "/path/to/region.csv"
+col_to_join_on = "bpl"
+col_to_add = "region"
+null_filler = 99
+col_type = "float"
+
+# --------- POTENTIAL MATCHES UNIVERSE -------------
+
+[[potential_matches_universe]]
+expression = "sex == 1"
+
+# --------- BLOCKING --------------
+
+[[blocking]]
+column_name = "sex"
+
+[[blocking]]
+column_name = "birthyr_3"
+dataset = "a"
+derived_from = "replaced_birthyr"
+expand_length = 3
+explode = true
+
+[[blocking]]
+column_name = "namelast_bigrams"
+explode = true
+
+# --------- COMPARISONS --------------
+
+[comparisons]
+operator = "AND"
+
+[comparisons.comp_a]
+comparison_type = "threshold"
+feature_name = "namefrst_std_jw"
+threshold = 0.8
+
+[comparisons.comp_b]
+comparison_type = "threshold"
+feature_name = "namelast_jw"
+threshold = 0.75
+
+# --------- HOUSEHOLD COMPARISIONS (post-blocking filters) -------------
+
+[hh_comparisons]
+comparison_type = "threshold"
+feature_name = "byrdiff"
+threshold_expr = "<= 10"
+
+# --------- COMPARISON FEATURES --------------
+
+[[comparison_features]]
+alias = "region"
+column_name = "region"
+comparison_type = "fetch_a"
+categorical = true
+
+[[comparison_features]]
+alias = "namefrst_std_jw"
+column_name = "namefrst_std"
+comparison_type = "jaro_winkler"
+
+[[comparison_features]]
+alias = "namelast_jw"
+column_name = "namelast"
+comparison_type = "jaro_winkler"
+
+[[comparison_features]]
+alias = "sex_equals"
+column_name = "sex"
+comparison_type = "equals"
+categorical = true
+
+[[comparison_features]]
+alias = "relate_a"
+column_name = "relate_div_100"
+comparison_type = "fetch_a"
+
+# --------- PIPELINE-GENERATED FEATURES ------------
+
+[[pipeline_features]]
+input_columns =  ["sex_equals", "region"]
+output_column =  "sex_region_interaction"
+transformer_type =  "interaction"
+
+[[pipeline_features]]
+input_column = "relate_a"
+output_column = "relatetype"
+transformer_type = "bucketizer"
+categorical = true
+splits = [1,3,5,9999]
+
+# --------- TRAINING --------------
+
+[training]
+
+independent_vars = [ "namelast_jw", "region", "hits", "sex_region_interaction", "relatetype"]
+scale_data = false
+
+dataset = "/path/to/training_data.csv"
+dependent_var = "match"
+score_with_model = true
+use_training_data_features = false
+split_by_id_a = true
+decision = "drop_duplicate_with_threshold_ratio"
+
+n_training_iterations = 2
+output_suspicious_TD = true
+param_grid = true
+model_parameters = [ 
+    { type = "random_forest", maxDepth = [7], numTrees = [100], threshold = [0.05, 0.005], threshold_ratio = [1.2, 1.3] },
+    { type = "logistic_regression", threshold = [0.50, 0.65, 0.80], threshold_ratio = [1.0, 1.1] }
+]
+    
+chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
+
+# --------- HOUSEHOLD TRAINING --------------
+
+[hh_training]
+
+prediction_col = "prediction"
+hh_col = "serialp"
+
+independent_vars = ["namelast_jw", "namefrst_std_jw", "relatetype", "sex_equals"]
+scale_data = false
+
+dataset = "/path/to/hh_training_data_1900_1910.csv"
+dependent_var = "match"
+score_with_model = true
+use_training_data_features = false
+split_by_id_a = true
+decision = "drop_duplicate_with_threshold_ratio"
+
+n_training_iterations = 10
+output_suspicious_TD = true
+param_grid = false
+model_parameters = [
+    { type = "random_forest", maxDepth = 6, numTrees = 50, threshold = 0.5, threshold_ratio = 1.0 },
+    { type = "probit", threshold = 0.5, threshold_ratio = 1.0 }
+]
+    
+chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
+
+```
+
+## Top level configs
+
+These configs should go at the top of your config file under no header:
+
+*id_column*
+
+Required.  Specify the id column that uniquely identifies a record in each dataset.
+```
+id_column = "id"
+```
+
+*drop_data_from_scored_matches*
+
+Optional.  Whether or not the scored potential matches should be output with full features data, or just ids and match information.
+```
+drop_data_from_scored_matches = false
+```
+
+## Data sources
+
+* Header names: `datasource_a`, `datasource_b`
+* Description: Specifies your input data.
+* Required: True
+* Type: Object
+* Attributes:
+  * `alias` -- Type: `string`. The short name for the datasource. Must be alphanumeric with no spaces.
+  * `file` -- Type: `string`. Required. The path to the input file. The file can be `csv` or `parquet`.
+
+```
+[datasource_a]
+alias = "us1900"
+file = "/path/to/my_file.csv"
+```
+
+## Filter
+
+* Header name: `filter`
+* Description: Specifies filters to apply to your input data.
+* Required: False
+* Type: List
+* Attributes:
+  * `expression` -- Type: `string`. SQL expression to apply to your input datasets. Can not be combined with `training_data_subset` in a single filter.
+  * `training_data_subset` -- Type: `boolean`. If set to true, will subset your input data to only include records that are also in your training data. Can not be combined with `expression` in a single filter.
+  * `datasource` -- Type: `string`. If you want to limit the filter to operate only on dataset a or b, you can specify that with this attribute.
+
+```
+[[filter]]
+training_data_subset = true
+datasource = "a"
+
+[[filter]]
+expression = "NAMELAST is not null and NAMELAST != ''"
+
+[[filter]]
+expression = "age >= 5"
+datasource = "b"
+```
+
+
+## [Column Mappings](column_mapping_transforms)
+
+* Header name: `column_mappings`
+* Description: Base column mappings and transformations to extract from your input datasets.
+* Required: True
+* Type: List
+* Attributes:
+  * `alias` -- Type: `string`. Optional; if not specified the new column name defaults to `column_name`. New name of column.
+  * `column_name` -- Type: `string`. Name of column in input data. Used as the name of the output column if `alias` is not specified.
+  * `transforms` -- Type: `List`. Optional. A list of transforms to apply, in order, to the input data. See the [column mapping transforms](column_mapping_transforms) section for more information.
+
+```
+[[column_mappings]]
+column_name = "age"
+
+[[column_mappings]]
+alias = "namefrst_clean"
+column_name = "namefrst"
+transforms = [
+  { type = "lowercase_strip" },
+  { type = "rationalize_name_words" },
+  { type = "remove_qmark_hyphen"},
+  { type = "replace_apostrophe"},
+  { type = "remove_suffixes",  values = ["jr", "sr", "ii", "iii", "iv", "v", "vi", "vii", "viii"] },
+  { type = "remove_alternate_names"},
+  { type = "condense_strip_whitespace"}
+]
+```
+
+## [Substitution Columns](substitutions)
+
+* Header name: `substitution_columns`
+* Description: Substitutions to apply to data after column mappings.
+* Required: False
+* Type: List
+* Attributes:
+  * `column_name` -- Type: `string`. Required. Column to apply substitutions to.
+  * `substitutions` -- Type: `list`. A list of substitutions to apply. See the [substitutions](substitutions) section for more information.
+
+```
+[[substitution_columns]]
+column_name = "namefrst_std"
+
+[[substitution_columns.substitutions]]
+join_column = "sex"
+join_value = "1"
+substitution_file = "/path/to/name_std/male.csv"
+
+[[substitution_columns.substitutions]]
+join_column = "sex"
+join_value = "2"
+substitution_file = "/path/to/name_std/female.csv"
+```
+
+
+## [Feature Selections](feature_selection_transforms)
+
+* Header name: `feature_selections`
+* Description: A list of feature selections to apply to the input data after substitutions and column mappings. See the [feature selection transforms](feature_selection_transforms) section for more information, including information on the specific transforms available.
+
+* Required: False
+* Type: List
+* Attributes: 
+  * `input_column` -- Type: `string`. Required.  The name of the input column.
+  * `output_column` -- Type: `string`. Required.  The name of the output column.
+  * `transform` -- Type: `string`.  The name of the transform to apply to the column.
+  * Other attributes vary depending on transform type.
+
+```
+[[feature_selections]]
+input_column = "namelast_clean"
+output_column = "namelast_clean_bigrams"
+transform = "bigrams"
+
+[[feature_selections]]
+input_column = "bpl_clean"
+output_column = "region"
+transform = "attach_variable"
+region_dict = "/path/to/region.csv"
+col_to_join_on = "bpl"
+col_to_add = "region"
+null_filler = 99
+col_type = "float"
+```
+
+## Potential Matches Universe
+
+* Header name: `potential_matches_universe`
+* Description: Limits the universe of created potential matches generated using an expression fed to a SQL query.
+* Required: False
+* Type: List
+* Attributes: 
+  * `expression` -- Type: `string`.  Required.  The expression to use to filter prepped_df_(a/b) before generating potential matches.
+  
+```
+[[potential_matches_universe]]
+# limits potential matches created to only men
+expression = "sex == 1"
+```
+
+## Blocking
+
+* Header name: `blocking`
+* Description: Describes what columns to block on and how to create the blocks for the potential matches.
+* Required: True
+* Type: List
+* Attributes:
+  * `column_name` -- Type: `string`. Required. The name of the column in the existing data to block on if not exploded; The name of the newly exploded column if `explode = true`.
+  * `explode` -- Type: `boolean`. Optional. If true, will attempt to "explode" the column by creating duplicate rows for each value in the column. Only works on columns that are arrays of values or when `expand_length` is set.
+  * `dataset` -- Type: `string`. Optional. Must be `a` or `b` and used in conjuction with `explode`. Will only explode the column from the `a` or `b` dataset when specified.
+  * `derived_from` -- Type: `string`. Used in conjunction with `explode = true`.  Specifies an input column from the existing dataset to be exploded. 
+  * `expand_length` -- Type: `integer`. When `explode` is used on a column that is an integer, this can be specified to create an array with a range of integer values from (`expand_length` minus `original_value`) to (`expand_length` plus `original_value`).  For example, if the input column value for birthyr is 1870, explode is true, and the expand_length is 3, the exploded column birthyr_3 value would be the array [1867, 1868, 1869, 1870, 1871, 1872, 1873].
+
+
+```
+[[blocking]]
+column_name = "bpl"
+
+[[blocking]]
+column_name = "birthyr_3"
+dataset = "a"
+derived_from = "birthyr"
+expand_length = 3
+explode = true
+```
+
+## [Comparisons](comparison_types)
+
+* Header name: `comparisons`
+* Description: A list of comparisons to threshold the potential matches on. Only potential matches that pass the thresholds will be created. See [comparison types](comparison_types) for more information.
+* Required: True
+* Type: Object
+* Attributes:
+  * `comparison_type` -- Type: `string`. Required. See [comparison types](comparison_types) for more information.
+  * `feature_name` -- Type: `string`. Required. The `comparison_feature` to use for the comparison threshold.  A `comparison_feature` column by this name must be specified in the `comparison_features` section.
+
+```
+[comparisons]
+operator = "AND"
+
+[comparisons.comp_a]
+comparison_type = "threshold"
+feature_name = "namefrst_jw"
+threshold = 0.79
+
+[comparisons.comp_b]
+comparison_type = "threshold"
+feature_name = "namelast_jw"
+threshold = 0.79
+```
+
+## [Household Comparisons](comparison_types)
+
+* Header name: `hh_comparisons`
+* Description: A list of comparisons to threshold the household potential matches on. Also referred to as post-blocking filters, as all household potential matches are created, then only potential matches that pass the post-blocking filters will be kept for scoring. See [comparison types](comparison_types) for more information.
+* Required: False
+* Type: Object
+* Attributes:
+  * `comparison_type` -- Type: `string`.  Required. See [comparison types](comparison_types) for more information.
+  * `feature_name` -- Type: `string`. Required. The `comparison_feature` to use for the comparison threshold. A `comparison_feature` column by this name must be specified in the `comparison_features` section.
+  
+```
+[hh_comparisons]
+# only keep household potential matches with an age difference less than or equal than ten years
+comparison_type = "threshold"
+feature_name = "byrdiff"
+threshold_expr = "<= 10"
+```
+
+## [Comparison Features](comparison_types)
+
+* Header name: `comparison_features`
+* Description: A list of comparison features to create when comparing records. Comparisons for individual and household linking rounds are both represented here -- no need to duplicate comparisons if used in both rounds, simply specify the `column_name` in the appropriate `training` or `hh_training` section of the config.  See the [comparison types](comparison_types) section for more information.
+* Required: True
+* Type: List
+* Attributes:
+  * `alias` -- Type: `string`. Optional. The name of the comparison feature column to be generated.  If not specified, the output column will default to `column_name`.
+  * `column_name` -- Type: `string`. The name of the columns to compare.
+  * `comparison_type` -- Type: `string`. The name of the comparison type to use. See the [comparison types](comparison_types) section for more information.
+  * `categorical` -- Type: `boolean`.  Optional.  Whether the output data should be treated as categorical data (important information used during one-hot encoding and vectorizing in the machine learning pipeline stage).
+  * Other attributes may be included as well depending on `comparison_type`.  See the [comparison types](comparison_types) section for details on each comparison type.
+
+```
+[[comparison_features]]
+alias = "race"
+column_name = "race"
+comparison_type = "equals"
+categorical = true
+
+[[comparison_features]]
+alias = "namefrst_jw"
+column_name = "namefrst_unstd"
+comparison_type = "jaro_winkler"
+
+[[comparison_features]]
+column_name = "durmarr"
+comparison_type = "new_marr"
+upper_threshold = 7
+```
+
+## [Pipeline-generated Features](pipeline_features)
+
+* Header name: `pipeline_features`
+* Description: Features to be added in the model pipeline created for scoring a dataset. These features cannot be used in the `comparisons` section of the config and are for creating more robust ML models.  They typically leverage code available in the Spark Pipeline API.
+* Required: False
+* Type: List
+* Attributes:
+  * `transformer_type` -- Type: `string`. Required. See [pipeline features](pipeline_features) for more information on the available transformer types.
+  * `input_column` -- Type: `string`. Either use `input_column` or `input_columns`. Used if a single input_column is needed for the pipeline feature.
+  * `input_columns` -- Type: List of strings. Either use `input_column` or `input_columns`.  Used if a list of input_columns is needed for the pipeline feature.
+  * `output_column` -- Type: `string`. The name of the new pipeline feature column to be generated.
+  * `categorical` -- Type: `boolean`. Optional.  Whether the output data should be treated as categorical data (important information used during one-hot encoding and vectorizing in the machine learning pipeline stage).
+  * Other attributes may be included as well depending on the particular pipline feature `transformer_type`.
+
+```
+[[pipeline_features]]
+input_columns =  ["sex_equals", "regionf"]
+output_column =  "sex_regionf_interaction"
+transformer_type =  "interaction"
+
+[[pipeline_features]]
+input_column = "immyear_diff"
+output_column = "immyear_caution"
+transformer_type = "bucketizer"
+categorical = true
+splits = [-1,0,6,11,9999]
+```
+
+## Training and [models](models)
+
+* Header name: `training`
+* Description: Specifies the training data set as well as a myriad of attributes related to training a model including the dependent variable within that dataset, the independent variables created from the `comparison_features` section, and the different models you want to use for either model exploration or scoring.  
+* Required: False
+* Type: Object
+* Attributes:
+  * `dataset` -- Type: `string`. Location of the training dataset. Must be a csv file.
+  * `dependent_var` -- Type: `string`. Name of dependent variable in training dataset.
+  * `independent_vars` -- Type: `list`. List of independent variables to use in the model. These must be either part of `pipeline_features` or `comparison_features`.
+  * `chosen_model` -- Type: `object`. The model to train with in the `training` task and score with in the `matching` task. See the [models](models) section for more information on model specifications.
+  * `threshold` -- Type: `float`. The threshold for which to accept model probability values as true predictions.  Can be used to specify a threshold to use for all models, or can be specified within each `chosen_model` and `model_parameters` specification.
+  * `decision` -- Type: `string`. Optional. Specifies which decision function to use to create the final prediction. The first option is `drop_duplicate_a`, which drops any links for which a record in the `a` data set has a predicted match more than one time. The second option is `drop_duplicate_with_threshold_ratio` which only takes links for which the `a` record has the highest probability out of any other potential links, and the second best link for the `a` record is less than the `threshold_ratio`.
+  * `threshold_ratio` -- Type: `float`. Optional. For use when `decision` is `drop_duplicate_with_threshold_ratio` . Specifies the smallest possible ratio to accept between a best and second best link for a given record.  Can be used to specify a threshold ratio (beta threshold) to use for all models.  Alternatively, unique threshold ratios can be specified in each individual `chosen_model` and `model_parameters` specification.
+  * `model_parameters` -- Type: `list`. Specifies models to test out in the `model_exploration` task. See the [models](models) section for more information on model specifications.
+  * `param_grid` -- Type: `boolean`. Optional. If you would like to evaluate multiple hyper-parameters for a single model type in your `model_parameters` specification, you can give hyper-parameter inputs as arrays of length >= 1 instead of integers to allow one model per row specification with multiple model eval outputs.
+  * `score_with_model` -- Type: `boolean`. If set to false, will skip the `apply_model` step of the matching task. Use this if you want to use the `run_all_steps` command and are just trying to generate potential links, such as for the creation of training data.
+  * `n_training_iterations` -- Type: `integer`. Optional; default value is 10. The number of training iterations to use during the `model_exploration` task.
+  * `scale_data` -- Type: `boolean`.  Optional. Whether to scale the data as part of the machine learning pipeline.
+  * `use_training_data_features` -- Type: `boolean`. Optional. If the identifiers in the training data set are not present in your raw input data, you will need to set this to `true`, or training features will not be able to be generated, giving null column errors.  For example, if the training data set you are using has individuals from 1900 and 1910, but you are about to train a model to score the 1930-1940 potential matches, you need this to be set to `true` or it will fail, since the individual IDs are not present in the 1930 and 1940 raw input data.  If you were about to train a model to score the 1900-1910 potential matches with this same training set, it would be best to set this to `false`, so you can be sure the training features are created from scratch to match your exact current configuration settings, although if you know the features haven't changed, you could set it to `true` to save a small amount of processing time.
+  * `output_suspicious_TD` -- Type: `boolean`.  Optional.  Used in the `model_exploration` link task.  Outputs tables of potential matches that the model repeatedly scores differently than the match value given by the training data.  Helps to identify false positives/false negatives in the training data, as well as areas that need additional training feature coverage in the model, or need increased representation in the training data set.
+  * `split_by_id_a` -- Type: `boolean`.  Optional.  Used in the `model_exploration` link task.  When set to true, ensures that all potential matches for a given individual with ID_a are grouped together in the same train-test-split group. For example, if individual histid_a "A304BT" has three potential matches in the training data, one each to histid_b "B200", "C201", and "D425", all of those potential matches would either end up in the "train" split or the "test" split when evaluating the model performance.
+  * `feature_importances` -- Type: `boolean`. Optional, and currently not functional.  Whether to record feature importances for the training features when training or evaluating an ML model.
+
+
+```
+[training]
+independent_vars = ["race", "srace", "race_interacted_srace", "hits", "hits2", "exact_mult", "ncount", "ncount2", "region", "namefrst_jw","namelast_jw","namefrst_std_jw","byrdiff", "f_interacted_jw_f", "jw_f", "f_caution", "f_pres", "fbplmatch", "m_interacted_jw_m", "jw_m", "m_caution", "m_pres", "mbplmatch", "sp_interacted_jw_sp", "jw_sp", "sp_caution", "sp_pres", "mi", "fsoundex", "lsoundex", "rel", "oth", "sgen", "nbors", "county_distance", "county_distance_squared", "street_jw", "imm_interacted_immyear_caution", "immyear_diff", "imm"]
+scale_data = false
+dataset = "/path/to/1900_1910_training_data_20191023.csv"
+dependent_var = "match"
+use_training_data_features = false
+output_suspicious_TD = true
+split_by_id_a = true
+
+score_with_model = true
+feature_importances = true
+
+decision = "drop_duplicate_with_threshold_ratio"
+
+n_training_iterations = 10
+param_grid = false
+model_parameters = [
+  { type = "random_forest", maxDepth = 6, numTrees = 50 },
+  { type = "probit", threshold = 0.5}
+]
+
+chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
+```
+
+## Household training and models
+
+* Header name: `hh_training`
+* Description: Specifies the household training data set as well as a myriad of attributes related to training a model including the dependent var within that data set, the independent vars created from the `comparison_features` section, and the different models you want to use.  
+* Required: False
+* Type: Object
+* Attributes:
+  * All of the attributes and [models](models) available in [training](#training-and-models) may also be used here.
+  * `prediction_col` -- Type: `string`.  Required. The name of the column that the final prediction value is recorded in the individual linking round scoring step.
+  * `hh_col` -- Type: `string`. Required. The name of the column with the household identifier.
+
+```
+[hh_training]
+prediction_col = "prediction"
+hh_col = "serialp"
+
+independent_vars = ["namelast_jw","namefrst_jw","namefrst_std_jw", "jw_max_a", "jw_max_b", "f1_match", "f2_match", "byrdifcat", "racematch", "imm", "bplmatch", "imm_interacted_bplmatch", "sexmatch", "mardurmatch", "relatetype", "relatematch", "relatetype_interacted_relatematch"]
+
+scale_data = false
+dataset = "/path/to/hh_training_data_1900_1910.csv"
+dependent_var = "match"
+use_training_data_features = false
+output_suspicious_TD = true
+split_by_id_a = true
+score_with_model = true
+feature_importances = true
+decision = "drop_duplicate_with_threshold_ratio"
+
+param_grid = true
+n_training_iterations = 10
+model_parameters = [
+    { type = "logistic_regression", threshold = [0.5], threshold_ratio = [1.1]},
+    { type = "random_forest", maxDepth = [5, 6, 7], numTrees = [50, 75, 100], threshold = [0.5], threshold_ratio = [1.0, 1.1, 1.2]}
+]
+
+chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
+```

@@ -1,0 +1,5 @@
+{
+	"users_dir": "/pkg/ipums/programming/linking/hlink/users",
+	"users_dir_fast": "/mnt/nas-af/linking/hlink/users",
+	"python": "/pkg/ipums/programming/linking/hlink/deploys/XXX_BRANCH/venv/bin/python"
+} 

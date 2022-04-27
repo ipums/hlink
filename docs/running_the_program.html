@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Running hlink &#8212; hlink 2.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Workflow Examples" href="use_examples.html" />
+    <link rel="prev" title="Link Tasks" href="link_tasks.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="running-hlink">
+<h1>Running hlink<a class="headerlink" href="#running-hlink" title="Permalink to this headline">¶</a></h1>
+<section id="using-hlink-as-a-library">
+<h2>Using hlink as a Library<a class="headerlink" href="#using-hlink-as-a-library" title="Permalink to this headline">¶</a></h2>
+<p>hlink can be used as a Python library for scripting linking jobs. It provides some high-level classes and
+functions for interacting with Spark, handling configuration, and running linking tasks and steps.</p>
+<p>The main class in the library is <code class="docutils literal notranslate"><span class="pre">LinkRun</span></code>, which represents a complete linking job. It provides access
+to each of the link tasks and their steps. Here is an example script that uses <code class="docutils literal notranslate"><span class="pre">LinkRun</span></code> to do some linking.
+Below we go into more detail on each of the important aspects of the script.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hlink.linking.link_run</span> <span class="kn">import</span> <span class="n">LinkRun</span>
+<span class="kn">from</span> <span class="nn">hlink.spark.factory</span> <span class="kn">import</span> <span class="n">SparkFactory</span>
+<span class="kn">from</span> <span class="nn">hlink.configs.load_config</span> <span class="kn">import</span> <span class="n">load_conf_file</span>
+
+<span class="c1"># First we create a SparkSession with all default configuration settings.</span>
+<span class="n">factory</span> <span class="o">=</span> <span class="n">SparkFactory</span><span class="p">()</span>
+<span class="n">spark</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># Now let&#39;s load in our config file.</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">load_conf_file</span><span class="p">(</span><span class="s2">&quot;./my_conf&quot;</span><span class="p">)</span>
+
+<span class="n">lr</span> <span class="o">=</span> <span class="n">LinkRun</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Get some information about each of the steps in the</span>
+<span class="c1"># preprocessing task.</span>
+<span class="n">prep_steps</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">get_steps</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prep_steps</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Required input tables:&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">input_table_names</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated output tables:&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">output_table_names</span><span class="p">)</span>
+
+<span class="c1"># Run all of the steps in the preprocessing task.</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">run_all_steps</span><span class="p">()</span>
+
+<span class="c1"># Run the first two steps in the matching task.</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">matching</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">matching</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Get the potential_matches table.</span>
+<span class="n">matches</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s2">&quot;potential_matches&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">matches</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+
+<span class="c1"># Get the Spark DataFrame for the potential_matches table.</span>
+<span class="n">matches_df</span> <span class="o">=</span> <span class="n">matches</span><span class="o">.</span><span class="n">df</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Each link task can be accessed through the <code class="docutils literal notranslate"><span class="pre">LinkRun</span></code> as an attribute like <code class="docutils literal notranslate"><span class="pre">lr.preprocessing</span></code> or <code class="docutils literal notranslate"><span class="pre">lr.hh_model_exploration</span></code>.
+Link steps for each task can be run with <code class="docutils literal notranslate"><span class="pre">task.run_all_steps()</span></code> or <code class="docutils literal notranslate"><span class="pre">task.run_step(i)</span></code>. The easiest way to
+access Spark tables is through <code class="docutils literal notranslate"><span class="pre">lr.get_table()</span></code>. This method returns an <code class="docutils literal notranslate"><span class="pre">hlink.linking.table.Table</span></code> object, which provides
+an interface to easily check if the table exists, get its Spark DataFrame, or drop it.</p>
+<p>To create a <code class="docutils literal notranslate"><span class="pre">LinkRun</span></code>, we need to set up a <code class="docutils literal notranslate"><span class="pre">pyspark.sql.SparkSession</span></code> object. The most convenient way to do this is through
+the <code class="docutils literal notranslate"><span class="pre">hlink.spark.factory.SparkFactory</span></code> class. <code class="docutils literal notranslate"><span class="pre">SparkFactory</span></code> defines many default configuration values which can be adjusted as needed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hlink.spark.factory</span> <span class="kn">import</span> <span class="n">SparkFactory</span>
+
+<span class="n">factory</span> <span class="o">=</span> <span class="n">SparkFactory</span><span class="p">()</span>
+<span class="n">spark</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">set_local</span><span class="p">()</span><span class="o">.</span><span class="n">set_num_cores</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">set_executor_memory</span><span class="p">(</span><span class="s2">&quot;5G&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We’ll also need to load in a config to get the <code class="docutils literal notranslate"><span class="pre">LinkRun</span></code> up and running. A config is
+a dictionary with string keys, often read in from a TOML or JSON file. The
+<code class="docutils literal notranslate"><span class="pre">hlink.configs.load_config.load_conf_file</span></code> function is helpful for reading in config files,
+as are the <code class="docutils literal notranslate"><span class="pre">json</span></code> and <code class="docutils literal notranslate"><span class="pre">toml</span></code> python modules. For more information on writing config files,
+please see the <a class="reference internal" href="config.html"><span class="doc">Configuration</span></a> page.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">examples/tutorial</span></code> directory there is an example script that uses hlink as a library to
+link people between two datasets. The example includes a working config file.</p>
+</section>
+<section id="interactive-mode">
+<h2>Interactive Mode<a class="headerlink" href="#interactive-mode" title="Permalink to this headline">¶</a></h2>
+<p>In addition to a library, hlink provides a command-line interface, which can be started
+with the <code class="docutils literal notranslate"><span class="pre">hlink</span></code> command.</p>
+<section id="starting-the-program">
+<h3>Starting the program<a class="headerlink" href="#starting-the-program" title="Permalink to this headline">¶</a></h3>
+<p>The program takes as input a TOML or JSON configuration file, described in the <a class="reference internal" href="config.html"><span class="doc">Configuration</span></a> page.  Parameters described in the config include paths to input data files, paths to training data files, instructions for generating machine learning features, and model parameters.  The configuration enables reproducible runs that should produce the same results on the same input data.</p>
+<p>All input flags can be printed to the console by running <code class="docutils literal notranslate"><span class="pre">hlink</span> <span class="pre">--help</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cpu ~$ hlink --help
+usage: hlink [-h] [--mesos] [--user USER] [--cores CORES]
+             [--executor_memory EXECUTOR_MEMORY] [--task TASK]
+             [--execute_tasks EXECUTE_TASKS [EXECUTE_TASKS ...]]
+             [--execute_command EXECUTE_COMMAND [EXECUTE_COMMAND ...]]
+             [--conf CONF]
+
+Historical linking program.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --mesos               run on mesos at isrdi. Must be on isrdi machines to
+                        work.
+  --user USER           run as a specific user
+  --cores CORES         the max number of cores to use on mesos
+  --executor_memory EXECUTOR_MEMORY
+                        the memory per executor to use
+  --task TASK           The initial task to begin processing.
+  --execute_tasks EXECUTE_TASKS [EXECUTE_TASKS ...]
+                        Execute a series of tasks then exit the program.
+  --execute_command EXCUTE_COMMAND [EXECUTE_COMMAND ...]
+                        Execute a single command then exit the program.
+  --conf CONF, --run CONF
+                        Specify a filepath where your config file for the run
+                        is located.
+</pre></div>
+</div>
+<p>To run the program in interactive mode using a configuration file at a specified path, say <code class="docutils literal notranslate"><span class="pre">./fullcount_1870_1880.toml</span></code>, run a command following this pattern:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink --conf<span class="o">=</span>./full_count_1870_1880.toml
+</pre></div>
+</div>
+<p>After the program has started, you will see a prompt that looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $
+</pre></div>
+</div>
+<p>Type <code class="docutils literal notranslate"><span class="pre">help</span></code> or <code class="docutils literal notranslate"><span class="pre">?</span></code> and hit enter to see a list of commands; type <code class="docutils literal notranslate"><span class="pre">help</span> <span class="pre">&lt;command&gt;</span></code> to see the help text of a specific command.
+Commands that start with “x_” are experimental. They may be unstable or missing some documentation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ ?
+
+Documented commands (type help &lt;topic&gt;):
+========================================
+analyze        get_steps      set_preexisting_tables  x_persist
+borrow_tables  get_tasks      set_print_sql           x_sql
+count          help           show                    x_sqlf
+csv            ipython        showf                   x_summary
+desc           list           x_crosswalk             x_tab
+drop           q              x_hh_tfam               x_tfam
+drop_all       reload         x_hh_tfam_2a            x_tfam_raw
+drop_all_prc   run_all_steps  x_hh_tfam_2b            x_union
+drop_all_temp  run_step       x_load
+get_settings   set_link_task  x_parquet_from_csv
+</pre></div>
+</div>
+</section>
+<section id="running-linking-tasks-and-steps">
+<h3>Running Linking Tasks and Steps<a class="headerlink" href="#running-linking-tasks-and-steps" title="Permalink to this headline">¶</a></h3>
+<p>The program is organized into a hierarchy of tasks and steps. The five major tasks are <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code>, <code class="docutils literal notranslate"><span class="pre">training</span></code>, <code class="docutils literal notranslate"><span class="pre">matching</span></code>, <code class="docutils literal notranslate"><span class="pre">hh_training</span></code>, and <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code>, and within each task are multiple steps.
+To see all linking tasks, run the command <code class="docutils literal notranslate"><span class="pre">get_tasks</span></code>.  You should see something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ get_tasks
+Current link task: Preprocessing
+Linking task choices are: 
+preprocessing :: Preprocessing
+        Requires no preexisting tables.
+        Produces tables: {&#39;prepped_df_a&#39;, &#39;prepped_df_b&#39;, &#39;raw_df_b&#39;, &#39;raw_df_a&#39;}
+training :: Training
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;prepped_df_b&#39;}
+        Produces tables: {&#39;training_data&#39;, &#39;training_features&#39;}
+matching :: Matching
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;prepped_df_b&#39;}
+        Produces tables: {&#39;scored_potential_matches&#39;, &#39;potential_matches_prepped&#39;, &#39;potential_matches&#39;, &#39;exploded_df_b&#39;, &#39;exploded_df_a&#39;, &#39;predicted_matches&#39;}
+hh_training :: Household Training
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;prepped_df_b&#39;}
+        Produces tables: {&#39;hh_training_features&#39;, &#39;hh_training_data&#39;}
+hh_matching :: Household Matching
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;predicted_matches&#39;, &#39;prepped_df_b&#39;}
+        Produces tables: {&#39;hh_predicted_matches&#39;, &#39;hh_scored_potential_matches&#39;, &#39;hh_potential_matches&#39;, &#39;hh_blocked_matches&#39;, &#39;hh_potential_matchs_prepped&#39;}
+model_exploration :: Model Exploration
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;prepped_df_b&#39;}
+        Produces tables: {&#39;model_eval_training_vectorized&#39;, &#39;model_eval_training_data&#39;, &#39;model_eval_repeat_FPs&#39;, &#39;model_eval_training_features&#39;, &#39;model_eval_training_results&#39;, &#39;model_eval_repeat_FNs&#39;}
+hh_model_exploration :: Household Model Exploration
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;prepped_df_b&#39;}
+        Produces tables: {&#39;hh_model_eval_training_vectorized&#39;, &#39;hh_model_eval_repeat_FPs&#39;, &#39;hh_model_eval_repeat_FNs&#39;, &#39;hh_model_eval_training_results&#39;, &#39;hh_model_eval_training_features&#39;, &#39;hh_model_eval_training_data&#39;}
+reporting :: Reporting
+        Requires tables: {&#39;prepped_df_a&#39;, &#39;hh_predicted_matches&#39;, &#39;prepped_df_b&#39;, &#39;predicted_matches&#39;, &#39;raw_df_b&#39;, &#39;raw_df_a&#39;}
+        Produces no persistent tables.
+</pre></div>
+</div>
+<p>Each linking task will interact with Spark tables within the program. To see a list of tables run the command <code class="docutils literal notranslate"><span class="pre">list</span></code>. To also see hidden intermediate tables, run <code class="docutils literal notranslate"><span class="pre">list</span> <span class="pre">all</span></code>. If you have just started the program for the first time, you should see no tables created yet:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ list
++--------+---------+-----------+
+|database|tableName|isTemporary|
++--------+---------+-----------+
++--------+---------+-----------+
+</pre></div>
+</div>
+<p>To see information about the steps of the task you are currently on, run <code class="docutils literal notranslate"><span class="pre">get_steps</span></code>. You should see something that looks like this:</p>
+<div class="highlight-txt notranslate"><div class="highlight"><pre><span></span>Link task: Preprocessing
+step 0: register raw dataframes
+        Tables used:
+        Tables created:
+                Table &#39;raw_df_a&#39; &lt;- Preprocessing: Raw data read in from datasource A
+                Table &#39;raw_df_b&#39; &lt;- Preprocessing: Raw data read in from datasource B
+step 1: prepare dataframes
+        Tables used:
+                Table &#39;raw_df_a&#39; &lt;- Preprocessing: Raw data read in from datasource A
+                Table &#39;raw_df_b&#39; &lt;- Preprocessing: Raw data read in from datasource B
+        Tables created:
+                Table &#39;prepped_df_a&#39; &lt;- Preprocessing: Preprocessed data from source A with selected columns and features
+                Table &#39;prepped_df_b&#39; &lt;- Preprocessing: Preprocessed data from source B with selected columns and features
+</pre></div>
+</div>
+<p>To change your current link task, run <code class="docutils literal notranslate"><span class="pre">set_link_task</span> <span class="pre">&lt;task_name&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;task_name&gt;</span></code> is the name of the link task.</p>
+<p>Once you are sure that you are on the right task, you can use the <code class="docutils literal notranslate"><span class="pre">run_step</span> <span class="pre">&lt;num&gt;</span></code> command to run a step. For example if you run <code class="docutils literal notranslate"><span class="pre">run_step</span> <span class="pre">0</span></code> you should see something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ run_step 0
+Link task: Preprocessing
+Running step 0: register raw dataframes
+Finished step 0: register raw dataframes in 5.85s 
+</pre></div>
+</div>
+<p>After the step is complete, you can run <code class="docutils literal notranslate"><span class="pre">list</span></code> to see what tables it created:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ list
++--------+---------+-----------+-------------------------------------------------+
+|database|tableName|isTemporary|description                                      |
++--------+---------+-----------+-------------------------------------------------+
+|linking |raw_df_a |false      |Preprocessing: Raw data read in from datasource A|
+|linking |raw_df_b |false      |Preprocessing: Raw data read in from datasource B|
++--------+---------+-----------+-------------------------------------------------+
+</pre></div>
+</div>
+<p>To run all steps in a task, use the <code class="docutils literal notranslate"><span class="pre">run_all_steps</span> <span class="pre">&lt;tasks&gt;</span></code> command, where <code class="docutils literal notranslate"><span class="pre">&lt;tasks&gt;</span></code> is a list of tasks you want to run all the steps for. By default this command will run all the steps for the current task.</p>
+</section>
+<section id="example-interactive-mode-workflow">
+<h3>Example interactive mode workflow<a class="headerlink" href="#example-interactive-mode-workflow" title="Permalink to this headline">¶</a></h3>
+<ol>
+<li><p>Create a config file and put it in your hlink config directory.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">full_count_1870_1880</span><span class="o">.</span><span class="n">toml</span>
+</pre></div>
+</div>
+</li>
+<li><p>Launch the hlink program in interactive mode:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink --conf<span class="o">=</span>/path/to/conf/full_count_1870_1880
+</pre></div>
+</div>
+</li>
+<li><p>Run the tasks you want to complete:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> hlink $ run_all_steps preprocessing training matching
+</pre></div>
+</div>
+</li>
+<li><p>List the created tables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ list 
+</pre></div>
+</div>
+</li>
+<li><p>Export the results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ csv predicted_matches /my/output/file.csv
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">hlink</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="link_tasks.html">Link Tasks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running hlink</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-hlink-as-a-library">Using hlink as a Library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interactive-mode">Interactive Mode</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="use_examples.html">Advanced Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Configuration API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="column_mapping_transforms.html">Column Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison_types.html">Comparison Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_selection_transforms.html">Feature Selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_features.html">Pipeline Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="substitutions.html">Substitutions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="link_tasks.html" title="previous chapter">Link Tasks</a></li>
+      <li>Next: <a href="use_examples.html" title="next chapter">Advanced Workflow Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019-2022, IPUMS.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/running_the_program.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
