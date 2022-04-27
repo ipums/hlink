@@ -1,0 +1,71 @@
+id_column = "id"
+feature_selections = []
+generate_potential_matches_with_full_data = true
+
+[datasource_a]
+alias = "us1900"
+file = "integration_a.csv"
+
+[datasource_b]
+alias = "us1910"
+file = "integration_b.csv"
+
+[[column_mappings]]
+column_name = "serialp"
+[[column_mappings]]
+column_name = "sex"
+[[column_mappings]]
+column_name = "namelast"
+[[column_mappings]]
+column_name = "bpl"
+[[column_mappings]]
+column_name = "region"
+[[column_mappings]]
+column_name = "age"
+
+[[comparison_features]]
+alias = "regionf"
+column_name = "region"
+comparison_type = "fetch_a"
+categorical = true
+
+[[comparison_features]]
+alias = "namelast_jw"
+column_name = "namelast"
+comparison_type = "jaro_winkler"
+
+[[comparison_features]]
+alias = "sex_equals"
+column_name = "sex"
+comparison_type = "equals"
+
+[[blocking]]
+column_name = "sex"
+[[blocking]]
+column_name = "age_3"
+dataset = "a"
+derived_from = "age"
+expand_length = 3
+explode = true
+
+[comparisons]
+comparison_type = "threshold"
+feature_name = "namelast_jw"
+threshold = 0.8
+
+[[pipeline_features]]
+input_columns =  ["sex_equals", "regionf"]
+output_column =  "sex_regionf_interaction"
+transformer_type =  "interaction"
+
+[training]
+dataset = "training_data.csv"
+dependent_var = "match"
+decision = "drop_duplicate_with_threshold_ratio"
+independent_vars = [ "namelast_jw", "regionf", "hits", "sex_regionf_interaction"]
+model_parameters = [ { type = "random_forest", maxDepth = 7, numTrees = 100, featureSubsetStrategy = "sqrt", threshold_ratio = 1.3 } ]
+chosen_model = { type = "random_forest", maxDepth = 7, numTrees = 100, featureSubsetStrategy = "sqrt" }
+threshold_ratio = 1.3
+score_with_model = true
+n_training_iterations = 2
+

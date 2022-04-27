@@ -1,0 +1,6 @@
+﻿histid_a,namefrst_a,namelast_a,serialp_a,histid_b,namefrst_b,namelast_b,serialp_b,prediction
+1000A,Albert,Johnson,1,1000B,Albert,Johnson,7,1
+1001B,Mary,Johnson,1,1001B,Mary,Johnson,7,1
+1002A,Steve,Johnson,1,1003B,Steve,Johnson,7,1
+1002A,Steve,Johnson,1,1007B,Steve,Johnson,8,1
+1003A,Robert,Johnson,1,1004B,Robert,Johnson,8,1
