@@ -1,4 +1,0 @@
-#! /bin/bash
-
-/pkg/ipumsi-programming/perl_ipums_git/src/_log_from_wrapper /pkg/ipums/programming/linking/hlink/deploys/XXX_BRANCH/venv/bin/hlink "$@"
-SPARK_HOME=/pkg/ipums/programming/linking/hlink/spark/spark-2.3.1-bin-hadoop2.7 HLINK_CONF=/pkg/ipums/programming/linking/hlink/deploys/XXX_BRANCH/global_conf.json /pkg/ipums/programming/linking/hlink/deploys/XXX_BRANCH/venv/bin/hlink "$@" 
