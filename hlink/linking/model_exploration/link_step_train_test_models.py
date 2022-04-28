@@ -28,8 +28,10 @@ class LinkStepTrainTestModels(LinkStep):
             ],
             output_table_names=[
                 f"{task.table_prefix}training_results",
-                f"{task.table_prefix}repeat_FPs",
-                f"{task.table_prefix}repeat_FNs",
+                f"{task.table_prefix}repeat_fps",
+                f"{task.table_prefix}repeat_fns",
+                f"{task.table_prefix}repeat_tps",
+                f"{task.table_prefix}repeat_tns",
             ],
         )
 
@@ -308,6 +310,19 @@ class LinkStepTrainTestModels(LinkStep):
                 f"Training results saved to Spark table '{table_prefix}training_results'."
             )
 
+    def _prepare_otd_table(self, spark, df, id_a, id_b):
+        spark_df = spark.createDataFrame(df)
+        counted = (
+            spark_df.groupby(id_a, id_b)
+            .agg(
+                count("*").alias("count"),
+                mean("probability").alias("mean_probability"),
+            )
+            .filter("count > 1")
+            .orderBy(["count", id_a, id_b])
+        )
+        return counted
+
     def _save_otd_data(self, otd_data, spark):
         table_prefix = self.task.table_prefix
 
@@ -315,40 +330,54 @@ class LinkStepTrainTestModels(LinkStep):
             return
         id_a = otd_data["id_a"]
         id_b = otd_data["id_b"]
+
         if not otd_data["FP_data"].empty:
-            sp_FPs = spark.createDataFrame(otd_data["FP_data"])
-            counted_FPs = (
-                sp_FPs.groupBy(id_a, id_b)
-                .agg(
-                    count("*").alias("count"),
-                    mean("probability").alias("mean_probability"),
-                )
-                .filter("count > 1")
-                .orderBy(["count", f"{id_a}", f"{id_b}"])
+            table_name = f"{table_prefix}repeat_fps"
+            counted_FPs = self._prepare_otd_table(
+                spark, otd_data["FP_data"], id_a, id_b
             )
-            counted_FPs.write.mode("overwrite").saveAsTable(f"{table_prefix}repeat_FPs")
+            counted_FPs.write.mode("overwrite").saveAsTable(table_name)
             print(
-                f"A table of false positives of length {counted_FPs.count()} was saved as '{table_prefix}repeat_FPs' for analysis."
+                f"A table of false positives of length {counted_FPs.count()} was saved as '{table_name}' for analysis."
             )
         else:
             print("There were no false positives recorded.")
+
         if not otd_data["FN_data"].empty:
-            sp_FNs = spark.createDataFrame(otd_data["FN_data"])
-            counted_FNs = (
-                sp_FNs.groupBy(id_a, id_b)
-                .agg(
-                    count("*").alias("count"),
-                    mean("probability").alias("mean_probability"),
-                )
-                .filter("count > 1")
-                .orderBy(["count", f"{id_a}", f"{id_b}"])
+            table_name = f"{table_prefix}repeat_fns"
+            counted_FNs = self._prepare_otd_table(
+                spark, otd_data["FN_data"], id_a, id_b
             )
-            counted_FNs.write.mode("overwrite").saveAsTable(f"{table_prefix}repeat_FNs")
+            counted_FNs.write.mode("overwrite").saveAsTable(table_name)
             print(
-                f"A table of false negatives of length {counted_FNs.count()} was saved as '{table_prefix}repeat_FNs' for analysis."
+                f"A table of false negatives of length {counted_FNs.count()} was saved as '{table_name}' for analysis."
             )
         else:
             print("There were no false negatives recorded.")
+
+        if not otd_data["TP_data"].empty:
+            table_name = f"{table_prefix}repeat_tps"
+            counted_TPs = self._prepare_otd_table(
+                spark, otd_data["TP_data"], id_a, id_b
+            )
+            counted_TPs.write.mode("overwrite").saveAsTable(table_name)
+            print(
+                f"A table of true positives of length {counted_TPs.count()} was saved as '{table_name}' for analysis."
+            )
+        else:
+            print("There were no true positives recorded.")
+
+        if not otd_data["TN_data"].empty:
+            table_name = f"{table_prefix}repeat_tns"
+            counted_TNs = self._prepare_otd_table(
+                spark, otd_data["TN_data"], id_a, id_b
+            )
+            counted_TNs.write.mode("overwrite").saveAsTable(table_name)
+            print(
+                f"A table of true negatives of length {counted_TNs.count()} was saved as '{table_name}' for analysis."
+            )
+        else:
+            print("There were no true negatives recorded.")
 
     def _create_otd_data(self, id_a, id_b):
         """Output Suspicous Data (OTD): used to check config to see if you should find sketchy training data that the models routinely mis-classify"""
@@ -362,6 +391,8 @@ class LinkStepTrainTestModels(LinkStep):
             return {
                 "FP_data": pd.DataFrame(),
                 "FN_data": pd.DataFrame(),
+                "TP_data": pd.DataFrame(),
+                "TN_data": pd.DataFrame(),
                 "id_a": id_a,
                 "id_b": id_b,
             }
@@ -429,15 +460,29 @@ def _get_confusion_matrix(predictions, dep_var, otd_data):
     TN_count = TN.count()
 
     if otd_data:
+        id_a = otd_data["id_a"]
+        id_b = otd_data["id_b"]
+
         new_FP_data = FP.select(
-            otd_data["id_a"], otd_data["id_b"], dep_var, "prediction", "probability"
+            id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
         otd_data["FP_data"] = otd_data["FP_data"].append(new_FP_data)
 
         new_FN_data = FN.select(
-            otd_data["id_a"], otd_data["id_b"], dep_var, "prediction", "probability"
+            id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
         otd_data["FN_data"] = otd_data["FN_data"].append(new_FN_data)
+
+        new_TP_data = TP.select(
+            id_a, id_b, dep_var, "prediction", "probability"
+        ).toPandas()
+        otd_data["TP_data"] = otd_data["TP_data"].append(new_TP_data)
+
+        new_TN_data = TN.select(
+            id_a, id_b, dep_var, "prediction", "probability"
+        ).toPandas()
+        otd_data["TN_data"] = otd_data["TN_data"].append(new_TN_data)
+
     return TP_count, FP_count, FN_count, TN_count
 
 

@@ -22,13 +22,17 @@ model_eval_training_data,Model Exploration: Raw training data as read from speci
 model_eval_training_vectorized,Model Exploration: Training data after applying comparison feature and pipeline transformations,1
 model_eval_training_results,Model Exploration: Results of ML model exploration train/test splits,0
 model_eval_training_features,Model Exploration: Transformed data with features,1
-model_eval_repeat_FPs,Model Exploration: Potential false positives repeated in training data during train/test split,1
-model_eval_repeat_FNs,Model Exploration: Potential false negatives repeated in training data during train/test split,1
+model_eval_repeat_fps,Model Exploration: Potential false positives repeated in training data during train/test split,1
+model_eval_repeat_fns,Model Exploration: Potential false negatives repeated in training data during train/test split,1
+model_eval_repeat_tps,Model Exploration: Potential true positives repeated in training data during train/test split,1
+model_eval_repeat_tns,Model Exploration: Potential true negatives repeated in training data during train/test split,1
 hh_model_eval_training_features,Household Model Exploration: Transformed data with features,1
 hh_model_eval_training_vectorized,Household Model Exploration: Training data after applying comparison feature and pipeline transformations,1
 hh_model_eval_training_results,Household Model Exploration: Results of household ML model exploration train/test splits,0
 hh_model_eval_training_data,Household Model Exploration: Raw training data as read from specified file,1
-hh_model_eval_repeat_FPs,Household Model Exploration: Potential false positives repeated in household training data during train/test split,1
-hh_model_eval_repeat_FNs,Household Model Exploration: Potential false negatives repeated in household training data during train/test split,1
+hh_model_eval_repeat_fps,Household Model Exploration: Potential false positives repeated in household training data during train/test split,1
+hh_model_eval_repeat_fns,Household Model Exploration: Potential false negatives repeated in household training data during train/test split,1
+hh_model_eval_repeat_tps,Household Model Exploration: Potential true positives repeated in household training data during train/test split,1
+hh_model_eval_repeat_tns,Household Model Exploration: Potential true negatives repeated in household training data during train/test split,1
 predicted_matches,Matching: Matches predicted by algorithm after thresholds and removal of duplicate histid_b,0
 hh_predicted_matches,Household Matching: Matches predicted by algorithm after thresholds and removal of duplicate histid_b,0
