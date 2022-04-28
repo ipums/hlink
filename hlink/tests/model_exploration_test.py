@@ -285,9 +285,15 @@ def test_step_2_train_random_forest_spark(
     assert tr.query("model == 'random_forest'")["precision_test_mean"].iloc[0] > 0.5
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 3
 
-    FNs = spark.table("model_eval_repeat_FNs").toPandas()
+    FNs = spark.table("model_eval_repeat_fns").toPandas()
     assert FNs.shape == (3, 4)
     assert FNs.query("id_a == 30")["count"].iloc[0] > 5
+
+    TPs = spark.table("model_eval_repeat_tps").toPandas()
+    assert TPs.shape == (1, 4)
+
+    TNs = spark.table("model_eval_repeat_tns").toPandas()
+    assert TNs.shape == (6, 4)
 
     main.do_drop_all("")
 
