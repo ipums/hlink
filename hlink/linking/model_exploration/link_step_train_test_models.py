@@ -331,7 +331,9 @@ class LinkStepTrainTestModels(LinkStep):
 
         if not otd_data["FP_data"].empty:
             table_name = f"{table_prefix}repeat_FPs"
-            counted_FPs = self._prepare_otd_table(spark, otd_data["FP_data"], id_a, id_b)
+            counted_FPs = self._prepare_otd_table(
+                spark, otd_data["FP_data"], id_a, id_b
+            )
             counted_FPs.write.mode("overwrite").saveAsTable(table_name)
             print(
                 f"A table of false positives of length {counted_FPs.count()} was saved as '{table_name}' for analysis."
@@ -341,7 +343,9 @@ class LinkStepTrainTestModels(LinkStep):
 
         if not otd_data["FN_data"].empty:
             table_name = f"{table_prefix}repeat_FNs"
-            counted_FNs = self._prepare_otd_table(spark, otd_data["FN_data"], id_a, id_b)
+            counted_FNs = self._prepare_otd_table(
+                spark, otd_data["FN_data"], id_a, id_b
+            )
             counted_FNs.write.mode("overwrite").saveAsTable(table_name)
             print(
                 f"A table of false negatives of length {counted_FNs.count()} was saved as '{table_name}' for analysis."
@@ -351,7 +355,9 @@ class LinkStepTrainTestModels(LinkStep):
 
         if not otd_data["TP_data"].empty:
             table_name = f"{table_prefix}repeat_TPs"
-            counted_TPs = self._prepare_otd_table(spark, otd_data["TP_data"], id_a, id_b)
+            counted_TPs = self._prepare_otd_table(
+                spark, otd_data["TP_data"], id_a, id_b
+            )
             counted_TPs.write.mode("overwrite").saveAsTable(table_name)
             print(
                 f"A table of true positives of length {counted_TPs.count()} was saved as '{table_name}' for analysis."
@@ -361,7 +367,9 @@ class LinkStepTrainTestModels(LinkStep):
 
         if not otd_data["TN_data"].empty:
             table_name = f"{table_prefix}repeat_TNs"
-            counted_TNs = self._prepare_otd_table(spark, otd_data["TN_data"], id_a, id_b)
+            counted_TNs = self._prepare_otd_table(
+                spark, otd_data["TN_data"], id_a, id_b
+            )
             counted_TNs.write.mode("overwrite").saveAsTable(table_name)
             print(
                 f"A table of true negatives of length {counted_TNs.count()} was saved as '{table_name}' for analysis."
