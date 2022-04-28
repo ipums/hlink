@@ -350,6 +350,16 @@ class LinkStepTrainTestModels(LinkStep):
         else:
             print("There were no false negatives recorded.")
 
+        if not otd_data["TP_data"].empty:
+            print("True positive data is not empty; saving not implemented yet")
+        else:
+            print("There were no true positives recorded.")
+
+        if not otd_data["TN_data"].empty:
+            print("True negative data is not empty; saving not implemented yet")
+        else:
+            print("There were no true negatives recorded.")
+
     def _create_otd_data(self, id_a, id_b):
         """Output Suspicous Data (OTD): used to check config to see if you should find sketchy training data that the models routinely mis-classify"""
         training_conf = str(self.task.training_conf)
@@ -362,6 +372,8 @@ class LinkStepTrainTestModels(LinkStep):
             return {
                 "FP_data": pd.DataFrame(),
                 "FN_data": pd.DataFrame(),
+                "TP_data": pd.DataFrame(),
+                "TN_data": pd.DataFrame(),
                 "id_a": id_a,
                 "id_b": id_b,
             }
@@ -429,15 +441,29 @@ def _get_confusion_matrix(predictions, dep_var, otd_data):
     TN_count = TN.count()
 
     if otd_data:
+        id_a = otd_data["id_a"]
+        id_b = otd_data["id_b"]
+
         new_FP_data = FP.select(
-            otd_data["id_a"], otd_data["id_b"], dep_var, "prediction", "probability"
+            id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
         otd_data["FP_data"] = otd_data["FP_data"].append(new_FP_data)
 
         new_FN_data = FN.select(
-            otd_data["id_a"], otd_data["id_b"], dep_var, "prediction", "probability"
+            id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
         otd_data["FN_data"] = otd_data["FN_data"].append(new_FN_data)
+
+        new_TP_data = TP.select(
+            id_a, id_b, dep_var, "prediction", "probability"
+        ).toPandas()
+        otd_data["TP_data"] = otd_data["TP_data"].append(new_TP_data)
+
+        new_TN_data = TN.select(
+            id_a, id_b, dep_var, "prediction", "probability"
+        ).toPandas()
+        otd_data["TN_data"] = otd_data["TN_data"].append(new_TN_data)
+
     return TP_count, FP_count, FN_count, TN_count
 
 
