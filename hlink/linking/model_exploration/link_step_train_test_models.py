@@ -28,8 +28,10 @@ class LinkStepTrainTestModels(LinkStep):
             ],
             output_table_names=[
                 f"{task.table_prefix}training_results",
-                f"{task.table_prefix}repeat_FPs",
-                f"{task.table_prefix}repeat_FNs",
+                f"{task.table_prefix}repeat_fps",
+                f"{task.table_prefix}repeat_fns",
+                f"{task.table_prefix}repeat_tps",
+                f"{task.table_prefix}repeat_tns",
             ],
         )
 
@@ -330,7 +332,7 @@ class LinkStepTrainTestModels(LinkStep):
         id_b = otd_data["id_b"]
 
         if not otd_data["FP_data"].empty:
-            table_name = f"{table_prefix}repeat_FPs"
+            table_name = f"{table_prefix}repeat_fps"
             counted_FPs = self._prepare_otd_table(
                 spark, otd_data["FP_data"], id_a, id_b
             )
@@ -342,7 +344,7 @@ class LinkStepTrainTestModels(LinkStep):
             print("There were no false positives recorded.")
 
         if not otd_data["FN_data"].empty:
-            table_name = f"{table_prefix}repeat_FNs"
+            table_name = f"{table_prefix}repeat_fns"
             counted_FNs = self._prepare_otd_table(
                 spark, otd_data["FN_data"], id_a, id_b
             )
@@ -354,7 +356,7 @@ class LinkStepTrainTestModels(LinkStep):
             print("There were no false negatives recorded.")
 
         if not otd_data["TP_data"].empty:
-            table_name = f"{table_prefix}repeat_TPs"
+            table_name = f"{table_prefix}repeat_tps"
             counted_TPs = self._prepare_otd_table(
                 spark, otd_data["TP_data"], id_a, id_b
             )
@@ -366,7 +368,7 @@ class LinkStepTrainTestModels(LinkStep):
             print("There were no true positives recorded.")
 
         if not otd_data["TN_data"].empty:
-            table_name = f"{table_prefix}repeat_TNs"
+            table_name = f"{table_prefix}repeat_tns"
             counted_TNs = self._prepare_otd_table(
                 spark, otd_data["TN_data"], id_a, id_b
             )
