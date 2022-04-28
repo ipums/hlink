@@ -308,6 +308,19 @@ class LinkStepTrainTestModels(LinkStep):
                 f"Training results saved to Spark table '{table_prefix}training_results'."
             )
 
+    def _prepare_otd_table(self, spark, df, id_a, id_b):
+        spark_df = spark.createDataFrame(df)
+        counted = (
+            spark_df.groupby(id_a, id_b)
+            .agg(
+                count("*").alias("count"),
+                mean("probability").alias("mean_probability"),
+            )
+            .filter("count > 1")
+            .orderBy(["count", id_a, id_b])
+        )
+        return counted
+
     def _save_otd_data(self, otd_data, spark):
         table_prefix = self.task.table_prefix
 
@@ -315,48 +328,44 @@ class LinkStepTrainTestModels(LinkStep):
             return
         id_a = otd_data["id_a"]
         id_b = otd_data["id_b"]
+
         if not otd_data["FP_data"].empty:
-            sp_FPs = spark.createDataFrame(otd_data["FP_data"])
-            counted_FPs = (
-                sp_FPs.groupBy(id_a, id_b)
-                .agg(
-                    count("*").alias("count"),
-                    mean("probability").alias("mean_probability"),
-                )
-                .filter("count > 1")
-                .orderBy(["count", f"{id_a}", f"{id_b}"])
-            )
-            counted_FPs.write.mode("overwrite").saveAsTable(f"{table_prefix}repeat_FPs")
+            table_name = f"{table_prefix}repeat_FPs"
+            counted_FPs = self._prepare_otd_table(spark, otd_data["FP_data"], id_a, id_b)
+            counted_FPs.write.mode("overwrite").saveAsTable(table_name)
             print(
-                f"A table of false positives of length {counted_FPs.count()} was saved as '{table_prefix}repeat_FPs' for analysis."
+                f"A table of false positives of length {counted_FPs.count()} was saved as '{table_name}' for analysis."
             )
         else:
             print("There were no false positives recorded.")
+
         if not otd_data["FN_data"].empty:
-            sp_FNs = spark.createDataFrame(otd_data["FN_data"])
-            counted_FNs = (
-                sp_FNs.groupBy(id_a, id_b)
-                .agg(
-                    count("*").alias("count"),
-                    mean("probability").alias("mean_probability"),
-                )
-                .filter("count > 1")
-                .orderBy(["count", f"{id_a}", f"{id_b}"])
-            )
-            counted_FNs.write.mode("overwrite").saveAsTable(f"{table_prefix}repeat_FNs")
+            table_name = f"{table_prefix}repeat_FNs"
+            counted_FNs = self._prepare_otd_table(spark, otd_data["FN_data"], id_a, id_b)
+            counted_FNs.write.mode("overwrite").saveAsTable(table_name)
             print(
-                f"A table of false negatives of length {counted_FNs.count()} was saved as '{table_prefix}repeat_FNs' for analysis."
+                f"A table of false negatives of length {counted_FNs.count()} was saved as '{table_name}' for analysis."
             )
         else:
             print("There were no false negatives recorded.")
 
         if not otd_data["TP_data"].empty:
-            print("True positive data is not empty; saving not implemented yet")
+            table_name = f"{table_prefix}repeat_TPs"
+            counted_TPs = self._prepare_otd_table(spark, otd_data["TP_data"], id_a, id_b)
+            counted_TPs.write.mode("overwrite").saveAsTable(table_name)
+            print(
+                f"A table of true positives of length {counted_TPs.count()} was saved as '{table_name}' for analysis."
+            )
         else:
             print("There were no true positives recorded.")
 
         if not otd_data["TN_data"].empty:
-            print("True negative data is not empty; saving not implemented yet")
+            table_name = f"{table_prefix}repeat_TNs"
+            counted_TNs = self._prepare_otd_table(spark, otd_data["TN_data"], id_a, id_b)
+            counted_TNs.write.mode("overwrite").saveAsTable(table_name)
+            print(
+                f"A table of true negatives of length {counted_TNs.count()} was saved as '{table_name}' for analysis."
+            )
         else:
             print("There were no true negatives recorded.")
 
