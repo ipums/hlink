@@ -22,4 +22,4 @@ Hlink is designed to link two datasets. The primary use case was for linking dem
 
 In addition, it also provides functionality for the following research/development tasks:
 1. Model Exploration and Household Model Exploration: Use a matrix of models and hyper-parameters to evaluate model performance and select a model to be used in the production run.  Also generates reports of suspected false positives and false negatives in the specified training data set if appropriate config flag is set.
-2. Reporting): Generate reports on the linked data.
+2. Reporting: Generate reports on the linked data.
