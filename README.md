@@ -1,6 +1,6 @@
 # hlink: historical record linkage
 
-A working paper on the creation and applications of this program can be found at <https://doi.org/10.18128/ipums2020-03>. A publication on the same topic is forthcoming.
+A working paper on the creation and applications of this program can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>. A publication on the same topic is forthcoming.
 
 ## Docs
 
