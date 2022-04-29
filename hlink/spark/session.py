@@ -11,7 +11,7 @@ from pyspark.sql.types import *
 
 
 class SparkConnection(object):
-    """Handles initialization of spark session and connection to local / mesos cluster."""
+    """Handles initialization of spark session and connection to local cluster."""
 
     def __init__(self, derby_dir, warehouse_dir, tmp_dir, python, db_name):
         self.derby_dir = derby_dir
@@ -51,15 +51,6 @@ class SparkConnection(object):
     def local(self, cores=1, executor_memory="10G"):
         """Create a local 'cluster'."""
         return self.connect(f"local[{cores}]", cores, executor_memory, cores)
-
-    def mesos(self, url, cores, executor_memory, executor_cores=16):
-        """Connect to a mesos cluster at the given URL to get cluster resources."""
-        return self.connect(
-            url,
-            executor_cores,
-            executor_memory,
-            cores,
-        )
 
     def connect(
         self, connection_string, executor_cores=None, executor_memory=None, cores=None

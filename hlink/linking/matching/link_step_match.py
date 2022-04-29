@@ -22,8 +22,6 @@ class LinkStepMatch(LinkStep):
 
     def _run(self):
         config = self.task.link_run.config
-        if config.get("mesos", False):
-            self.task.spark.sql("set spark.sql.shuffle.partitions=4000")
 
         blocking = matching_helpers.get_blocking(config)
 
