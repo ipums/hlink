@@ -2,7 +2,7 @@
 
 ## Overview
 
-`hlink` is designed to link two datasets. It allows for probabilistic and deterministic record linkage. It provides functionality for the following production tasks:
+Hlink is designed to link two datasets. The primary use case was for linking demographics in the Household -> Person hierarchical structure, however it can be used to link generic datasets as well by skipping the Household linking task. It allows for probabilistic and deterministic record linkage, and provides functionality for the following tasks:
 
 1. [Preprocessing](link_tasks.html#preprocessing): preprocess each dataset to clean and transform it in preparation for linking.
 2. [Training](link_tasks.html#training-and-household-training): train machine learning models on a set of features and compare results between models.
