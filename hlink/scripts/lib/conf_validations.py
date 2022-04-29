@@ -90,7 +90,7 @@ def check_hh_training(config, comp_features):
 
 
 def check_training(config, comp_features):
-    comp_features += ["hits", "hits2", "exact_mult"]
+    comp_features += ["hits", "hits2", "exact_mult", "exact_all_mult"]
     training = config.get("training")
     if training is None:
         return
