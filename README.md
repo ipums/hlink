@@ -4,7 +4,7 @@ A working paper on the creation and applications of this program can be found at
 
 ## Docs
 
-Documentation site can be found [here](https://pages.github.umn.edu/mpc/hlink).    
+Documentation site can be found [here](https://hlink.docs.ipums.org).
 This includes information about installation and setting up your configuration files.
 
 An example script and config file can be found in the `examples` directory.
