@@ -28,7 +28,6 @@ class SparkFactory:
         self.python = sys.executable
         self.db_name = "linking"
         self.is_local = True
-        self.mesos_url = None
         self.num_cores = 4
         self.executor_memory = "10G"
         self.executor_cores = 16
@@ -61,13 +60,6 @@ class SparkFactory:
     def set_local(self):
         """Make a local spark connection."""
         self.is_local = True
-        self.mesos_url = None
-        return self
-
-    def set_mesos(self, url):
-        """Make a spark connection to the mesos cluster at the given URL."""
-        self.is_local = False
-        self.mesos_url = url
         return self
 
     def set_num_cores(self, num_cores):
@@ -90,12 +82,4 @@ class SparkFactory:
             self.python,
             self.db_name,
         )
-        if self.is_local:
-            return spark_conn.local(self.num_cores, self.executor_memory)
-        else:
-            return spark_conn.mesos(
-                self.mesos_url,
-                self.num_cores,
-                self.executor_memory,
-                self.executor_cores,
-            )
+        return spark_conn.local(self.num_cores, self.executor_memory)

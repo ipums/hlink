@@ -38,10 +38,6 @@ class LinkStepScore(LinkStep):
             )
             return
 
-        if config.get("mesos", False):
-            self.task.spark.sql("set spark.sql.shuffle.partitions=10000")
-            self.task.spark.sql("set spark.sql.files.maxPartitionBytes=28000000")
-
         id_a = config["id_column"] + "_a"
         id_b = config["id_column"] + "_b"
         chosen_model_params = config[training_conf]["chosen_model"].copy()

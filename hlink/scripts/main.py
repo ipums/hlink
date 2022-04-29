@@ -99,8 +99,6 @@ def cli():
         traceback.print_exception("", err, None)
         sys.exit(1)
 
-    run_conf["mesos"] = args.mesos
-
     spark = _get_spark(run_conf, args)
     _setup_logging(run_conf)
     history_file = os.path.expanduser("~/.history_hlink")
@@ -143,15 +141,10 @@ def cli():
 def _parse_args():
     parser = argparse.ArgumentParser(description="Historical linking program.")
     parser.add_argument(
-        "--mesos",
-        help="run on mesos at isrdi. Must be on isrdi machines to work.",
-        action="store_true",
-    )
-    parser.add_argument(
         "--user", help="run as a specific user", default=getpass.getuser()
     )
     parser.add_argument(
-        "--cores", help="the max number of cores to use on mesos", default=4, type=int
+        "--cores", help="the max number of cores to use", default=4, type=int
     )
     parser.add_argument(
         "--executor_memory", help="the memory per executor to use", default="10G"
@@ -191,16 +184,9 @@ def _get_spark(run_conf, args):
         run_conf["python"],
         "linking",
     )
-    if not (args.mesos):
-        spark = spark_connection.local(
-            cores=args.cores, executor_memory=args.executor_memory
-        )
-    else:
-        spark = spark_connection.mesos(
-            "mesos://mpc-cluster.pop.umn.edu:5050",
-            cores=args.cores,
-            executor_memory=args.executor_memory,
-        )
+    spark = spark_connection.local(
+        cores=args.cores, executor_memory=args.executor_memory
+    )
     return spark
 
 

@@ -84,7 +84,7 @@ All input flags can be printed to the console by running `hlink --help`.
 
 ```
 cpu ~$ hlink --help
-usage: hlink [-h] [--mesos] [--user USER] [--cores CORES]
+usage: hlink [-h] [--user USER] [--cores CORES]
              [--executor_memory EXECUTOR_MEMORY] [--task TASK]
              [--execute_tasks EXECUTE_TASKS [EXECUTE_TASKS ...]]
              [--execute_command EXECUTE_COMMAND [EXECUTE_COMMAND ...]]
@@ -94,10 +94,8 @@ Historical linking program.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --mesos               run on mesos at isrdi. Must be on isrdi machines to
-                        work.
   --user USER           run as a specific user
-  --cores CORES         the max number of cores to use on mesos
+  --cores CORES         the max number of cores to use
   --executor_memory EXECUTOR_MEMORY
                         the memory per executor to use
   --task TASK           The initial task to begin processing.

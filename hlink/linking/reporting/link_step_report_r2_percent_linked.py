@@ -25,9 +25,6 @@ class LinkStepReportR2PercentLinked(LinkStep):
     def _run(self):
         """ For households with anyone linked in round 1, report percent of remaining household members linked in round 2. """
 
-        if self.task.link_run.config.get("mesos", False):
-            self.task.spark.sql("set spark.sql.shuffle.partitions=4000")
-
         pdfa = self.task.spark.table("prepped_df_a").select("serialp", "histid")
         pm = (
             self.task.spark.table("predicted_matches")

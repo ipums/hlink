@@ -108,7 +108,7 @@ with the <code class="docutils literal notranslate"><span class="pre">hlink</spa
 <p>The program takes as input a TOML or JSON configuration file, described in the <a class="reference internal" href="config.html"><span class="doc">Configuration</span></a> page.  Parameters described in the config include paths to input data files, paths to training data files, instructions for generating machine learning features, and model parameters.  The configuration enables reproducible runs that should produce the same results on the same input data.</p>
 <p>All input flags can be printed to the console by running <code class="docutils literal notranslate"><span class="pre">hlink</span> <span class="pre">--help</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cpu ~$ hlink --help
-usage: hlink [-h] [--mesos] [--user USER] [--cores CORES]
+usage: hlink [-h] [--user USER] [--cores CORES]
              [--executor_memory EXECUTOR_MEMORY] [--task TASK]
              [--execute_tasks EXECUTE_TASKS [EXECUTE_TASKS ...]]
              [--execute_command EXECUTE_COMMAND [EXECUTE_COMMAND ...]]
@@ -118,10 +118,7 @@ Historical linking program.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --mesos               run on mesos at isrdi. Must be on isrdi machines to
-                        work.
   --user USER           run as a specific user
-  --cores CORES         the max number of cores to use on mesos
   --executor_memory EXECUTOR_MEMORY
                         the memory per executor to use
   --task TASK           The initial task to begin processing.

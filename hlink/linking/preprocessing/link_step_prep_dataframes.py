@@ -23,8 +23,6 @@ class LinkStepPrepDataframes(LinkStep):
 
     def _run(self):
         config = self.task.link_run.config
-        if config.get("mesos", False):
-            self.task.spark.sql("set spark.sql.shuffle.partitions=4000")
 
         substitution_columns = config.get("substitution_columns", [])
         self.task.run_register_python(
