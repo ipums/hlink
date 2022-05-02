@@ -18,7 +18,9 @@ To set up a copy of this project for development,
 
 ## Running Tests
 
-To run the project's test suite, run `pytest hlink/tests` in the root project directory.
+To run the project's test suite, run `pytest hlink/tests` in the root project directory. Running all of the tests
+can take a while, depending on your computer's hardware and setup. To run a subset of tests that test some but not
+all of the core features, try `pytest hlink/tests -m quickcheck`. These tests should run much more quickly.
 
 ## Building the Scala Jar
 
