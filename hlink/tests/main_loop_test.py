@@ -11,6 +11,7 @@ from pyspark.ml.feature import VectorAssembler, OneHotEncoderEstimator
 from hlink.linking.link_run import link_task_choices
 
 
+@pytest.mark.quickcheck
 def test_do_get_steps(capsys, main, spark):
     for task in link_task_choices:
         task_inst = getattr(main.link_run, task)
@@ -26,6 +27,7 @@ def test_do_get_steps(capsys, main, spark):
             assert str(step) in output
 
 
+@pytest.mark.quickcheck
 def test_do_set_link_task(capsys, main):
     main.current_link_task = main.link_run.matching
     main.do_set_link_task("preprocessing")

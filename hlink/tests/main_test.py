@@ -60,6 +60,7 @@ def test_load_conf_does_not_exist_no_env(monkeypatch, tmp_path, conf_file, user)
         load_conf(filename, user)
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("conf_file", ("my_conf.json",))
 @pytest.mark.parametrize("user", users)
 def test_load_conf_json_exists_no_env(monkeypatch, tmp_path, conf_file, user):
@@ -90,6 +91,7 @@ def test_load_conf_json_exists_ext_added_no_env(monkeypatch, tmp_path, conf_name
     assert conf["conf_path"] == filename
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("conf_file", ("my_conf.toml",))
 @pytest.mark.parametrize("user", users)
 def test_load_conf_toml_exists_no_env(monkeypatch, tmp_path, conf_file, user):
@@ -188,6 +190,7 @@ def test_load_conf_does_not_exist_env(
         load_conf(conf_file, user)
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("conf_file", ("my_conf.json",))
 @pytest.mark.parametrize("user", users)
 def test_load_conf_json_exists_in_conf_dir_env(
@@ -207,6 +210,7 @@ def test_load_conf_json_exists_in_conf_dir_env(
     assert conf["conf_path"] == str(file)
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("conf_file", ("my_conf.toml",))
 @pytest.mark.parametrize("user", users)
 def test_load_conf_toml_exists_in_conf_dir_env(

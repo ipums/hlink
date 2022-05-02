@@ -11,6 +11,7 @@ import os.path
 import pytest
 
 
+@pytest.mark.quickcheck
 def test_load_conf_file_json(package_path):
     conf_path = os.path.join(package_path, "conf")
     conf_file = os.path.join(conf_path, "test")
@@ -18,6 +19,7 @@ def test_load_conf_file_json(package_path):
     assert conf["id_column"] == "id"
 
 
+@pytest.mark.quickcheck
 def test_load_conf_file_toml(package_path):
     conf_path = os.path.join(package_path, "conf")
     conf_file = os.path.join(conf_path, "test1")
@@ -25,6 +27,7 @@ def test_load_conf_file_toml(package_path):
     assert conf["id_column"] == "id-toml"
 
 
+@pytest.mark.quickcheck
 def test_load_conf_file_nested(package_path):
     running_path = package_path.rpartition("hlink/tests")[0]
     conf_name = "hlink_config/config/test_conf_flag_run"

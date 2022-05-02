@@ -10,6 +10,7 @@ from pyspark.sql.types import StructType, StructField, LongType
 from hlink.errors import DataError
 
 
+@pytest.mark.quickcheck
 def test_step_0(preprocessing, spark, preprocessing_conf):
     """ Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
 
