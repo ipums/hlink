@@ -8,12 +8,14 @@ def simple_schema():
     return StructType([StructField("test", StringType())])
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("table_name", ["this_table_does_not_exist", "@@@", "LOL rofl"])
 def test_exists_table_does_not_exist(spark, table_name):
     t = Table(spark, table_name, "table used for testing")
     assert not t.exists()
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("table_name", ["table_for_testing_Table_class"])
 def test_exists_table_does_exist(spark, table_name, simple_schema):
     t = Table(spark, table_name, "table used for testing")
@@ -23,6 +25,7 @@ def test_exists_table_does_exist(spark, table_name, simple_schema):
     spark.sql(f"DROP TABLE {table_name}")
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("table_name", ["table_for_testing_Table_class"])
 def test_drop_table_does_exist(spark, table_name, simple_schema):
     t = Table(spark, table_name, "table used for testing")
@@ -42,6 +45,7 @@ def test_drop_table_does_not_exist(spark, table_name):
     assert not t.exists()
 
 
+@pytest.mark.quickcheck
 @pytest.mark.parametrize("table_name", ["table_for_testing_Table_class"])
 def test_df_table_does_exist(spark, table_name, simple_schema):
     t = Table(spark, table_name, "table used for testing")
