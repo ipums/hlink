@@ -3,10 +3,12 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import pytest
 from pyspark.ml import Pipeline
 import hlink.linking.core.pipeline as pipeline_core
 
 
+@pytest.mark.quickcheck
 def test_all_steps(
     spark,
     training_conf,

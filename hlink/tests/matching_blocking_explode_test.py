@@ -3,10 +3,12 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import pytest
 import pandas as pd
 from hlink.linking.matching.link_step_score import LinkStepScore
 
 
+@pytest.mark.quickcheck
 def test_steps_1_2_matching(
     spark, blocking_explode_conf, matching_test_input, matching, main
 ):
