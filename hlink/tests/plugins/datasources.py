@@ -6,7 +6,7 @@
 import hlink.tests
 import pytest
 import os
-from pyspark.sql.types import *
+from pyspark.sql.types import ArrayType, LongType, StringType, StructField, StructType
 from pyspark.sql import Row
 
 

@@ -7,7 +7,15 @@ import os.path
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 import hlink.spark
-from pyspark.sql.types import *
+from pyspark.sql.types import (
+    ArrayType,
+    BooleanType,
+    DoubleType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+)
 
 
 class SparkConnection(object):

@@ -3,7 +3,6 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-import sys
 import pytest
 import json
 import toml

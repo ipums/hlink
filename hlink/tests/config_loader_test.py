@@ -4,9 +4,6 @@
 #   https://github.com/ipums/hlink
 
 from hlink.configs.load_config import load_conf_file
-import hlink.scripts.main
-import hlink.tests.conftest
-from hlink.errors import UsageError
 import os.path
 import pytest
 
