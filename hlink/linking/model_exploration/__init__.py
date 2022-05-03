@@ -3,4 +3,4 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from .model_exploration import ModelExploration
+from .model_exploration import ModelExploration  # noqa F401

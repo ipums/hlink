@@ -3,4 +3,4 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from .matching import Matching
+from .matching import Matching  # noqa F401
