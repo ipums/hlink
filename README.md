@@ -1,3 +1,5 @@
+![build](https://github.com/ipums/hlink/actions/workflows/docker-build.yml/badge.svg)
+
 # hlink: Historical Record Linkage
 
 A paper on the creation and applications of this program can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>.
