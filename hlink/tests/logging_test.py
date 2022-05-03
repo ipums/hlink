@@ -3,8 +3,6 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-import pytest
-import hlink.scripts.main
 import logging
 
 
