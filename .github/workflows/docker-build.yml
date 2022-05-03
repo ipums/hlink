@@ -1,0 +1,26 @@
+name: HLink Docker CI
+
+on: [pull_request, push]
+
+env:
+  HLINK_TAG: hlink:githubactions
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag $HLINK_TAG
+      
+    - name: Check formatting with black
+      run: docker run $HLINK_TAG black --check .
+      
+    - name: Lint with flake8
+      run: docker run $HLINK_TAG flake8 --count .
+      
+    - name: Test
+      run: docker run $HLINK_TAG pytest hlink/tests
