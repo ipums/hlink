@@ -84,13 +84,8 @@ RUN \
 
 # --------------------- SBT INSTALL END --------------------- #
 
-
 RUN mkdir /hlink
 WORKDIR /hlink
 
-COPY scala_jar scala_jar
-RUN cd scala_jar && sbt assembly 
-
 COPY . .
-RUN mv scala_jar/target/scala-2.11/*.jar hlink/spark/jars/
-RUN pip install .
+RUN pip install -e .[dev]
