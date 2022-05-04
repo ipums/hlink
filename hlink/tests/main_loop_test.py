@@ -6,7 +6,7 @@
 import os
 import pandas as pd
 import pytest
-from pyspark.ml.feature import VectorAssembler, OneHotEncoderEstimator
+from pyspark.ml.feature import VectorAssembler, OneHotEncoder
 from hlink.linking.link_run import link_task_choices
 
 
@@ -77,9 +77,7 @@ def test_output_csv_array_and_vector_data(
     data_a = preprocessing.spark.table("prepped_df_a")
     # data_a.withColumn('dense_vector_ex', Vectors.dense([0.0, 0.5, 0.6, 0.8]))
 
-    encoder = OneHotEncoderEstimator(
-        inputCols=["pernum"], outputCols=["pernum_onehotencoded"]
-    )
+    encoder = OneHotEncoder(inputCols=["pernum"], outputCols=["pernum_onehotencoded"])
     model = encoder.fit(data_a)
     data_e = model.transform(data_a)
 
