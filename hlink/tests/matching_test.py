@@ -180,40 +180,38 @@ def test_step_2_sum(spark, matching_household_conf, matching, preprocessing):
 
 
 #
-## TODO: fix hh compare rate java function
-## def test_step_2_hh_compare_rate(spark, matching_household_conf, matching, preprocessing):
-## matching_household_conf['feature_selections'] = [
-##  {
-##   "output_col": "namefrst_related_rows",
-##  "input_cols": ["namefrst_std", "bpl", "sex"],
-## "transform": "related_individual_rows",
-## "family_id": "serialp",
-## "relate_col": "relate",
-## "top_code": 10,
-## "bottom_code": 3
-## }
-## ]
+# TODO: fix hh compare rate java function
+# def test_step_2_hh_compare_rate(spark, matching_household_conf, matching, preprocessing):
+# matching_household_conf['feature_selections'] = [
+#  {
+#   "output_col": "namefrst_related_rows",
+#  "input_cols": ["namefrst_std", "bpl", "sex"],
+# "transform": "related_individual_rows",
+# "family_id": "serialp",
+# "relate_col": "relate",
+# "top_code": 10,
+# "bottom_code": 3
+# }
+# ]
 #
-##  matching_household_conf['comparison_features'] = [
-##   {
-##    "alias": "namelast_jw",
-##   "column_name": "namelast_clean",
-##  "comparison_type": "jaro_winkler"
-## },
-## {
-## "alias": "related_match_rate",
-## "column_name": "namefrst_related_rows",
-## "comparison_type": "hh_compare_rate"
-## }
-## ]
+#  matching_household_conf['comparison_features'] = [
+#   {
+#    "alias": "namelast_jw",
+#   "column_name": "namelast_clean",
+#  "comparison_type": "jaro_winkler"
+# },
+# {
+# "alias": "related_match_rate",
+# "column_name": "namefrst_related_rows",
+# "comparison_type": "hh_compare_rate"
+# }
+# ]
 #
-## preprocessing.step_0_register_raw_dfs()
-## preprocessing.step_1_prep_dataframe()
-## matching.step_0_explode()
-## matching.step_1_match()
+# preprocessing.step_0_register_raw_dfs()
+# preprocessing.step_1_prep_dataframe()
+# matching.step_0_explode()
+# matching.step_1_match()
 #
-## Create pandas DFs of the step_2 potential matches table
-## potential_matches_df = spark.table("potential_matches").toPandas()
-## assert (len(potential_matches_df.namelast_popularity_a) == 41)
-#
-#
+# Create pandas DFs of the step_2 potential matches table
+# potential_matches_df = spark.table("potential_matches").toPandas()
+# assert (len(potential_matches_df.namelast_popularity_a) == 41)

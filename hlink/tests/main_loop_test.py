@@ -6,7 +6,6 @@
 import os
 import pandas as pd
 import pytest
-from argparse import Namespace
 from pyspark.ml.feature import VectorAssembler, OneHotEncoderEstimator
 from hlink.linking.link_run import link_task_choices
 
