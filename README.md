@@ -1,4 +1,4 @@
-![build](https://github.com/ipums/hlink/actions/workflows/docker-build.yml/badge.svg)
+[![HLink Docker CI](https://github.com/ipums/hlink/actions/workflows/docker-build.yml/badge.svg)](https://github.com/ipums/hlink/actions/workflows/docker-build.yml)
 
 # hlink: Historical Record Linkage
 
