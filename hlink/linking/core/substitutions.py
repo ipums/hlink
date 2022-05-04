@@ -4,7 +4,7 @@
 #   https://github.com/ipums/hlink
 
 from collections import namedtuple
-from pyspark.sql.functions import *
+from pyspark.sql.functions import concat_ws, lit, regexp_replace, split, when
 
 
 def generate_substitutions(spark, df_selected, substitution_columns):

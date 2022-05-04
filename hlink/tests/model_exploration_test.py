@@ -7,7 +7,6 @@ import pytest
 import pandas as pd
 
 import hlink.linking.core.threshold as threshold_core
-import hlink.tests
 from hlink.linking.model_exploration.link_step_train_test_models import (
     LinkStepTrainTestModels,
 )

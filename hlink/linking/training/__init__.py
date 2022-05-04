@@ -3,4 +3,4 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from .training import Training
+from .training import Training  # noqa F401

@@ -3,8 +3,26 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from pyspark.sql.functions import *
-from pyspark.sql.types import *
+from pyspark.sql.functions import (
+    array,
+    collect_list,
+    concat,
+    count,
+    expr,
+    floor,
+    length,
+    lit,
+    lower,
+    regexp_replace,
+    sort_array,
+    soundex,
+    split,
+    struct,
+    trim,
+    udf,
+    when,
+)
+from pyspark.sql.types import ArrayType, LongType, StringType
 from pyspark.ml import Pipeline
 from pyspark.sql import Window
 from pyspark.ml.feature import NGram, RegexTokenizer, CountVectorizer, MinHashLSH

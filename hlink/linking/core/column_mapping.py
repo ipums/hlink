@@ -3,7 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from pyspark.sql.functions import *
+from pyspark.sql.functions import col, lit
 import hlink.linking.core.transforms as transforms_core
 
 
