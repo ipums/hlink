@@ -599,8 +599,8 @@ def datasource_rel_jw_input(spark):
                 ArrayType(
                     StructType(
                         [
-                            StructField("birthyr", LongType(), True),
                             StructField("namefrst_std", StringType(), True),
+                            StructField("birthyr", LongType(), True),
                             StructField("sex", LongType(), True),
                         ]
                     ),
