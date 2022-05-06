@@ -547,7 +547,7 @@ def _append_results(desc_df, results_df, model_type, params):
 
 
 def _print_desc_df(desc_df):
-    pd.set_option("display.max_colwidth", -1)
+    pd.set_option("display.max_colwidth", None)
     print(
         desc_df.drop(
             [
