@@ -60,7 +60,7 @@ RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
 # --------------------- JAVA INSTALL END --------------------- #
 
 # --------------------- SBT INSTALL --------------------- #
-ENV SCALA_VERSION 2.11.12
+ENV SCALA_VERSION 2.12.15
 ENV SBT_VERSION 1.1.6
 
 # Scala expects this file
