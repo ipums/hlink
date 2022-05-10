@@ -281,7 +281,7 @@ def test_step_2_train_random_forest_spark(
 
     tr = spark.table("model_eval_training_results").toPandas()
     # assert tr.shape == (1, 18)
-    assert tr.query("model == 'random_forest'")["precision_test_mean"].iloc[0] > 0.5
+    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] == 0.765625
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 3
 
     FNs = spark.table("model_eval_repeat_fns").toPandas()
@@ -289,7 +289,7 @@ def test_step_2_train_random_forest_spark(
     assert FNs.query("id_a == 30")["count"].iloc[0] > 5
 
     TPs = spark.table("model_eval_repeat_tps").toPandas()
-    assert TPs.shape == (1, 4)
+    assert TPs.shape == (2, 4)
 
     TNs = spark.table("model_eval_repeat_tns").toPandas()
     assert TNs.shape == (6, 4)
@@ -312,7 +312,7 @@ def test_step_2_train_logistic_regression_spark(
     tr = spark.table("model_eval_training_results").toPandas()
 
     # assert tr.shape == (1, 16)
-    assert tr.query("model == 'logistic_regression'")["precision_test_mean"].iloc[0] > 0
+    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.8125
     assert (
         round(tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0], 1)
         == 0.7
@@ -544,11 +544,11 @@ def test_step_2_split_by_id_a(
 
     assert len(splits) == 4
 
-    assert splits[0][0].toPandas()["id_a"].unique().tolist() == ["10", "20"]
-    assert splits[0][1].toPandas()["id_a"].unique().tolist() == ["30"]
+    assert splits[0][0].toPandas()["id_a"].unique().tolist() == ["10", "20", "30"]
+    assert splits[0][1].toPandas()["id_a"].unique().tolist() == []
 
-    assert splits[1][0].toPandas()["id_a"].unique().tolist() == ["10"]
-    assert splits[1][1].toPandas()["id_a"].unique().tolist() == ["20", "30"]
+    assert splits[1][0].toPandas()["id_a"].unique().tolist() == ["10", "20"]
+    assert splits[1][1].toPandas()["id_a"].unique().tolist() == ["30"]
 
     main.do_drop_all("")
 
