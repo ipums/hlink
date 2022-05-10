@@ -37,7 +37,6 @@ def load_table_from_csv(link_task, path, table_name):
 
 @pytest.fixture(scope="session")
 def spark(tmpdir_factory):
-    # See comment above
     os.environ["PYSPARK_PYTHON"] = sys.executable
     spark_connection = SparkConnection(
         tmpdir_factory.mktemp("derby"),
