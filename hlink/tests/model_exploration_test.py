@@ -101,22 +101,22 @@ def test_all(
     preds = spark.table("model_eval_predictions").toPandas()
     assert (
         preds.query("id_a == 20 and id_b == 30")["second_best_prob"].round(2).iloc[0]
-        < 0.1
+        >= 0.6
     )
     assert (
         preds.query("id_a == 20 and id_b == 30")["probability"].round(2).iloc[0] > 0.5
     )
     assert preds.query("id_a == 30 and id_b == 30")["prediction"].iloc[0] == 0
     assert pd.isnull(
-        preds.query("id_a == 20 and id_b == 50")["second_best_prob"].iloc[0]
+        preds.query("id_a == 10 and id_b == 30")["second_best_prob"].iloc[0]
     )
 
     pred_train = spark.table("model_eval_predict_train").toPandas()
-    assert pred_train.query("id_a == 20 and id_b == 30")["match"].iloc[0] == 1
+    assert pred_train.query("id_a == 20 and id_b == 50")["match"].iloc[0] == 0
     assert pd.isnull(
-        pred_train.query("id_a == 20 and id_b == 50")["second_best_prob"].iloc[0]
+        pred_train.query("id_a == 10 and id_b == 50")["second_best_prob"].iloc[1]
     )
-    assert pred_train.query("id_a == 20 and id_b == 30")["prediction"].iloc[0] == 1
+    assert pred_train.query("id_a == 20 and id_b == 50")["prediction"].iloc[1] == 1
 
     main.do_drop_all("")
 
