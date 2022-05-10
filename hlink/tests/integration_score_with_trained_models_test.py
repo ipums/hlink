@@ -93,13 +93,13 @@ def test_apply_chosen_model_RF(
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "probability"
         ].iloc()[0]
-        < 0.5
+        > 0.5
     )
     assert (
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "prediction"
         ].iloc()[0]
-        == 0
+        == 1
     )
     assert (
         pm_df.query("id_b == '033FD0FA-C523-42B5-976A-751E830F7021'")[
@@ -825,13 +825,13 @@ def test_step_3_apply_chosen_model_boosted_trees(
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "probability"
         ].iloc()[0]
-        < 0.5
+        > 0.5
     )
     assert (
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "prediction"
         ].iloc()[0]
-        == 0
+        == 1
     )
     assert (
         pm_df.query("id_b == '033FD0FA-C523-42B5-976A-751E830F7021'")[
@@ -950,13 +950,13 @@ def test_step_3_apply_chosen_model_RF_threshold(
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "probability"
         ].iloc()[0]
-        < 0.5
+        > 0.5
     )
     assert (
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "prediction"
         ].iloc()[0]
-        == 0
+        == 1
     )
     assert (
         pm_df.query("id_b == '033FD0FA-C523-42B5-976A-751E830F7021'")[
@@ -1195,13 +1195,13 @@ def test_step_3_apply_chosen_model_boosted_trees_threshold(
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "probability"
         ].iloc()[0]
-        < 0.5
+        > 0.5
     )
     assert (
         pm_df.query("id_a == '81E992C0-3796-4BE7-B02E-9CAD0289C6EC'")[
             "prediction"
         ].iloc()[0]
-        == 0
+        == 1
     )
     assert (
         pm_df.query("id_b == '033FD0FA-C523-42B5-976A-751E830F7021'")[
