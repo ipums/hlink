@@ -17,10 +17,8 @@ import hlink.linking.model_exploration as me
 import hlink.linking.hh_model_exploration as hh_me
 from hlink.linking.link_run import LinkRun
 import json
-import logging
 import os
 import pytest
-from unittest.mock import patch
 import sys
 from types import SimpleNamespace
 
@@ -37,31 +35,9 @@ def load_table_from_csv(link_task, path, table_name):
     ).saveAsTable(table_name)
 
 
-#  A work-around for Redmine bug 21151 (exceptions that are printed when tests
-#  are run).  They occur because of an issue within the version of pyspark
-#  and py4j that we use.  They all are raised in this method in the standard
-#  logging library:
-real_isEnabledFor = logging.Logger.isEnabledFor
-
-
-#  The issue is that during garbage-collection part of py4j, the method is
-#  called with a non-numeric level (i.e., None).  So, we patch the library
-#  method with our own:
-def our_isEnabledFor(self, level):
-    if level is None:
-        return False
-    return real_isEnabledFor(self, level)
-
-
-#  The patch is done in the pytest fixture below.
-
-
 @pytest.fixture(scope="session")
 def spark(tmpdir_factory):
     # See comment above
-    patcher = patch("logging.Logger.isEnabledFor", our_isEnabledFor)
-    patcher.start()
-
     os.environ["PYSPARK_PYTHON"] = sys.executable
     spark_connection = SparkConnection(
         tmpdir_factory.mktemp("derby"),
