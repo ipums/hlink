@@ -304,7 +304,7 @@ def test_step_2_JW_street(spark, matching_conf, matching):
     )
     assert (
         potential_matches_df.query("id_a == 10 and id_b == 10")["jw_street"].iloc[0]
-        > 0.97
+        == 0.95
     )
     assert (
         potential_matches_df.query("id_a == 20 and id_b == 30")["namelast_jw"].iloc[0]
@@ -366,11 +366,11 @@ def test_step_2_maximum_jaro_winkler(spark, matching_conf, matching):
         == 1
     )
     assert (
-        0.98
+        0.97
         > potential_matches_prepped_df.query("id_a == 10 and id_b == 10")[
             "maximum_jw"
         ].iloc[0]
-        > 0.97
+        > 0.96
     )
     assert (
         0.855
