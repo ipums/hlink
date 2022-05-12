@@ -44,7 +44,7 @@ dev_requires = [
     "flake8==4.0.1",
     "sphinx",
     "recommonmark",
-    "pytest==4.6.3",
+    "pytest==7.0.1",
 ]
 
 setup(
