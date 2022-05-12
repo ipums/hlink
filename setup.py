@@ -12,6 +12,11 @@ packages_with_templates = [
     "hlink.linking.preprocessing",
     "hlink.linking.matching",
     "hlink.linking.hh_matching",
+    "hlink.linking.model_exploration",
+    "hlink.linking.hh_model_exploration",
+    "hlink.linking.reporting",
+    "hlink.linking.training",
+    "hlink.linking.hh_training",
 ]
 
 package_data = {"hlink.spark": ["jars/hlink_lib-assembly-1.0.jar"]}
