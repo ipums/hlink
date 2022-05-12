@@ -41,7 +41,7 @@ install_requires = [
 dev_requires = [
     "pre-commit",
     "black==20.8b1",
-    "flake8==3.7.8",
+    "flake8==4.0.1",
     "sphinx",
     "recommonmark",
     "pytest==4.6.3",
