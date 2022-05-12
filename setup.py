@@ -28,14 +28,14 @@ for package in packages_with_templates:
 package_data["hlink.linking"].append("table_definitions.csv")
 
 install_requires = [
-    "colorama==0.4.1",
+    "colorama==0.4.4",
     "ipython==7.0.1",
     "Jinja2==3.0.3",
     "numpy==1.19.5",
     "pandas==1.1.5",
     "pyspark==3.2.1",
     "scikit-learn==0.23.1",
-    "toml==0.10.1",
+    "toml==0.10.2",
 ]
 
 dev_requires = [
