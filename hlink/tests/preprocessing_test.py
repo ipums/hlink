@@ -12,7 +12,7 @@ from hlink.errors import DataError
 
 @pytest.mark.quickcheck
 def test_step_0(preprocessing, spark, preprocessing_conf):
-    """ Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
+    """Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
 
     # Run the preprocessing step (this will use the test data)
     preprocessing.run_step(0)
@@ -41,7 +41,7 @@ def test_step_0(preprocessing, spark, preprocessing_conf):
 def test_step_0_datasource_parquet_file(
     preprocessing, spark, preprocessing_conf, input_data_dir_path
 ):
-    """ Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
+    """Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
 
     preprocessing_conf["datasource_a"] = {
         "parquet_file": os.path.join(
@@ -69,7 +69,7 @@ def test_step_0_datasource_parquet_file(
 def test_step_0_datasource_file_parquet(
     preprocessing, spark, preprocessing_conf, input_data_dir_path
 ):
-    """ Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
+    """Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
 
     preprocessing_conf["datasource_a"] = {
         "file": os.path.join(input_data_dir_path, "test_parquet_data_b.parquet"),
@@ -95,7 +95,7 @@ def test_step_0_datasource_file_parquet(
 def test_step_0_datasource_file_csv(
     preprocessing, spark, preprocessing_conf, input_data_dir_path
 ):
-    """ Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
+    """Test preprocessing step 0 to ensure that temporary raw_df_unpartitioned_(a/b) tables are created (exact copies of datasources from config). Also test that the presistent raw_df_(a/b) tables are created. Should be same as raw datasources with filters applied"""
 
     preprocessing_conf["datasource_a"] = {
         "file": os.path.join(input_data_dir_path, "test_csv_data_a.csv"),
@@ -131,7 +131,7 @@ def test_step_0_datasource_file_csv(
 
 
 def test_step_0_filters_training_data(preprocessing, spark, preprocessing_conf):
-    """ Test filter run in preprocessing step 0 which selects any person in a household which has a person who is also represented in the test data"""
+    """Test filter run in preprocessing step 0 which selects any person in a household which has a person who is also represented in the test data"""
 
     # create some training data we can use for testing
     td_schema = StructType(
@@ -164,7 +164,7 @@ def test_step_0_filters_training_data(preprocessing, spark, preprocessing_conf):
 
 
 def test_step_0_filters_expression(preprocessing, spark, preprocessing_conf):
-    """ Test a filter run in preprocessing step 0 which selects rows from the raw data according to an expression"""
+    """Test a filter run in preprocessing step 0 which selects rows from the raw data according to an expression"""
 
     # overwrite the config filter value to include only an expression type filter
     preprocessing_conf["filter"] = [
@@ -189,7 +189,7 @@ def test_step_0_filters_expression(preprocessing, spark, preprocessing_conf):
 def test_step_0_filters_expression_and_household(
     preprocessing, spark, preprocessing_conf
 ):
-    """ Test a filter run in preprocessing step 0 which selects rows from the raw data according to an expression AND includes any other entries with the same household ID (serialp)"""
+    """Test a filter run in preprocessing step 0 which selects rows from the raw data according to an expression AND includes any other entries with the same household ID (serialp)"""
 
     # overwrite the config filter value to include an expression filter which includes a household:true argument.
     # Note: in a household filter, the variables for household ID in each input file must be specified in the filter.  (This is the "serial_a": "serialp" bit below.)
@@ -245,7 +245,7 @@ def test_step_0_filters_datasource(preprocessing, spark, preprocessing_conf):
 def test_step_0_check_for_all_spaces_unrestricted_data(
     preprocessing, spark, preprocessing_conf_all_space_columns, capsys
 ):
-    """ Tests the check in preprocessing that looks for all-space columns, as found in unrestricted data files. """
+    """Tests the check in preprocessing that looks for all-space columns, as found in unrestricted data files."""
     with pytest.raises(DataError, match=r"\: namelast, street\."):
         preprocessing.run_step(0)
 
@@ -397,7 +397,7 @@ def test_step_1_transform_override(
 def test_step_1_transforms_namefrst_soundex(
     preprocessing, spark, preprocessing_conf, region_code_path
 ):
-    """Test a column mapping with string-based transforms on firstname removing middle name """
+    """Test a column mapping with string-based transforms on firstname removing middle name"""
     preprocessing_conf["column_mappings"] = [
         {
             "column_name": "namefrst",
@@ -450,7 +450,7 @@ def test_step_1_transforms_namefrst_soundex(
 def test_step_1_transforms_prefix_suffix(
     preprocessing, spark, preprocessing_conf, region_code_path
 ):
-    """Test a column mapping with different string transforms """
+    """Test a column mapping with different string transforms"""
     preprocessing_conf["column_mappings"] = [
         {
             "column_name": "namefrst",
@@ -487,7 +487,7 @@ def test_step_1_transforms_prefix_suffix(
 
 
 def test_step_1_transform_adv_str(preprocessing, spark, preprocessing_conf):
-    """ Test a column mapping with remaining transforms """
+    """Test a column mapping with remaining transforms"""
     preprocessing_conf["column_mappings"] = [
         {
             "column_name": "namelast",
@@ -540,7 +540,7 @@ def test_step_1_transform_adv_str(preprocessing, spark, preprocessing_conf):
 def test_step_1_transform_neighbor_agg(
     preprocessing, spark, preprocessing_conf_household_data
 ):
-    """ Test neighbor_aggregate transform on data containing households """
+    """Test neighbor_aggregate transform on data containing households"""
     preprocessing_conf_household_data["feature_selections"] = [
         {
             "output_column": "namelast_neighbors",
@@ -640,7 +640,7 @@ def test_step_1_transform_neighbor_agg(
 def test_step_1_transform_attach_family_col(
     preprocessing, spark, preprocessing_conf_household_data
 ):
-    """ Test attach_family_col transform on data containing households """
+    """Test attach_family_col transform on data containing households"""
     preprocessing_conf_household_data["feature_selections"] = [
         {
             "output_col": "spouse_namefrst",
@@ -741,7 +741,7 @@ def test_step_1_transform_attach_family_col(
 def test_step_1_transform_calc_nativity(
     preprocessing, spark, preprocessing_conf_19thc_nativity_conf
 ):
-    """ Test attach_family_col transform on data containing households """
+    """Test attach_family_col transform on data containing households"""
 
     preprocessing.run_step(0)
     preprocessing.run_step(1)
@@ -817,7 +817,7 @@ def test_step_1_transform_calc_nativity(
 def test_step_1_transform_related_individuals(
     preprocessing, spark, preprocessing_conf_household_data
 ):
-    """ Test attach related_individuals transform """
+    """Test attach related_individuals transform"""
     preprocessing_conf_household_data["feature_selections"] = [
         {
             "output_col": "namefrst_related",
@@ -875,7 +875,7 @@ def test_step_1_transform_related_individuals(
 def test_step_1_transform_related_individual_rows(
     preprocessing, spark, preprocessing_conf_household_data
 ):
-    """ Test attach related_individuals transform """
+    """Test attach related_individuals transform"""
     preprocessing_conf_household_data["feature_selections"] = [
         {
             "output_col": "spouse_namefrst",
@@ -1072,7 +1072,7 @@ def test_step_1_transform_related_individual_rows(
 def test_step_1_transform_popularity(
     preprocessing, spark, preprocessing_conf_popularity
 ):
-    """ Test attach related_individuals transform """
+    """Test attach related_individuals transform"""
     preprocessing_conf_popularity["feature_selections"] = [
         {
             "checkpoint": True,
@@ -1137,7 +1137,7 @@ def test_step_1_transform_popularity(
 
 
 def test_step_1_transforms_adv_calc(preprocessing, spark, preprocessing_conf):
-    """ Test more column mapping with transforms """
+    """Test more column mapping with transforms"""
     preprocessing_conf["column_mappings"] = [
         {
             "column_name": "serialp",
@@ -1179,7 +1179,7 @@ def test_step_1_transforms_adv_calc(preprocessing, spark, preprocessing_conf):
 
 
 def test_step_1_transforms_expand(preprocessing, spark, preprocessing_conf):
-    """ Test transform expand """
+    """Test transform expand"""
     preprocessing_conf["column_mappings"] = [
         {"column_name": "age"},
         {
@@ -1206,7 +1206,7 @@ def test_step_1_transforms_expand(preprocessing, spark, preprocessing_conf):
 
 
 def test_step_1_override(preprocessing, spark, preprocessing_conf):
-    """ Test column override """
+    """Test column override"""
     preprocessing_conf["column_mappings"] = [
         {
             "column_name": "serialp",
@@ -1226,7 +1226,7 @@ def test_step_1_override(preprocessing, spark, preprocessing_conf):
 
 
 def test_step_1_set_values_a_explicitly(preprocessing, spark, preprocessing_conf):
-    """ Test setting a column value explicitly """
+    """Test setting a column value explicitly"""
     preprocessing_conf["column_mappings"] = [
         {"column_name": "serialp", "alias": "serialp", "set_value_column_a": "c"}
     ]
@@ -1242,7 +1242,7 @@ def test_step_1_set_values_a_explicitly(preprocessing, spark, preprocessing_conf
 
 
 def test_step_1_set_values_b_explicitly(preprocessing, spark, preprocessing_conf):
-    """ Test setting b column value explicitly """
+    """Test setting b column value explicitly"""
     preprocessing_conf["column_mappings"] = [
         {"column_name": "serialp", "alias": "serialp", "set_value_column_b": "a"}
     ]
@@ -1264,7 +1264,7 @@ def test_step_1_substitution(
     substitutions_womens_names_path,
     substitutions_mens_names_path,
 ):
-    """ Test text substitution """
+    """Test text substitution"""
     preprocessing_conf_simple_names["column_mappings"] = [
         {
             "column_name": "namefrst",
@@ -1314,7 +1314,7 @@ def test_step_1_street_abbrev_substitution(
     preprocessing_conf_street_names,
     substitutions_street_abbrevs_path,
 ):
-    """ Test text substitution """
+    """Test text substitution"""
     preprocessing_conf_street_names["id_column"] = "histid"
     preprocessing_conf_street_names["column_mappings"] = [
         {
@@ -1380,7 +1380,7 @@ def test_step_1_street_remove_stop_words(
     preprocessing_conf_street_names,
     substitutions_street_abbrevs_path,
 ):
-    """ Test text substitution """
+    """Test text substitution"""
     preprocessing_conf_street_names["id_column"] = "histid"
     preprocessing_conf_street_names["column_mappings"] = [
         {"column_name": "street", "alias": "street_orig"},
@@ -1435,7 +1435,7 @@ def test_step_1_street_remove_stop_words(
 def test_step_1_divide_by_int_mapping_birthyr(
     preprocessing, spark, preprocessing_conf_birthyr
 ):
-    """ Test text substitution """
+    """Test text substitution"""
     preprocessing_conf_birthyr["id_column"] = "histid"
     preprocessing_conf_birthyr["column_mappings"] = [
         {"column_name": "yearp", "alias": "year"},
@@ -1483,7 +1483,7 @@ def test_step_1_divide_by_int_mapping_birthyr(
 
 
 def test_step_1_fix_bpl(preprocessing, spark, preprocessing_conf_birthyr):
-    """ Test text substitution """
+    """Test text substitution"""
     preprocessing_conf_birthyr["id_column"] = "histid"
     preprocessing_conf_birthyr["column_mappings"] = [
         {"column_name": "state1"},
@@ -1547,7 +1547,7 @@ def test_step_1_fix_bpl(preprocessing, spark, preprocessing_conf_birthyr):
 
 
 def test_step_1_bigrams(preprocessing, spark, preprocessing_conf_simple_names):
-    """ Test checkpoint transform """
+    """Test checkpoint transform"""
     preprocessing_conf_simple_names["column_mappings"] = [
         {"column_name": "namefrst"},
         {
@@ -1586,7 +1586,7 @@ def test_step_1_bigrams(preprocessing, spark, preprocessing_conf_simple_names):
 
 
 def test_step_1_bigrams_no_space(preprocessing, spark, preprocessing_conf_simple_names):
-    """ Test checkpoint transform """
+    """Test checkpoint transform"""
     preprocessing_conf_simple_names["column_mappings"] = [
         {"column_name": "namefrst"},
         {
@@ -1621,7 +1621,7 @@ def test_step_1_bigrams_no_space(preprocessing, spark, preprocessing_conf_simple
 
 
 def test_step_1_array(preprocessing, spark, preprocessing_conf_simple_names):
-    """ Test array transform """
+    """Test array transform"""
     preprocessing_conf_simple_names["column_mappings"] = [
         {"column_name": "namefrst"},
         {"column_name": "sex"},
@@ -1648,7 +1648,7 @@ def test_step_1_array(preprocessing, spark, preprocessing_conf_simple_names):
 def test_step_1_union(
     preprocessing, spark, preprocessing_conf_synthetic_household_data
 ):
-    """ Test union transform"""
+    """Test union transform"""
     preprocessing_conf_synthetic_household_data["column_mappings"] = [
         {"column_name": "namefrst"},
         {"column_name": "namelast"},
@@ -1684,7 +1684,7 @@ def test_step_1_union(
 
 
 def test_rel_rows_real_data(spark, preprocessing, preprocessing_conf_rel_rows):
-    """ Test related_rows data and double threshold comparison blocking criteria """
+    """Test related_rows data and double threshold comparison blocking criteria"""
 
     preprocessing.run_step(0)
 

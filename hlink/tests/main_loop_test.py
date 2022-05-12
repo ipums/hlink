@@ -38,7 +38,7 @@ def test_do_set_link_task(capsys, main):
 def test_output_csv_array_and_vector_data(
     main, preprocessing, spark, preprocessing_conf_household_data
 ):
-    """ Test if csv output works for array and vector data. """
+    """Test if csv output works for array and vector data."""
     preprocessing_conf_household_data["feature_selections"] = [
         {
             "output_col": "namefrst_related",
