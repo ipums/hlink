@@ -9,13 +9,12 @@ import org.apache.spark.sql.expressions.MutableAggregationBuffer
 import org.apache.spark.sql.expressions.UserDefinedAggregateFunction
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
-import com.isrdi.udfs.SerJaroWinklerDistance
 import scala.util.control.Breaks._
 import scala.collection.mutable.ArrayBuffer
 import scala.math.abs
 
 class ExtraChildren extends UDF8[Seq[Row], Seq[Row], String, Long, Long, String, String, Map[String, String], Double] {
-  val distance = new SerJaroWinklerDistance
+  val jw_sim = new SerJaroWinklerSimilarity
   override def call(y1: Seq[Row], y2: Seq[Row], year_b: String, relate_a: Long, relate_b: Long, jw_threshold: String, age_threshold: String, var_map: Map[String, String]): Double = {
 
     if (relate_a <= 399 && relate_b <= 399) {
@@ -38,7 +37,7 @@ class ExtraChildren extends UDF8[Seq[Row], Seq[Row], String, Long, Long, String,
                 for ((r2, i) <- CB.zipWithIndex) {
                     for ((r1, j) <- CA.zipWithIndex) {
                         ids_b += r2.getAs[String](histid)
-                        var jw_s = distance.apply(r1.getAs[String](name), r2.getAs[String](name))
+                        var jw_s = jw_sim.apply(r1.getAs[String](name), r2.getAs[String](name))
                         if (abs(r1.getAs[Long](birthyr).toLong - r2.getAs[Long](birthyr).toLong) <= age_t && r1.getAs[Long](sex) == r2.getAs[Long](sex) && jw_s >= jw_t) {
                             var ma = (jw_s.toDouble, r1.getAs[String](histid), r2.getAs[String](histid))
                             good_matches += ma

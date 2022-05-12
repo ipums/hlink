@@ -6,4 +6,4 @@
 package com.isrdi.udfs
 import org.apache.commons.text.similarity._
 
-class SerJaroWinklerDistance extends JaroWinklerDistance with Serializable { }
+class SerJaroWinklerSimilarity extends JaroWinklerSimilarity with Serializable { }
