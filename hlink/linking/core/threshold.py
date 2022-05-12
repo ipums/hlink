@@ -79,7 +79,7 @@ def _apply_alpha_threshold(pred_df, alpha_threshold, threshold_ratio):
 
 
 def _apply_threshold_ratio(df, alpha_threshold, threshold_ratio, id_col):
-    """ Apply a decision threshold using the ration of a match's probability to the next closest match's probability. """
+    """Apply a decision threshold using the ration of a match's probability to the next closest match's probability."""
     id_a = id_col + "_a"
     id_b = id_col + "_b"
     if "probability" not in df.columns:

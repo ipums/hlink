@@ -14,7 +14,7 @@ def test_apply_chosen_model_RF(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
     training_conf["comparison_features"] = [
         {
@@ -137,7 +137,7 @@ def test_apply_chosen_model_RF_pm_IDs_only(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -225,7 +225,7 @@ def test_apply_chosen_model_probit_pm_IDs_only(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -296,7 +296,7 @@ def test_apply_chosen_model_RF_pm_IDs_only_full_data_out(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -384,7 +384,7 @@ def test_apply_chosen_model_probit(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [
@@ -502,7 +502,7 @@ def test_step_3_apply_chosen_model_logistic_regression(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [
@@ -623,7 +623,7 @@ def test_step_3_apply_chosen_model_decision_tree(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [
@@ -746,7 +746,7 @@ def test_step_3_apply_chosen_model_boosted_trees(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
     training_conf["comparison_features"] = [
         {
@@ -869,7 +869,7 @@ def test_step_3_apply_chosen_model_RF_threshold(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [
@@ -994,7 +994,7 @@ def test_step_3_apply_chosen_model_probit_threshold(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [
@@ -1114,7 +1114,7 @@ def test_step_3_apply_chosen_model_boosted_trees_threshold(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [

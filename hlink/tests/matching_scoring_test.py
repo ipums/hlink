@@ -14,7 +14,7 @@ from hlink.linking.matching.link_step_score import LinkStepScore
     reason="We still want to test that whatever 'secondary_threshold' became is being applied correctly, but we need to refactor this test to account for the fact that this was totally renamed and is now being carried out in a different step (step 3 doesn't exist anymore)."
 )
 def test_step_3_uniq_and_secondary_threshold(spark, matching_conf, matching):
-    """ Test a secondary threshold with uniqueness """
+    """Test a secondary threshold with uniqueness"""
     matching_conf["comparison_features"] = [
         {
             "alias": "namefrst_jw",
@@ -80,7 +80,7 @@ def test_step_3_uniq_and_secondary_threshold(spark, matching_conf, matching):
 
 # TODO: is there a step 3 anymore?
 def test_step_3_skip_on_no_conf(spark, matching_conf, matching, capsys):
-    """ Test matching step 3 doesn't run if no training config"""
+    """Test matching step 3 doesn't run if no training config"""
 
     matching_conf["comparison_features"] = [
         {
@@ -106,7 +106,7 @@ def test_step_3_skip_on_no_conf(spark, matching_conf, matching, capsys):
 def test_step_3_alpha_beta_thresholds(
     spark, matching, matching_conf, threshold_ratio_data_path_2
 ):
-    """ Test matching step 3 with both probability and ratio thresholds """
+    """Test matching step 3 with both probability and ratio thresholds"""
 
     matching.spark.read.csv(
         threshold_ratio_data_path_2, header=True, inferSchema=True

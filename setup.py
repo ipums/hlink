@@ -40,7 +40,7 @@ install_requires = [
 
 dev_requires = [
     "pre-commit",
-    "black==20.8b1",
+    "black==22.3.0",
     "flake8==4.0.1",
     "sphinx",
     "recommonmark",

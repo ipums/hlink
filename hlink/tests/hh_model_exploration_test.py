@@ -14,7 +14,7 @@ def test_all_hh_mod_ev(
     hh_model_exploration,
     hh_training_data_path,
 ):
-    """ Integration test for hh model eval steps 0, 1, and 2 with two models """
+    """Integration test for hh model eval steps 0, 1, and 2 with two models"""
     path_a, path_b, path_pms = hh_integration_test_data
     hh_model_exploration.spark.read.csv(
         path_a, header=True, inferSchema=True
