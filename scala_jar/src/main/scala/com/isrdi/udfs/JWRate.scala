@@ -5,11 +5,10 @@
 
 package com.isrdi.udfs
 import org.apache.spark.sql.api.java.UDF3
-import com.isrdi.udfs.SerJaroWinklerDistance
 import scala.math.max
 
 class JWRate extends UDF3[Seq[String], Seq[String], String, Double] {
-  val distance = new SerJaroWinklerDistance
+  val jw_sim = new SerJaroWinklerSimilarity
   override def call(list1: Seq[String], list2: Seq[String], jw_threshold: String): Double = {
     
     var hits = 0.0
@@ -18,7 +17,7 @@ class JWRate extends UDF3[Seq[String], Seq[String], String, Double] {
     for (s1 <- list1) {
       max_score = 0.0
       for (s2 <- list2) {
-        max_score = max(max_score, distance.apply(s1, s2))
+        max_score = max(max_score, jw_sim.apply(s1, s2))
       }
       if (max_score > jw_t) {
         hits = hits + 1.0
