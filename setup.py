@@ -36,10 +36,10 @@ install_requires = [
     "colorama==0.4.4",
     "ipython==7.0.1",
     "Jinja2==3.0.3",
-    "numpy==1.19.5",
-    "pandas==1.1.5",
+    "numpy==1.22.3",
+    "pandas==1.4.2",
     "pyspark==3.2.1",
-    "scikit-learn==0.23.1",
+    "scikit-learn==1.1.0",
     "toml==0.10.2",
 ]
 
