@@ -34,8 +34,8 @@ package_data["hlink.linking"].append("table_definitions.csv")
 
 install_requires = [
     "colorama==0.4.4",
-    "ipython==7.0.1",
-    "Jinja2==3.0.3",
+    "ipython==8.3.0",
+    "Jinja2==3.1.2",
     "numpy==1.22.3",
     "pandas==1.4.2",
     "pyspark==3.2.1",
@@ -49,7 +49,7 @@ dev_requires = [
     "flake8==4.0.1",
     "sphinx",
     "recommonmark",
-    "pytest==7.0.1",
+    "pytest==7.1.2",
 ]
 
 setup(
