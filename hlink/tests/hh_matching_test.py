@@ -26,9 +26,9 @@ def test_step_0_filter_and_pair(spark, hh_matching_stubs, hh_matching, conf):
 
     # Make assertions on the data
     assert blocked_matches_hh_df.shape[0] == 9
-    assert blocked_matches_hh_df.query("serialp_a == '1'").shape == (9, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '8'").shape == (6, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '7'").shape == (3, 4)
+    assert blocked_matches_hh_df.query("serialp_a == 1").shape == (9, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 8").shape == (6, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 7").shape == (3, 4)
 
 
 def test_household_matching_training_integration(
@@ -289,9 +289,9 @@ def test_step_0_1_hh_blocking_and_filtering(
 
     # Make assertions on the data
     assert blocked_matches_hh_df.shape[0] == 9
-    assert blocked_matches_hh_df.query("serialp_a == '1'").shape == (9, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '8'").shape == (6, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '7'").shape == (3, 4)
+    assert blocked_matches_hh_df.query("serialp_a == 1").shape == (9, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 8").shape == (6, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 7").shape == (3, 4)
 
     assert potential_matches_hh_df.shape[0] == 3
     assert potential_matches_hh_df.query("histid_a == '1004A'").shape[0] == 2

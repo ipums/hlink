@@ -1048,22 +1048,22 @@ def test_step_1_transform_related_individual_rows(
         == 2
     )
     assert (
-        pdf_a.query("serial == '2485411' and pernum == 1").unrelated_rows.iloc[0][0][0]
+        pdf_a.query("serial == 2485411 and pernum == 1").unrelated_rows.iloc[0][0][0]
         == "anne"
     )
     assert (
         len(
-            pdf_a.query(
-                "serial == '2492741' and pernum == 4"
-            ).namefrst_related_rows.iloc[0]
+            pdf_a.query("serial == 2492741 and pernum == 4").namefrst_related_rows.iloc[
+                0
+            ]
         )
         == 2
     )
     assert (
         len(
-            pdf_b.query(
-                "serial == '2492741' and pernum == 4"
-            ).namefrst_related_rows.iloc[0]
+            pdf_b.query("serial == 2492741 and pernum == 4").namefrst_related_rows.iloc[
+                0
+            ]
         )
         == 1
     )
