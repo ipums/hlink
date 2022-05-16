@@ -23,7 +23,7 @@ class LinkStepExportCrosswalk(LinkStep):
         )
 
     def _run(self):
-        """ Pull in key demographic data for linked individuals and export a fixed-width crosswalk file. """
+        """Pull in key demographic data for linked individuals and export a fixed-width crosswalk file."""
         config = self.task.link_run.config
 
         pm = (

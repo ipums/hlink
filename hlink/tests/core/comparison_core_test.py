@@ -9,7 +9,7 @@ from pyspark.ml import Pipeline
 
 
 def test_rel_jaro_winkler_comparison(spark, conf, datasource_rel_jw_input):
-    """ Test the comparison feature data output """
+    """Test the comparison feature data output"""
 
     table_a, table_b = datasource_rel_jw_input
     features = [
@@ -52,7 +52,7 @@ def test_rel_jaro_winkler_comparison(spark, conf, datasource_rel_jw_input):
 
 
 def test_extra_children_comparison(spark, conf, datasource_extra_children_input):
-    """ Test the comparison feature data output """
+    """Test the comparison feature data output"""
 
     table_a, table_b = datasource_extra_children_input
     conf["id_column"] = "histid"
@@ -99,7 +99,7 @@ def test_extra_children_comparison(spark, conf, datasource_extra_children_input)
 
 
 def test_comparison_and_mi(spark, conf, datasource_mi_comparison):
-    """ Test the comparison feature data output """
+    """Test the comparison feature data output"""
 
     table_a, table_b = datasource_mi_comparison
     features = [
@@ -154,7 +154,7 @@ def test_comparison_and_mi(spark, conf, datasource_mi_comparison):
 
 
 def test_immyr_diff_w_imm_caution(spark, conf):
-    """ Test the comparison feature data output """
+    """Test the comparison feature data output"""
 
     data_a = [
         (0, 5, 1900),

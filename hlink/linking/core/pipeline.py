@@ -6,7 +6,7 @@
 from pyspark.ml.feature import (
     Imputer,
     StandardScaler,
-    OneHotEncoderEstimator,
+    OneHotEncoder,
     VectorAssembler,
     Bucketizer,
 )
@@ -95,7 +95,7 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         encoded_output_cols = [
             x + "_onehotencoded" for x in categorical_comparison_features
         ]
-        encoder = OneHotEncoderEstimator(
+        encoder = OneHotEncoder(
             inputCols=categorical_comparison_features,
             outputCols=encoded_output_cols,
             handleInvalid="keep",
@@ -139,7 +139,7 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         encoded_output_cols = [
             x + "_onehotencoded" for x in categorical_pipeline_features
         ]
-        encoder = OneHotEncoderEstimator(
+        encoder = OneHotEncoder(
             inputCols=categorical_pipeline_features,
             outputCols=encoded_output_cols,
             handleInvalid="keep",

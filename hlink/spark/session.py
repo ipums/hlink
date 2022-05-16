@@ -43,6 +43,7 @@ class SparkConnection(object):
                 "spark.driver.extraJavaOptions", f"-Dderby.system.home={self.derby_dir}"
             )
             .set("spark.executorEnv.SPARK_LOCAL_DIRS", self.tmp_dir)
+            .set("spark.sql.legacy.allowUntypedScalaUDF", True)
             .setAppName("linking")
             # .set("spark.executor.cores", executor_cores) \
         )

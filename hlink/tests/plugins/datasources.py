@@ -12,7 +12,7 @@ from pyspark.sql import Row
 
 @pytest.fixture(scope="session")
 def base_datasources(spark, tmpdir_factory):
-    """Create a fixture for conf datasource input.  These test data are suitable for use in most of the preprocessing tests, and include really messy names for testing some name cleaning transforms, as well as bpl, age, serialp, and sex data. """
+    """Create a fixture for conf datasource input.  These test data are suitable for use in most of the preprocessing tests, and include really messy names for testing some name cleaning transforms, as well as bpl, age, serialp, and sex data."""
     datasources = tmpdir_factory.mktemp("datasources")
     # Create the first spark dataframe with test data and save it as parquet
     df_schema = StructType(
@@ -93,7 +93,7 @@ def base_datasources(spark, tmpdir_factory):
 
 @pytest.fixture(scope="session")
 def county_dist_datasources(spark, tmpdir_factory):
-    """Create a fixture for conf datasource input.  These test data are suitable for use in testing county distance code calculation as well as the distance calculation itself. """
+    """Create a fixture for conf datasource input.  These test data are suitable for use in testing county distance code calculation as well as the distance calculation itself."""
     datasources = tmpdir_factory.mktemp("datasources")
     # Create the first spark dataframe with test data and save it as parquet
     df_schema = StructType(
@@ -125,7 +125,7 @@ def county_dist_datasources(spark, tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def datasource_preprocessing_simple_names(spark, conf, tmpdir_factory):
-    """ Synthetic data with name variants and sex data, designed for testing name substitution from gendered name files. """
+    """Synthetic data with name variants and sex data, designed for testing name substitution from gendered name files."""
     datasources = tmpdir_factory.mktemp("datasources")
     # Create the first spark dataframe with test data and save it as parquet
     df_schema = StructType(
@@ -157,7 +157,7 @@ def datasource_preprocessing_simple_names(spark, conf, tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def datasource_synthetic_households(spark, conf, tmpdir_factory):
-    """ This configuration includes data synthesized for testing the union feature on simple household/neighbors data. """
+    """This configuration includes data synthesized for testing the union feature on simple household/neighbors data."""
     datasources = tmpdir_factory.mktemp("datasources")
     # Create the first spark dataframe with test data and save it as parquet
     df_schema = StructType(
@@ -209,7 +209,7 @@ def datasource_synthetic_households(spark, conf, tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def datasource_real_households(spark, conf, tmpdir_factory):
-    """ This configuration includes datasets for testing addition of household and neighbors features.  It's pulled from a sample of actual census data. """
+    """This configuration includes datasets for testing addition of household and neighbors features.  It's pulled from a sample of actual census data."""
 
     path_a = "input_data/training_data_households.parquet"
     path_b = "input_data/households_b.parquet"
@@ -249,7 +249,7 @@ def datasource_calc_mfbpl_pm_data(spark, conf):
 
 @pytest.fixture(scope="function")
 def datasource_matching(spark, conf, matching):
-    """Create the prepped_df_(a/b) dataframes for testing matching steps """
+    """Create the prepped_df_(a/b) dataframes for testing matching steps"""
 
     # Create the first spark dataframe with test data and save it as parquet
     df_schema = StructType(
@@ -346,7 +346,7 @@ def datasource_matching(spark, conf, matching):
 
 @pytest.fixture(scope="function")
 def datasource_matching_comparisons(spark, conf, matching):
-    """Create the prepped_df_(a/b) dataframes for testing matching comparison steps """
+    """Create the prepped_df_(a/b) dataframes for testing matching comparison steps"""
 
     # Create the first spark dataframe with test data and save it as parquet
     df_schema = StructType(
@@ -574,7 +574,7 @@ def datasource_training(spark, conf, matching):
 
 @pytest.fixture(scope="function")
 def datasource_training_input(spark, conf, tmpdir_factory):
-    """ This configuration includes datasets for testing specification of input data for a batch training step. """
+    """This configuration includes datasets for testing specification of input data for a batch training step."""
     training_data = "input_data/training_data_long.csv"
     prepped_a_data = "input_data/training_data_long_a.csv"
     prepped_b_data = "input_data/training_data_long_b.csv"
@@ -589,7 +589,7 @@ def datasource_training_input(spark, conf, tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def datasource_rel_jw_input(spark):
-    """ Create tables for testing rel_jaro_winkler"""
+    """Create tables for testing rel_jaro_winkler"""
 
     schema = StructType(
         [
@@ -599,8 +599,8 @@ def datasource_rel_jw_input(spark):
                 ArrayType(
                     StructType(
                         [
-                            StructField("birthyr", LongType(), True),
                             StructField("namefrst_std", StringType(), True),
+                            StructField("birthyr", LongType(), True),
                             StructField("sex", LongType(), True),
                         ]
                     ),
@@ -665,7 +665,7 @@ def datasource_rel_jw_input(spark):
 
 @pytest.fixture(scope="function")
 def datasource_extra_children_input(spark):
-    """ Create tables for testing rel_children"""
+    """Create tables for testing rel_children"""
     schema = StructType(
         [
             StructField("histid", LongType(), True),
@@ -772,7 +772,7 @@ def datasource_extra_children_input(spark):
 
 @pytest.fixture(scope="function")
 def matching_test_input(spark, conf, tmpdir_factory):
-    """ This configuration includes datasets for testing matching steps. """
+    """This configuration includes datasets for testing matching steps."""
     prepped_a_data = "input_data/matching_test_a.csv"
     prepped_b_data = "input_data/matching_test_b.csv"
 
@@ -827,7 +827,7 @@ def datasource_mi_comparison(spark, conf):
 
 @pytest.fixture(scope="session")
 def datasource_unrestricted_blank_columns(spark, tmpdir_factory):
-    """Create a fixture for conf datasource input.  These test data are suitable for use in the preprocessing tests which check for all-space columns in unrestricted data file. """
+    """Create a fixture for conf datasource input.  These test data are suitable for use in the preprocessing tests which check for all-space columns in unrestricted data file."""
 
     datasources = tmpdir_factory.mktemp("datasources")
     # Create the first spark dataframe with test data and save it as parquet
@@ -913,7 +913,7 @@ def datasource_unrestricted_blank_columns(spark, tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def datasource_sql_condition_input(spark, conf, tmpdir_factory):
-    """ This configuration includes datasets for testing specification of input data for a batch training step. """
+    """This configuration includes datasets for testing specification of input data for a batch training step."""
     prepped_a_data = "input_data/sql_condition_marst_warn_a.csv"
     prepped_b_data = "input_data/sql_condition_marst_warn_b.csv"
     potential_matches = "input_data/potential_matches_sql_condition_marst_warn.csv"

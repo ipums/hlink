@@ -12,7 +12,7 @@ import pytest
 def test_step_4_aggregate_features(
     spark, matching_conf, matching, potential_matches_agg_path
 ):
-    """ Test adding aggregate features (hits, hits2, exact_all_mult, etc.) to potential matches """
+    """Test adding aggregate features (hits, hits2, exact_all_mult, etc.) to potential matches"""
     matching_conf["id_column"] = "histid"
     matching_conf["comparison_features"] = [
         {

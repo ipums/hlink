@@ -34,7 +34,7 @@ def region_code_path(spark):
 
 @pytest.fixture(scope="module")
 def substitutions_womens_names_path(spark):
-    """ Create a fixture with the path to Jonas's file for name substitutions for sex = 2"""
+    """Create a fixture with the path to Jonas's file for name substitutions for sex = 2"""
     path = "input_data/female.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
@@ -45,7 +45,7 @@ def substitutions_womens_names_path(spark):
 
 @pytest.fixture(scope="module")
 def birthyr_replace_path(spark):
-    """ Create a fixture with the path to Jonas's file for name substitutions for sex = 2"""
+    """Create a fixture with the path to Jonas's file for name substitutions for sex = 2"""
     path = "input_data/birthyr_replace.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
@@ -56,7 +56,7 @@ def birthyr_replace_path(spark):
 
 @pytest.fixture(scope="module")
 def substitutions_mens_names_path(spark):
-    """ Create a fixture with the path to Jonas's file for name substitutions for sex = 1"""
+    """Create a fixture with the path to Jonas's file for name substitutions for sex = 1"""
     path = "input_data/male.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
@@ -67,7 +67,7 @@ def substitutions_mens_names_path(spark):
 
 @pytest.fixture(scope="module")
 def substitutions_street_abbrevs_path(spark):
-    """ Create a fixture with the path to Jonas's file for name substitutions for sex = 1"""
+    """Create a fixture with the path to Jonas's file for name substitutions for sex = 1"""
     path = "input_data/street_abbrevs_most_common.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
@@ -78,7 +78,7 @@ def substitutions_street_abbrevs_path(spark):
 
 @pytest.fixture(scope="module")
 def test_street_names_data_path(spark):
-    """ Create a fixture with the path to Jonas's file for name substitutions for sex = 1"""
+    """Create a fixture with the path to Jonas's file for name substitutions for sex = 1"""
     path = "input_data/test_street_names_data.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
@@ -113,7 +113,7 @@ def county_dist_path(spark):
 
 @pytest.fixture(scope="module")
 def ext_path_preprocessing_popularity(spark):
-    """ Create a fixture with the path to the test potential_matches csv file """
+    """Create a fixture with the path to the test potential_matches csv file"""
 
     path = "input_data/popularity.csv"
 
@@ -125,7 +125,7 @@ def ext_path_preprocessing_popularity(spark):
 
 @pytest.fixture(scope="module")
 def potential_matches_path(spark):
-    """ Create a fixture with the path to the test potential_matches csv file """
+    """Create a fixture with the path to the test potential_matches csv file"""
 
     path = "input_data/potential_matches.csv"
 
@@ -137,7 +137,7 @@ def potential_matches_path(spark):
 
 @pytest.fixture(scope="module")
 def potential_matches_path_ids_only(spark):
-    """ Create a fixture with the path to the test potential_matches csv file """
+    """Create a fixture with the path to the test potential_matches csv file"""
 
     path = "input_data/potential_matches_ids_only.csv"
 
@@ -149,7 +149,7 @@ def potential_matches_path_ids_only(spark):
 
 @pytest.fixture(scope="module")
 def potential_matches_agg_path(spark):
-    """ Create a fixture with the path to the test potential_matches csv file """
+    """Create a fixture with the path to the test potential_matches csv file"""
 
     path = "input_data/potential_matches_agg.csv"
 
@@ -285,7 +285,7 @@ def hh_agg_features_test_data(spark):
 
 @pytest.fixture(scope="module")
 def hh_training_data_path(spark):
-    """ Create a fixture with the path to the test HH training data file """
+    """Create a fixture with the path to the test HH training data file"""
 
     td_path = "input_data/new_hh_test_td.csv"
 

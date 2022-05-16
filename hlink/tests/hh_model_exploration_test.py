@@ -14,7 +14,7 @@ def test_all_hh_mod_ev(
     hh_model_exploration,
     hh_training_data_path,
 ):
-    """ Integration test for hh model eval steps 0, 1, and 2 with two models """
+    """Integration test for hh model eval steps 0, 1, and 2 with two models"""
     path_a, path_b, path_pms = hh_integration_test_data
     hh_model_exploration.spark.read.csv(
         path_a, header=True, inferSchema=True
@@ -93,12 +93,12 @@ def test_all_hh_mod_ev(
         ]
     )
     pm0 = preds.query(
-        "histid_a == '5DD3EBA2-D1E4-4E22-921A-0FFB59115932' and histid_b == '4B38B1CF-6DCE-4D92-BCEE-A591208D3D68'"
+        "histid_a == '790BFA1D-E8A8-4C96-B005-6C36DD5154F0' and histid_b == 'B0BFE02E-DDEE-4DD1-86E3-15F297D18DAE'"
     )
     assert pm0["second_best_prob"].round(2).iloc[0] >= 0.90
     assert pm0["ratio"].round(2).iloc[0] >= 1.01
     assert pm0["prediction"].iloc[0] == 0
-    assert pm0["probability"].round(2).iloc[0] >= 0.93
+    assert pm0["probability"].round(2).iloc[0] >= 0.91
 
     pred_train = spark.table("hh_model_eval_predict_train").toPandas()
     assert all(

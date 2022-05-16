@@ -12,7 +12,7 @@ from hlink.linking.matching.link_step_score import LinkStepScore
 def test_step_2_geo_distance_1_key_jaro_winkler(
     spark, matching_conf, matching, state_dist_path
 ):
-    """ Test matching step 2 to ensure that comparison features are generated (both regular (represented by J/W) and as requiring a distance lookup file)"""
+    """Test matching step 2 to ensure that comparison features are generated (both regular (represented by J/W) and as requiring a distance lookup file)"""
 
     matching_conf["comparison_features"] = [
         {
@@ -107,7 +107,7 @@ def test_step_2_geo_distance_1_key_jaro_winkler(
 
 
 def test_step_2_geo_distance_ids_only(spark, matching_conf, matching, state_dist_path):
-    """ Test matching step 2 to ensure that comparison features are generated (both regular (represented by J/W) and as requiring a distance lookup file)"""
+    """Test matching step 2 to ensure that comparison features are generated (both regular (represented by J/W) and as requiring a distance lookup file)"""
 
     matching_conf["comparison_features"] = [
         {
@@ -167,7 +167,7 @@ def test_step_2_geo_distance_ids_only(spark, matching_conf, matching, state_dist
 def test_step_2_geo_distance_2_keys(
     spark, preprocessing, matching, matching_conf_counties, county_dist_path
 ):
-    """ Test county distance code transform """
+    """Test county distance code transform"""
     matching_conf_counties["column_mappings"] = [
         {"column_name": "county_p", "alias": "county"},
         {"column_name": "statefip_p", "alias": "statefip"},
@@ -247,7 +247,7 @@ def test_step_2_geo_distance_secondary_lookup(
     county_dist_path,
     state_dist_path,
 ):
-    """ Test county distance code transform """
+    """Test county distance code transform"""
     matching_conf_counties["column_mappings"] = [
         {"column_name": "county_p", "alias": "county"},
         {"column_name": "statefip_p", "alias": "statefip"},
@@ -343,7 +343,7 @@ def test_step_2_geo_distance_1_and_2_keys(
     county_dist_path,
     state_dist_path,
 ):
-    """ Test county distance code transform """
+    """Test county distance code transform"""
     matching_conf_counties["column_mappings"] = [
         {"column_name": "county_p", "alias": "county"},
         {"column_name": "statefip_p", "alias": "statefip"},

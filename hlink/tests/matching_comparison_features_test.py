@@ -118,7 +118,7 @@ def test_step_2_all_equals(spark, matching_household_conf, matching, preprocessi
 def test_step_2_fetch_either_length(
     spark, preprocessing, matching, matching_conf_nativity
 ):
-    """ Test nativity, imm, sgen (second generation immigrant) code transforms as well as nested comps and fetch_a """
+    """Test nativity, imm, sgen (second generation immigrant) code transforms as well as nested comps and fetch_a"""
     matching_conf_nativity["id_column"] = "histid"
     matching_conf_nativity["column_mappings"] = [
         {"column_name": "pair_no"},
@@ -175,7 +175,7 @@ def test_step_2_fetch_either_length(
 
 
 def test_step_2_nativity(spark, preprocessing, matching, matching_conf_nativity):
-    """ Test nativity, imm, sgen (second generation immigrant) code transforms as well as nested comps and fetch_a """
+    """Test nativity, imm, sgen (second generation immigrant) code transforms as well as nested comps and fetch_a"""
     matching_conf_nativity["id_column"] = "histid"
     matching_conf_nativity["column_mappings"] = [
         {"column_name": "pair_no"},
@@ -241,7 +241,7 @@ def test_step_2_nativity(spark, preprocessing, matching, matching_conf_nativity)
 
 
 def test_step_2_JW_only(spark, matching_conf, matching):
-    """ Test matching step 2 to ensure that comparison features are generated (can a regular comparison (as represented by J/W) still run if there's NOT a distance lookup feature)"""
+    """Test matching step 2 to ensure that comparison features are generated (can a regular comparison (as represented by J/W) still run if there's NOT a distance lookup feature)"""
 
     matching_conf["comparison_features"] = [
         {
@@ -271,7 +271,7 @@ def test_step_2_JW_only(spark, matching_conf, matching):
 
 
 def test_step_2_JW_street(spark, matching_conf, matching):
-    """ Test creation of comparison feature with an IF requirement (jw_street) as well as a regular comparison feature (represented by J/W)"""
+    """Test creation of comparison feature with an IF requirement (jw_street) as well as a regular comparison feature (represented by J/W)"""
 
     matching_conf["comparison_features"] = [
         {
@@ -304,7 +304,7 @@ def test_step_2_JW_street(spark, matching_conf, matching):
     )
     assert (
         potential_matches_df.query("id_a == 10 and id_b == 10")["jw_street"].iloc[0]
-        > 0.97
+        == 0.95
     )
     assert (
         potential_matches_df.query("id_a == 20 and id_b == 30")["namelast_jw"].iloc[0]
@@ -318,7 +318,7 @@ def test_step_2_JW_street(spark, matching_conf, matching):
 
 
 def test_step_2_maximum_jaro_winkler(spark, matching_conf, matching):
-    """ Test creation of maximum_jaro_winkler comparison feature"""
+    """Test creation of maximum_jaro_winkler comparison feature"""
 
     matching_conf["comparison_features"] = [
         {
@@ -366,11 +366,11 @@ def test_step_2_maximum_jaro_winkler(spark, matching_conf, matching):
         == 1
     )
     assert (
-        0.98
+        0.97
         > potential_matches_prepped_df.query("id_a == 10 and id_b == 10")[
             "maximum_jw"
         ].iloc[0]
-        > 0.97
+        > 0.96
     )
     assert (
         0.855
@@ -391,7 +391,7 @@ def test_step_2_maximum_jaro_winkler(spark, matching_conf, matching):
 def test_step_2_max_jaro_winkler(
     spark, matching_household_conf, matching, preprocessing
 ):
-    """ Test creation of max_jaro_winkler comparison feature"""
+    """Test creation of max_jaro_winkler comparison feature"""
 
     matching_household_conf["comparison_features"] = [
         {
@@ -469,7 +469,7 @@ def test_step_2_max_jaro_winkler(
 def test_step_2_rel_jaro_winkler(
     spark, matching_household_conf, matching, preprocessing
 ):
-    """ Test creation of max_jaro_winkler comparison feature"""
+    """Test creation of max_jaro_winkler comparison feature"""
 
     matching_household_conf["comparison_features"] = [
         {
@@ -559,7 +559,7 @@ def test_step_2_rel_jaro_winkler(
 def test_step_2_jaro_winkler_rate(
     spark, matching_household_conf, matching, preprocessing
 ):
-    """ Test creation of jaro_winkler_rate comparison feature"""
+    """Test creation of jaro_winkler_rate comparison feature"""
 
     matching_household_conf["comparison_features"] = [
         {
@@ -655,7 +655,7 @@ def test_step_2_jaro_winkler_rate(
 
 
 def test_step_2_JW_double_array_blocking_conf(spark, matching_conf, matching, capsys):
-    """ Test matching step 2 to ensure that comparison features are generated (can a regular comparison (as represented by J/W) still run if there's NOT a distance lookup feature)"""
+    """Test matching step 2 to ensure that comparison features are generated (can a regular comparison (as represented by J/W) still run if there's NOT a distance lookup feature)"""
     matching_conf["blocking_steps"] = [[{"column_name": "sex"}]]
     matching_conf.pop("blocking")
 
@@ -695,7 +695,7 @@ def test_step_2_JW_double_array_blocking_conf(spark, matching_conf, matching, ca
 def test_step_2_comparison_features_comp_c_and_caution(
     spark, matching_comparison_conf, matching
 ):
-    """ Test a comparison feature with comp_a, comp_b, and comp_c using spouse caution feature as example """
+    """Test a comparison feature with comp_a, comp_b, and comp_c using spouse caution feature as example"""
     matching_comparison_conf["comparison_features"] = [
         {
             "alias": "namelast_jw",
@@ -828,7 +828,7 @@ def test_step_2_comparison_features_comp_c_and_caution(
 def test_step_2_comparison_features_comp_d_and_caution(
     spark, matching_comparison_conf, matching
 ):
-    """ Test a comparison feature with comp_a, comp_b, comp_c, and comp_d using mixed booleans and caution features as example """
+    """Test a comparison feature with comp_a, comp_b, comp_c, and comp_d using mixed booleans and caution features as example"""
     matching.link_run.print_sql = True
     matching_comparison_conf["comparison_features"] = [
         {
@@ -960,7 +960,7 @@ def test_step_2_comparison_features_comp_d_and_caution(
 def test_step_2_neither_are_null(
     spark, matching_household_conf, matching, preprocessing
 ):
-    """ Test a comparison feature with comp_a, comp_b, and comp_c using spouse caution feature as example """
+    """Test a comparison feature with comp_a, comp_b, and comp_c using spouse caution feature as example"""
     matching_household_conf["feature_selections"] = [
         {
             "output_col": "spouse_namefrst",
@@ -1068,7 +1068,7 @@ def test_step_2_neither_are_null(
 def test_step_2_create_features_sql_condition(
     spark, conf, matching, datasource_sql_condition_input
 ):
-    """ Test a comparison feature with comp_a, comp_b, and comp_c using spouse caution feature as example """
+    """Test a comparison feature with comp_a, comp_b, and comp_c using spouse caution feature as example"""
     conf["comparison_features"] = [
         {
             "alias": "marst_warn",
@@ -1112,7 +1112,7 @@ def test_step_2_create_features_sql_condition(
 def test_step_1_transform_calc_nativity(
     preprocessing, spark, preprocessing_conf_19thc_nativity_conf, matching
 ):
-    """ Test attach_family_col transform on data containing households """
+    """Test attach_family_col transform on data containing households"""
 
     preprocessing.run_step(0)
     preprocessing.run_step(1)
@@ -1138,7 +1138,7 @@ def test_step_1_transform_calc_mfbpl_match(
     matching,
     datasource_calc_mfbpl_pm_data,
 ):
-    """ Test attach_family_col transform on data containing households """
+    """Test attach_family_col transform on data containing households"""
     path_a, path_b = datasource_calc_mfbpl_pm_data
 
     spark.read.csv(path_a, header=True, inferSchema=True).write.mode(
@@ -1168,7 +1168,7 @@ def test_caution_comp_012(
     preprocessing_conf_19thc_caution_conf,
     matching,
 ):
-    """ Test multiple clause comparison with 0, 1, and 2 outcome values. """
+    """Test multiple clause comparison with 0, 1, and 2 outcome values."""
     preprocessing.run_step(0)
     preprocessing.run_step(1)
 

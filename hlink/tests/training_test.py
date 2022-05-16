@@ -20,7 +20,7 @@ def test_all_steps(
     matching,
     training_validation_path,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -112,7 +112,7 @@ def test_all_steps(
 
 
 def test_step_2_bucketizer(spark, main, conf):
-    """ Test a bucketized feature using spark pipeline function """
+    """Test a bucketized feature using spark pipeline function"""
     data = [
         (0.0, 0, 0),
         (3.0, 1, 1),
@@ -185,7 +185,7 @@ def test_step_2_bucketizer(spark, main, conf):
 
 
 def test_step_2_interaction(spark, main, conf):
-    """ Test interacting two and three features using spark pipeline function """
+    """Test interacting two and three features using spark pipeline function"""
     data = [
         (0.0, 0.0, 0.0),
         (3.0, 1.0, 1.0),
