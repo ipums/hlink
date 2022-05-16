@@ -268,21 +268,21 @@ class LinkStepTrainTestModels(LinkStep):
             train_TP_count, train_FP_count, train_FN_count, train_TN_count
         )
 
-        return results_df.append(
+        new_results = pd.DataFrame(
             {
-                "precision_test": test_precision,
-                "recall_test": test_recall,
-                "precision_train": train_precision,
-                "recall_train": train_recall,
-                "pr_auc": pr_auc,
-                "test_mcc": test_mcc,
-                "train_mcc": train_mcc,
-                "model_id": model,
-                "alpha_threshold": at,
-                "threshold_ratio": tr,
+                "precision_test": [test_precision],
+                "recall_test": [test_recall],
+                "precision_train": [train_precision],
+                "recall_train": [train_recall],
+                "pr_auc": [pr_auc],
+                "test_mcc": [test_mcc],
+                "train_mcc": [train_mcc],
+                "model_id": [model],
+                "alpha_threshold": [at],
+                "threshold_ratio": [tr],
             },
-            ignore_index=True,
         )
+        return pd.concat([results_df, new_results], ignore_index=True)
 
     def _get_model_parameters(self, conf):
         training_conf = str(self.task.training_conf)
@@ -466,22 +466,22 @@ def _get_confusion_matrix(predictions, dep_var, otd_data):
         new_FP_data = FP.select(
             id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
-        otd_data["FP_data"] = otd_data["FP_data"].append(new_FP_data)
+        otd_data["FP_data"] = pd.concat([otd_data["FP_data"], new_FP_data])
 
         new_FN_data = FN.select(
             id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
-        otd_data["FN_data"] = otd_data["FN_data"].append(new_FN_data)
+        otd_data["FN_data"] = pd.concat([otd_data["FN_data"], new_FN_data])
 
         new_TP_data = TP.select(
             id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
-        otd_data["TP_data"] = otd_data["TP_data"].append(new_TP_data)
+        otd_data["TP_data"] = pd.concat([otd_data["TP_data"], new_TP_data])
 
         new_TN_data = TN.select(
             id_a, id_b, dep_var, "prediction", "probability"
         ).toPandas()
-        otd_data["TN_data"] = otd_data["TN_data"].append(new_TN_data)
+        otd_data["TN_data"] = pd.concat([otd_data["TN_data"], new_TN_data])
 
     return TP_count, FP_count, FN_count, TN_count
 
@@ -519,29 +519,31 @@ def _create_results_df():
 def _append_results(desc_df, results_df, model_type, params):
     # run.pop("type")
     print(results_df)
-    desc_df = desc_df.append(
+
+    new_desc = pd.DataFrame(
         {
-            "model": model_type,
-            "parameters": params,
-            "alpha_threshold": results_df["alpha_threshold"][0],
-            "threshold_ratio": results_df["threshold_ratio"][0],
-            "precision_test_mean": results_df["precision_test"].mean(),
-            "precision_test_sd": results_df["precision_test"].std(),
-            "recall_test_mean": results_df["recall_test"].mean(),
-            "recall_test_sd": results_df["recall_test"].std(),
-            "pr_auc_mean": results_df["pr_auc"].mean(),
-            "pr_auc_sd": results_df["pr_auc"].std(),
-            "mcc_test_mean": results_df["test_mcc"].mean(),
-            "mcc_test_sd": results_df["test_mcc"].std(),
-            "precision_train_mean": results_df["precision_train"].mean(),
-            "precision_train_sd": results_df["precision_train"].std(),
-            "recall_train_mean": results_df["recall_train"].mean(),
-            "recall_train_sd": results_df["recall_train"].std(),
-            "mcc_train_mean": results_df["train_mcc"].mean(),
-            "mcc_train_sd": results_df["train_mcc"].std(),
+            "model": [model_type],
+            "parameters": [params],
+            "alpha_threshold": [results_df["alpha_threshold"][0]],
+            "threshold_ratio": [results_df["threshold_ratio"][0]],
+            "precision_test_mean": [results_df["precision_test"].mean()],
+            "precision_test_sd": [results_df["precision_test"].std()],
+            "recall_test_mean": [results_df["recall_test"].mean()],
+            "recall_test_sd": [results_df["recall_test"].std()],
+            "pr_auc_mean": [results_df["pr_auc"].mean()],
+            "pr_auc_sd": [results_df["pr_auc"].std()],
+            "mcc_test_mean": [results_df["test_mcc"].mean()],
+            "mcc_test_sd": [results_df["test_mcc"].std()],
+            "precision_train_mean": [results_df["precision_train"].mean()],
+            "precision_train_sd": [results_df["precision_train"].std()],
+            "recall_train_mean": [results_df["recall_train"].mean()],
+            "recall_train_sd": [results_df["recall_train"].std()],
+            "mcc_train_mean": [results_df["train_mcc"].mean()],
+            "mcc_train_sd": [results_df["train_mcc"].std()],
         },
-        ignore_index=True,
     )
+
+    desc_df = pd.concat([desc_df, new_desc], ignore_index=True)
     _print_desc_df(desc_df)
     return desc_df
 
