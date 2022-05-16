@@ -8,7 +8,7 @@ from hlink.tests.conftest import load_table_from_csv
 
 
 def test_step_0_filter_and_pair(spark, hh_matching_stubs, hh_matching, conf):
-    """ Test hh_matching step 0 to make sure hh_blocked_matches is created correctly """
+    """Test hh_matching step 0 to make sure hh_blocked_matches is created correctly"""
 
     conf["id_column"] = "histid"
     conf["hh_training"] = {"prediction_col": "prediction"}
@@ -26,15 +26,15 @@ def test_step_0_filter_and_pair(spark, hh_matching_stubs, hh_matching, conf):
 
     # Make assertions on the data
     assert blocked_matches_hh_df.shape[0] == 9
-    assert blocked_matches_hh_df.query("serialp_a == '1'").shape == (9, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '8'").shape == (6, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '7'").shape == (3, 4)
+    assert blocked_matches_hh_df.query("serialp_a == 1").shape == (9, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 8").shape == (6, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 7").shape == (3, 4)
 
 
 def test_household_matching_training_integration(
     spark, hh_training, hh_matching, hh_training_conf, hh_integration_test_data
 ):
-    """ Test all hh_training and hh_matching steps to ensure they work as a pipeline """
+    """Test all hh_training and hh_matching steps to ensure they work as a pipeline"""
     path_a, path_b, path_pms = hh_integration_test_data
 
     load_table_from_csv(hh_matching, path_a, "prepped_df_a")
@@ -131,7 +131,7 @@ def test_household_matching_training_integration(
 def test_hh_agg_features(
     spark, hh_agg_features_test_data, hh_matching, hh_agg_feat_conf
 ):
-    """ Ensure proper creation of aggregate features on hh potential matches """
+    """Ensure proper creation of aggregate features on hh potential matches"""
 
     path_a, path_b, path_pms = hh_agg_features_test_data
 
@@ -260,7 +260,7 @@ def test_hh_agg_features(
 def test_step_0_1_hh_blocking_and_filtering(
     spark, hh_matching_stubs, hh_matching, conf
 ):
-    """ Test hh post-blocking filter works on hh_blocked_matches using a comparison feature """
+    """Test hh post-blocking filter works on hh_blocked_matches using a comparison feature"""
 
     conf["id_column"] = "histid"
     conf["hh_training"] = {"prediction_col": "prediction"}
@@ -289,9 +289,9 @@ def test_step_0_1_hh_blocking_and_filtering(
 
     # Make assertions on the data
     assert blocked_matches_hh_df.shape[0] == 9
-    assert blocked_matches_hh_df.query("serialp_a == '1'").shape == (9, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '8'").shape == (6, 4)
-    assert blocked_matches_hh_df.query("serialp_b == '7'").shape == (3, 4)
+    assert blocked_matches_hh_df.query("serialp_a == 1").shape == (9, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 8").shape == (6, 4)
+    assert blocked_matches_hh_df.query("serialp_b == 7").shape == (3, 4)
 
     assert potential_matches_hh_df.shape[0] == 3
     assert potential_matches_hh_df.query("histid_a == '1004A'").shape[0] == 2

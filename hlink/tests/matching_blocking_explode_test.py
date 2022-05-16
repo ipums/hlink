@@ -63,7 +63,7 @@ def test_steps_1_2_matching(
 def test_blocking_multi_layer_comparison(
     matching_conf_namefrst_std_and_unstd, spark, preprocessing, matching
 ):
-    """ Test a blocking criteria comparison which contains an 'and' clause and a nested 'or' clause """
+    """Test a blocking criteria comparison which contains an 'and' clause and a nested 'or' clause"""
 
     preprocessing.run_step(0)
     preprocessing.run_step(1)

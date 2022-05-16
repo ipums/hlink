@@ -9,7 +9,7 @@ These are models available to be used in the model evaluation, training, and hou
 
 ## random_forest
 
-Uses [pyspark.ml.classification.RandomForestClassifier](https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.RandomForestClassifier).  Returns probability as an array.
+Uses [pyspark.ml.classification.RandomForestClassifier](https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.RandomForestClassifier.html).  Returns probability as an array.
 * Parameters:
   * `maxDepth` -- Type: `int`. Maximum depth of the tree. Spark default value is 5.
   * `numTrees` -- Type: `int`. The number of trees to train.  Spark default value is 20, must be >= 1.
@@ -21,7 +21,7 @@ model_parameters = { type = "random_forest", maxDepth = 5, numTrees = 75, featur
 
 ## probit
 
-Uses [pyspark.ml.regression.GeneralizedLinearRegression](https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.regression.GeneralizedLinearRegression) with `family="binomial"` and `link="probit"`.  
+Uses [pyspark.ml.regression.GeneralizedLinearRegression](https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.regression.GeneralizedLinearRegression.html) with `family="binomial"` and `link="probit"`.  
 
 ```
 model_parameters = { type = "probit", threshold = 0.85, threshold_ratio = 1.2 }
@@ -29,7 +29,7 @@ model_parameters = { type = "probit", threshold = 0.85, threshold_ratio = 1.2 }
 
 ## logistic_regression
 
-Uses [pyspark.ml.classification.LogisticRegression](https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.LogisticRegression)
+Uses [pyspark.ml.classification.LogisticRegression](https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.LogisticRegression.html)
 
 ```
 chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
@@ -37,7 +37,8 @@ chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio 
 
 ## decision_tree
 
-Uses [pyspark.ml.classification.DecisionTreeClassifier](https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.DecisionTreeClassifier).
+Uses [pyspark.ml.classification.DecisionTreeClassifier](https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.DecisionTreeClassifier.html).
+
 * Parameters:
   * `maxDepth` -- Type: `int`.  Maximum depth of the tree.
   * `minInstancesPerNode` -- Type `int`. Per the Spark docs: "Minimum number of instances each child must have after split. If a split causes the left or right child to have fewer than minInstancesPerNode, the split will be discarded as invalid. Should be >= 1."
@@ -49,7 +50,8 @@ chosen_model = { type = "decision_tree", maxDepth = 6, minInstancesPerNode = 2, 
 
 ## gradient_boosted_trees
 
-Uses [pyspark.ml.classification.GBTClassifier](https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.GBTClassifier).
+Uses [pyspark.ml.classification.GBTClassifier](https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.GBTClassifier.html).
+
 * Parameters:
   * `maxDepth` -- Type: `int`.  Maximum depth of the tree.
   * `minInstancesPerNode` -- Type `int`. Per the Spark docs: "Minimum number of instances each child must have after split. If a split causes the left or right child to have fewer than minInstancesPerNode, the split will be discarded as invalid. Should be >= 1."

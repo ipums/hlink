@@ -23,7 +23,7 @@ class LinkStepReportR2PercentLinked(LinkStep):
         )
 
     def _run(self):
-        """ For households with anyone linked in round 1, report percent of remaining household members linked in round 2. """
+        """For households with anyone linked in round 1, report percent of remaining household members linked in round 2."""
 
         pdfa = self.task.spark.table("prepped_df_a").select("serialp", "histid")
         pm = (

@@ -12,6 +12,11 @@ packages_with_templates = [
     "hlink.linking.preprocessing",
     "hlink.linking.matching",
     "hlink.linking.hh_matching",
+    "hlink.linking.model_exploration",
+    "hlink.linking.hh_model_exploration",
+    "hlink.linking.reporting",
+    "hlink.linking.training",
+    "hlink.linking.hh_training",
 ]
 
 package_data = {"hlink.spark": ["jars/hlink_lib-assembly-1.0.jar"]}
@@ -28,24 +33,23 @@ for package in packages_with_templates:
 package_data["hlink.linking"].append("table_definitions.csv")
 
 install_requires = [
-    "colorama==0.4.1",
-    "ipython==7.0.1",
-    "Jinja2==2.10",
-    "numpy==1.19.5",
-    "pandas==0.25.3",
-    "pyspark==2.3.1",
-    "scikit-learn==0.23.1",
-    "toml==0.10.1",
+    "colorama==0.4.4",
+    "ipython==8.3.0",
+    "Jinja2==3.1.2",
+    "numpy==1.22.3",
+    "pandas==1.4.2",
+    "pyspark==3.2.1",
+    "scikit-learn==1.1.0",
+    "toml==0.10.2",
 ]
 
 dev_requires = [
     "pre-commit",
-    "black==20.8b1",
-    "flake8==3.7.8",
+    "black==22.3.0",
+    "flake8==4.0.1",
     "sphinx",
     "recommonmark",
-    "pluggy==0.13.1",
-    "pytest==4.6.3",
+    "pytest==7.1.2",
 ]
 
 setup(

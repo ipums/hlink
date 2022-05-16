@@ -11,12 +11,12 @@ class SparkError(Exception):
 
 
 class UsageError(Exception):
-    """ Incorrectly specified options """
+    """Incorrectly specified options"""
 
     pass
 
 
 class DataError(Exception):
-    """ There is an issue in the source data that will cause a problem. """
+    """There is an issue in the source data that will cause a problem."""
 
     pass

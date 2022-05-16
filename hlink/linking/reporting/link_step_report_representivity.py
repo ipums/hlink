@@ -29,7 +29,7 @@ class LinkStepReportRepresentivity(LinkStep):
         )
 
     def _run(self):
-        """ Report on representivity of linked data compared to source populations for 1900, 1910, linked round 1, and linked round 2. """
+        """Report on representivity of linked data compared to source populations for 1900, 1910, linked round 1, and linked round 2."""
         spark = self.task.spark
         config = self.task.link_run.config
 

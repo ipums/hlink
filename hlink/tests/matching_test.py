@@ -10,7 +10,7 @@ from hlink.linking.matching.link_step_score import LinkStepScore
 def test_removal_of_duplicate_histid_b(
     spark, matching, matching_conf, scored_matches_test_data
 ):
-    """ Test all hh matching and training steps to ensure they work as a workflow """
+    """Test all hh matching and training steps to ensure they work as a workflow"""
     path_pms = scored_matches_test_data
     matching.spark.read.csv(path_pms, header=True, inferSchema=True).write.mode(
         "overwrite"

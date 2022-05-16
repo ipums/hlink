@@ -20,7 +20,7 @@ def test_all(
     state_dist_path,
     training_data_doubled_path,
 ):
-    """ Test training step 2 with probit model"""
+    """Test training step 2 with probit model"""
     training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -101,28 +101,28 @@ def test_all(
     preds = spark.table("model_eval_predictions").toPandas()
     assert (
         preds.query("id_a == 20 and id_b == 30")["second_best_prob"].round(2).iloc[0]
-        < 0.1
+        >= 0.6
     )
     assert (
         preds.query("id_a == 20 and id_b == 30")["probability"].round(2).iloc[0] > 0.5
     )
     assert preds.query("id_a == 30 and id_b == 30")["prediction"].iloc[0] == 0
     assert pd.isnull(
-        preds.query("id_a == 20 and id_b == 50")["second_best_prob"].iloc[0]
+        preds.query("id_a == 10 and id_b == 30")["second_best_prob"].iloc[0]
     )
 
     pred_train = spark.table("model_eval_predict_train").toPandas()
-    assert pred_train.query("id_a == 20 and id_b == 30")["match"].iloc[0] == 1
+    assert pred_train.query("id_a == 20 and id_b == 50")["match"].iloc[0] == 0
     assert pd.isnull(
-        pred_train.query("id_a == 20 and id_b == 50")["second_best_prob"].iloc[0]
+        pred_train.query("id_a == 10 and id_b == 50")["second_best_prob"].iloc[1]
     )
-    assert pred_train.query("id_a == 20 and id_b == 30")["prediction"].iloc[0] == 1
+    assert pred_train.query("id_a == 20 and id_b == 50")["prediction"].iloc[1] == 1
 
     main.do_drop_all("")
 
 
 def test_step_2_param_grid(spark, main, training_conf, model_exploration, fake_self):
-    """ Test matching step 2 training to see if the custom param grid builder is working """
+    """Test matching step 2 training to see if the custom param grid builder is working"""
 
     training_conf["training"]["model_parameters"] = [
         {"type": "random_forest", "maxDepth": [3, 4, 5], "numTrees": [50, 100]},
@@ -179,7 +179,7 @@ def feature_conf(training_conf):
 def test_step_2_probability_ratio_threshold(
     spark, main, feature_conf, model_exploration, threshold_ratio_data_path
 ):
-    """ Test probability threshold ratio decision boundary to remove too close multi-matches """
+    """Test probability threshold ratio decision boundary to remove too close multi-matches"""
     feature_conf["id_column"] = "histid"
     feature_conf["training"]["dataset"] = threshold_ratio_data_path
     feature_conf["training"]["decision"] = "drop_duplicate_with_threshold_ratio"
@@ -224,7 +224,7 @@ def test_step_2_probability_ratio_threshold(
 def test_step_1_OneHotEncoding(
     spark, feature_conf, model_exploration, state_dist_path, training_data_path
 ):
-    """ Test matching step 2 training to see if the OneHotEncoding is working """
+    """Test matching step 2 training to see if the OneHotEncoding is working"""
 
     model_exploration.run_step(0)
     model_exploration.run_step(1)
@@ -263,7 +263,7 @@ def test_step_2_scale_values(
 def test_step_2_train_random_forest_spark(
     spark, main, feature_conf, model_exploration, state_dist_path
 ):
-    """ Test training step 2 with random forest model"""
+    """Test training step 2 with random forest model"""
     feature_conf["training"]["model_parameters"] = [
         {
             "type": "random_forest",
@@ -281,7 +281,7 @@ def test_step_2_train_random_forest_spark(
 
     tr = spark.table("model_eval_training_results").toPandas()
     # assert tr.shape == (1, 18)
-    assert tr.query("model == 'random_forest'")["precision_test_mean"].iloc[0] > 0.5
+    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 0.7
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 3
 
     FNs = spark.table("model_eval_repeat_fns").toPandas()
@@ -289,7 +289,7 @@ def test_step_2_train_random_forest_spark(
     assert FNs.query("id_a == 30")["count"].iloc[0] > 5
 
     TPs = spark.table("model_eval_repeat_tps").toPandas()
-    assert TPs.shape == (1, 4)
+    assert TPs.shape == (2, 4)
 
     TNs = spark.table("model_eval_repeat_tns").toPandas()
     assert TNs.shape == (6, 4)
@@ -300,7 +300,7 @@ def test_step_2_train_random_forest_spark(
 def test_step_2_train_logistic_regression_spark(
     spark, main, feature_conf, model_exploration, state_dist_path, training_data_path
 ):
-    """ Test training step 2 with logistic regression model"""
+    """Test training step 2 with logistic regression model"""
     feature_conf["training"]["model_parameters"] = [
         {"type": "logistic_regression", "threshold": 0.7}
     ]
@@ -312,7 +312,7 @@ def test_step_2_train_logistic_regression_spark(
     tr = spark.table("model_eval_training_results").toPandas()
 
     # assert tr.shape == (1, 16)
-    assert tr.query("model == 'logistic_regression'")["precision_test_mean"].iloc[0] > 0
+    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.8125
     assert (
         round(tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0], 1)
         == 0.7
@@ -323,7 +323,7 @@ def test_step_2_train_logistic_regression_spark(
 def test_step_2_train_decision_tree_spark(
     spark, main, feature_conf, model_exploration, state_dist_path, training_data_path
 ):
-    """ Test training step 2 with decision tree model"""
+    """Test training step 2 with decision tree model"""
     feature_conf["training"]["model_parameters"] = [
         {"type": "decision_tree", "maxDepth": 3, "minInstancesPerNode": 1, "maxBins": 7}
     ]
@@ -346,7 +346,7 @@ def test_step_2_train_decision_tree_spark(
 def test_step_2_train_gradient_boosted_trees_spark(
     spark, main, feature_conf, model_exploration, state_dist_path, training_data_path
 ):
-    """ Test training step 2 with gradient boosted tree model"""
+    """Test training step 2 with gradient boosted tree model"""
     feature_conf["training"]["model_parameters"] = [
         {
             "type": "gradient_boosted_trees",
@@ -382,7 +382,7 @@ def test_step_2_train_gradient_boosted_trees_spark(
 def test_step_2_interact_categorial_vars(
     spark, training_conf, model_exploration, state_dist_path, training_data_path
 ):
-    """ Test matching step 2 training to see if the OneHotEncoding is working """
+    """Test matching step 2 training to see if the OneHotEncoding is working"""
 
     training_conf["comparison_features"] = [
         {
@@ -471,7 +471,7 @@ def test_step_2_interact_categorial_vars(
 def test_step_2_VectorAssembly(
     spark, main, training_conf, model_exploration, state_dist_path, training_data_path
 ):
-    """ Test training step 1 training to see if the OneHotEncoding is working """
+    """Test training step 1 training to see if the OneHotEncoding is working"""
     training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -529,7 +529,7 @@ def test_step_2_split_by_id_a(
     training_data_path,
     fake_self,
 ):
-    """ Tests train-test-split which keeps all potential_matches of an id_a together in the same split """
+    """Tests train-test-split which keeps all potential_matches of an id_a together in the same split"""
 
     training_conf["training"]["n_training_iterations"] = 4
     training_conf["training"]["split_by_id_a"] = True
@@ -544,11 +544,11 @@ def test_step_2_split_by_id_a(
 
     assert len(splits) == 4
 
-    assert splits[0][0].toPandas()["id_a"].unique().tolist() == ["10", "20"]
-    assert splits[0][1].toPandas()["id_a"].unique().tolist() == ["30"]
+    assert splits[0][0].toPandas()["id_a"].unique().tolist() == ["10", "20", "30"]
+    assert splits[0][1].toPandas()["id_a"].unique().tolist() == []
 
-    assert splits[1][0].toPandas()["id_a"].unique().tolist() == ["10"]
-    assert splits[1][1].toPandas()["id_a"].unique().tolist() == ["20", "30"]
+    assert splits[1][0].toPandas()["id_a"].unique().tolist() == ["10", "20"]
+    assert splits[1][1].toPandas()["id_a"].unique().tolist() == ["30"]
 
     main.do_drop_all("")
 
@@ -566,7 +566,7 @@ def test_step_3_get_feature_importances_random_forest(
     spark_test_tmp_dir_path,
     model_exploration,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [
@@ -651,7 +651,7 @@ def test_step_3_get_feature_importances_probit(
     spark_test_tmp_dir_path,
     matching,
 ):
-    """ Test running the chosen model on potential matches dataset """
+    """Test running the chosen model on potential matches dataset"""
     td_path, pa_path, pb_path = datasource_training_input
 
     training_conf["comparison_features"] = [

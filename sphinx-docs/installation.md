@@ -3,8 +3,8 @@
 ## Requirements
 Make sure that you have each of these installed on your system.
 
-- [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-- Python >= 3.6
+- Java 8 or Java 11
+- Python 3.10
 
 ## Installing the program
 

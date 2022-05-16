@@ -17,10 +17,8 @@ import hlink.linking.model_exploration as me
 import hlink.linking.hh_model_exploration as hh_me
 from hlink.linking.link_run import LinkRun
 import json
-import logging
 import os
 import pytest
-from unittest.mock import patch
 import sys
 from types import SimpleNamespace
 
@@ -37,31 +35,8 @@ def load_table_from_csv(link_task, path, table_name):
     ).saveAsTable(table_name)
 
 
-#  A work-around for Redmine bug 21151 (exceptions that are printed when tests
-#  are run).  They occur because of an issue within the version of pyspark
-#  and py4j that we use.  They all are raised in this method in the standard
-#  logging library:
-real_isEnabledFor = logging.Logger.isEnabledFor
-
-
-#  The issue is that during garbage-collection part of py4j, the method is
-#  called with a non-numeric level (i.e., None).  So, we patch the library
-#  method with our own:
-def our_isEnabledFor(self, level):
-    if level is None:
-        return False
-    return real_isEnabledFor(self, level)
-
-
-#  The patch is done in the pytest fixture below.
-
-
 @pytest.fixture(scope="session")
 def spark(tmpdir_factory):
-    # See comment above
-    patcher = patch("logging.Logger.isEnabledFor", our_isEnabledFor)
-    patcher.start()
-
     os.environ["PYSPARK_PYTHON"] = sys.executable
     spark_connection = SparkConnection(
         tmpdir_factory.mktemp("derby"),
@@ -229,7 +204,7 @@ def preprocessing_conf_all_space_columns(
 
 @pytest.fixture(scope="function")
 def preprocessing_conf_simple_names(spark, conf, datasource_preprocessing_simple_names):
-    """ Create a fixture for testing name substitution and bigrams """
+    """Create a fixture for testing name substitution and bigrams"""
     pathname_a, pathname_b = datasource_preprocessing_simple_names
     conf["datasource_a"] = {"parquet_file": pathname_a}
     conf["datasource_b"] = {"parquet_file": pathname_b}
@@ -238,7 +213,7 @@ def preprocessing_conf_simple_names(spark, conf, datasource_preprocessing_simple
 
 @pytest.fixture(scope="function")
 def preprocessing_conf_popularity(spark, conf, ext_path_preprocessing_popularity):
-    """ Create a fixture for testing name substitution and bigrams """
+    """Create a fixture for testing name substitution and bigrams"""
     pathname = ext_path_preprocessing_popularity
     conf["datasource_a"] = {"file": pathname}
     conf["datasource_b"] = {"file": pathname}
@@ -259,7 +234,7 @@ def preprocessing_conf_popularity(spark, conf, ext_path_preprocessing_popularity
 
 @pytest.fixture(scope="function")
 def preprocessing_conf_street_names(spark, conf, test_street_names_data_path):
-    """ Create a fixture for testing street name abbreviation substitutions """
+    """Create a fixture for testing street name abbreviation substitutions"""
     conf["datasource_a"] = {"file": test_street_names_data_path}
     conf["datasource_b"] = {"file": test_street_names_data_path}
     return conf
@@ -267,7 +242,7 @@ def preprocessing_conf_street_names(spark, conf, test_street_names_data_path):
 
 @pytest.fixture(scope="function")
 def preprocessing_conf_birthyr(spark, conf, birthyr_replace_path):
-    """ Create a fixture for testing name substitution and bigrams """
+    """Create a fixture for testing name substitution and bigrams"""
     conf["datasource_a"] = {"file": birthyr_replace_path}
     conf["datasource_b"] = {"file": birthyr_replace_path}
     return conf
@@ -277,7 +252,7 @@ def preprocessing_conf_birthyr(spark, conf, birthyr_replace_path):
 def preprocessing_conf_synthetic_household_data(
     spark, conf, datasource_synthetic_households
 ):
-    """ Create a fixture conf for testing union transform of household/neighborhood data """
+    """Create a fixture conf for testing union transform of household/neighborhood data"""
     pathname_a, pathname_b = datasource_synthetic_households
     conf["datasource_a"] = {"parquet_file": pathname_a}
     conf["datasource_b"] = {"parquet_file": pathname_b}
@@ -288,7 +263,7 @@ def preprocessing_conf_synthetic_household_data(
 def preprocessing_conf_19thc_nativity_conf(
     spark, conf, datasource_19thc_nativity_households_data
 ):
-    """ Create a fixture conf for testing nativity calculation """
+    """Create a fixture conf for testing nativity calculation"""
     full_path_a, full_path_b = datasource_19thc_nativity_households_data
     conf["datasource_a"] = {"file": full_path_a}
     conf["datasource_b"] = {"file": full_path_b}
@@ -495,7 +470,7 @@ def preprocessing_conf_19thc_nativity_conf(
 def preprocessing_conf_19thc_caution_conf(
     spark, conf, datasource_19thc_nativity_households_data
 ):
-    """ Create a fixture conf for testing nativity calculation """
+    """Create a fixture conf for testing nativity calculation"""
     full_path_a, full_path_b = datasource_19thc_nativity_households_data
     conf["datasource_a"] = {"file": full_path_a}
     conf["datasource_b"] = {"file": full_path_b}
@@ -848,7 +823,7 @@ def preprocessing_conf_19thc_caution_conf(
 
 @pytest.fixture(scope="function")
 def preprocessing_conf_household_data(spark, conf, datasource_real_households):
-    """ Create a fixture conf for testing family/neighborhood transforms """
+    """Create a fixture conf for testing family/neighborhood transforms"""
     full_path_a, full_path_b = datasource_real_households
     conf["datasource_a"] = {"file": full_path_a}
     conf["datasource_b"] = {"file": full_path_b}
@@ -913,7 +888,7 @@ def preprocessing_conf_household_data(spark, conf, datasource_real_households):
 
 @pytest.fixture(scope="function")
 def preprocessing_conf_rel_rows(spark, conf, test_data_rel_rows_age):
-    """ Create a fixture conf for testing family/neighborhood transforms """
+    """Create a fixture conf for testing family/neighborhood transforms"""
     full_path_a, full_path_b = test_data_rel_rows_age
     conf["datasource_a"] = {"file": full_path_a}
     conf["datasource_b"] = {"file": full_path_b}
@@ -1315,7 +1290,7 @@ def matching_comparison_conf(spark, conf, datasource_matching_comparisons, match
 
 @pytest.fixture(scope="function")
 def matching_conf_counties(spark, conf, county_dist_datasources):
-    """ Create a fixture for testing name substitution and bigrams """
+    """Create a fixture for testing name substitution and bigrams"""
     pathname_a, pathname_b = county_dist_datasources
     conf["datasource_a"] = {"parquet_file": pathname_a}
     conf["datasource_b"] = {"parquet_file": pathname_b}
@@ -1325,7 +1300,7 @@ def matching_conf_counties(spark, conf, county_dist_datasources):
 
 @pytest.fixture(scope="function")
 def matching_conf_nativity(spark, conf, nativity_datasources):
-    """ Create a fixture for testing name substitution and bigrams """
+    """Create a fixture for testing name substitution and bigrams"""
     pathname_a, pathname_b = nativity_datasources
     conf["datasource_a"] = {"file": pathname_a}
     conf["datasource_b"] = {"file": pathname_b}
