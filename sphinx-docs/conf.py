@@ -4,6 +4,8 @@
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+import pkg_resources
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -23,7 +25,7 @@ project = "hlink"
 copyright = "2019-2022, IPUMS"
 author = "Jacob Wellington, Kelly Thompson, Jonas Helgertz, Riley Harper"
 
-version = "2.0.0"
+version = pkg_resources.get_distribution("hlink").version
 # The full version, including alpha/beta/rc tags
 release = version
 
