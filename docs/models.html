@@ -46,7 +46,7 @@
 </ul>
 <section id="random-forest">
 <h2>random_forest<a class="headerlink" href="#random-forest" title="Permalink to this headline">¶</a></h2>
-<p>Uses <a class="reference external" href="https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.RandomForestClassifier">pyspark.ml.classification.RandomForestClassifier</a>.  Returns probability as an array.</p>
+<p>Uses <a class="reference external" href="https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.RandomForestClassifier.html">pyspark.ml.classification.RandomForestClassifier</a>.  Returns probability as an array.</p>
 <ul class="simple">
 <li><p>Parameters:</p>
 <ul>
@@ -62,21 +62,21 @@
 </section>
 <section id="probit">
 <h2>probit<a class="headerlink" href="#probit" title="Permalink to this headline">¶</a></h2>
-<p>Uses <a class="reference external" href="https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.regression.GeneralizedLinearRegression">pyspark.ml.regression.GeneralizedLinearRegression</a> with <code class="docutils literal notranslate"><span class="pre">family=&quot;binomial&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">link=&quot;probit&quot;</span></code>.</p>
+<p>Uses <a class="reference external" href="https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.regression.GeneralizedLinearRegression.html">pyspark.ml.regression.GeneralizedLinearRegression</a> with <code class="docutils literal notranslate"><span class="pre">family=&quot;binomial&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">link=&quot;probit&quot;</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_parameters</span> <span class="o">=</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="p">}</span>
 </pre></div>
 </div>
 </section>
 <section id="logistic-regression">
 <h2>logistic_regression<a class="headerlink" href="#logistic-regression" title="Permalink to this headline">¶</a></h2>
-<p>Uses <a class="reference external" href="https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.LogisticRegression">pyspark.ml.classification.LogisticRegression</a></p>
+<p>Uses <a class="reference external" href="https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.LogisticRegression.html">pyspark.ml.classification.LogisticRegression</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_model</span> <span class="o">=</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="p">}</span>
 </pre></div>
 </div>
 </section>
 <section id="decision-tree">
 <h2>decision_tree<a class="headerlink" href="#decision-tree" title="Permalink to this headline">¶</a></h2>
-<p>Uses <a class="reference external" href="https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.DecisionTreeClassifier">pyspark.ml.classification.DecisionTreeClassifier</a>.</p>
+<p>Uses <a class="reference external" href="https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.DecisionTreeClassifier.html">pyspark.ml.classification.DecisionTreeClassifier</a>.</p>
 <ul class="simple">
 <li><p>Parameters:</p>
 <ul>
@@ -92,7 +92,7 @@
 </section>
 <section id="gradient-boosted-trees">
 <h2>gradient_boosted_trees<a class="headerlink" href="#gradient-boosted-trees" title="Permalink to this headline">¶</a></h2>
-<p>Uses <a class="reference external" href="https://spark.apache.org/docs/2.3.1/api/python/pyspark.ml.html#pyspark.ml.classification.GBTClassifier">pyspark.ml.classification.GBTClassifier</a>.</p>
+<p>Uses <a class="reference external" href="https://spark.apache.org/docs/3.2.1/api/python/reference/api/pyspark.ml.classification.GBTClassifier.html">pyspark.ml.classification.GBTClassifier</a>.</p>
 <ul class="simple">
 <li><p>Parameters:</p>
 <ul>
