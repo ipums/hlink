@@ -1,10 +1,13 @@
+# Workaround for a conda bug: https://stackoverflow.com/questions/72177222/runtimeerror-failed-to-find-interpreter-for-builtin-discover-of-python-spec-py 
+default_language_version:
+  python: python3.10
+
 repos:
-- repo: https://github.com/ambv/black
-  rev: 20.8b1
+- repo: https://github.com/psf/black
+  rev: 22.3.0
   hooks:
-  - id: black
-    language_version: python3.6
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v1.2.3
+    - id: black
+- repo: https://github.com/PyCQA/flake8
+  rev: 4.0.1
   hooks:
-  - id: flake8
+    - id: flake8
