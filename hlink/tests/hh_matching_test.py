@@ -44,9 +44,9 @@ def test_household_matching_training_integration(
     hh_training.run_step(0)
     hh_training.run_step(1)
 
-    assert spark.table("hh_training_data").toPandas().shape == (4349, 60)
+    assert spark.table("hh_training_data").toPandas().shape == (198, 60)
     hhtf = spark.table("hh_training_features").toPandas()
-    assert hhtf.shape == (155, 10)
+    assert hhtf.shape == (10, 10)
     assert all(
         elem in list(hhtf.columns)
         for elem in [
