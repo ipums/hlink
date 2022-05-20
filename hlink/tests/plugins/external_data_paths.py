@@ -243,8 +243,8 @@ def hh_matching_stubs(spark):
 def hh_integration_test_data(spark):
     """Create a fixture with the path to the test training data file"""
 
-    path_a = "input_data/hh_real_a.csv"
-    path_b = "input_data/hh_real_b.csv"
+    path_a = "input_data/hh_matching_a.csv"
+    path_b = "input_data/hh_matching_b.csv"
     path_matches = "input_data/matched_men.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
