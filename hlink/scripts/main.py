@@ -15,6 +15,7 @@ import readline
 import sys
 import traceback
 import uuid
+from timeit import default_timer as timer
 
 from hlink.spark.session import SparkConnection
 from hlink.configs.load_config import load_conf_file
@@ -99,8 +100,15 @@ def cli():
         traceback.print_exception("", err, None)
         sys.exit(1)
 
-    spark = _get_spark(run_conf, args)
     _setup_logging(run_conf)
+
+    logging.info("Initializing Spark")
+    spark_init_start = timer()
+    spark = _get_spark(run_conf, args)
+    spark_init_end = timer()
+    spark_init_time = round(spark_init_end - spark_init_start, 2)
+    logging.info(f"Initialized Spark in {spark_init_time}s")
+
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
 
@@ -205,7 +213,11 @@ def _cli_loop(spark, args, run_conf):
     try:
         print("Analyzing config file")
         analyze_conf(LinkRun(spark, run_conf))
+        logging.info("Analyzed config file, no errors found")
     except ValueError as err:
+        logging.error(
+            "Analysis found an error in the config file. See below for details."
+        )
         report_and_log_error("", err)
 
     while True:
@@ -242,6 +254,8 @@ def _setup_logging(conf):
     log_file = conf["log_file"]
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
+    hlink_version = pkg_resources.get_distribution("hlink").version
+
     # format_string = f"%(levelname)s %(asctime)s {user} {session_id} %(message)s -- {conf['conf_path']}"
     format_string = "%(levelname)s %(asctime)s -- %(message)s"
     print(f"*** Hlink log: {log_file}")
@@ -252,8 +266,9 @@ def _setup_logging(conf):
     logging.info(
         "-------------------------------------------------------------------------------------"
     )
-    logging.info(f"   New Session {session_id} by user {user} ")
-    logging.info(f"   Configured with  {conf['conf_path']}")
+    logging.info(f"   New session {session_id} by user {user}")
+    logging.info(f"   Configured with {conf['conf_path']}")
+    logging.info(f"   Using hlink version {hlink_version}")
     logging.info(
         "-------------------------------------------------------------------------------------"
     )

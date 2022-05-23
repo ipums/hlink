@@ -58,13 +58,16 @@ class LinkTask(object):
 
     def run_all_steps(self):
         """Run all steps in order."""
+        logging.info(f"Running all steps for task {self.display_name}")
         start_all = timer()
         for (i, step) in enumerate(self.get_steps()):
             print(f"Running step {i}: {step}")
+            logging.info(f"Running step {i}: {step}")
             step.run()
         end_all = timer()
         elapsed_time_all = round(end_all - start_all, 2)
         print(f"Finished all in {elapsed_time_all}s")
+        logging.info(f"Finished all steps in {elapsed_time_all}s")
 
     def run_step(self, step_num: int):
         """Run a particular step.
