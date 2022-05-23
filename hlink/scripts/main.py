@@ -102,12 +102,12 @@ def cli():
 
     _setup_logging(run_conf)
 
-    logging.info("Initializing spark")
+    logging.info("Initializing Spark")
     spark_init_start = timer()
     spark = _get_spark(run_conf, args)
     spark_init_end = timer()
     spark_init_time = round(spark_init_end - spark_init_start, 2)
-    logging.info(f"Initialized spark in {spark_init_time}s")
+    logging.info(f"Initialized Spark in {spark_init_time}s")
 
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
@@ -216,7 +216,7 @@ def _cli_loop(spark, args, run_conf):
         logging.info("Analyzed config file, no errors found")
     except ValueError as err:
         logging.error(
-            "analyze_conf() found an error in the config file. See below for details."
+            "Analysis found an error in the config file. See below for details."
         )
         report_and_log_error("", err)
 
@@ -266,9 +266,9 @@ def _setup_logging(conf):
     logging.info(
         "-------------------------------------------------------------------------------------"
     )
-    logging.info(f"   New Session {session_id} by user {user} ")
-    logging.info(f"   Configured with  {conf['conf_path']}")
-    logging.info(f"   Running hlink version {hlink_version}")
+    logging.info(f"   New session {session_id} by user {user}")
+    logging.info(f"   Configured with {conf['conf_path']}")
+    logging.info(f"   Using hlink version {hlink_version}")
     logging.info(
         "-------------------------------------------------------------------------------------"
     )
