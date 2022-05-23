@@ -205,7 +205,11 @@ def _cli_loop(spark, args, run_conf):
     try:
         print("Analyzing config file")
         analyze_conf(LinkRun(spark, run_conf))
+        logging.info("Analyzed config file, no errors found")
     except ValueError as err:
+        logging.error(
+            "analyze_conf() found an error in the config file. See below for details."
+        )
         report_and_log_error("", err)
 
     while True:
