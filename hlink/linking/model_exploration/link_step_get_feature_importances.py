@@ -5,6 +5,7 @@
 
 from pyspark.ml import PipelineModel
 from hlink.linking.link_step import LinkStep
+from pathlib import Path
 
 
 class LinkStepGetFeatureImportances(LinkStep):
@@ -31,9 +32,9 @@ class LinkStepGetFeatureImportances(LinkStep):
 
                 # retrieve the saved chosen model
                 print("Loading chosen ML model...")
-                model_path = config["spark_tmp_dir"] + "/chosen_model"
+                model_path = Path(config["spark_tmp_dir"]) / "chosen_model"
                 try:
-                    plm = PipelineModel.load(model_path)
+                    plm = PipelineModel.load(str(model_path))
                 except:
                     print(
                         "Model not found!  You might need to run step_2 to generate and train the chosen model if you haven't already done so."
