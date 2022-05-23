@@ -251,7 +251,9 @@ def _reload_modules():
 
 
 def _setup_logging(conf):
-    log_file = conf["log_file"]
+    log_file = Path(conf["log_file"])
+    log_file.parent.mkdir(exist_ok=True, parents=True)
+
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
     hlink_version = pkg_resources.get_distribution("hlink").version
