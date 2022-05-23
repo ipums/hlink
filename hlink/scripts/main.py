@@ -99,8 +99,8 @@ def cli():
         traceback.print_exception("", err, None)
         sys.exit(1)
 
-    spark = _get_spark(run_conf, args)
     _setup_logging(run_conf)
+    spark = _get_spark(run_conf, args)
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
 
