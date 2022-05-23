@@ -242,6 +242,8 @@ def _setup_logging(conf):
     log_file = conf["log_file"]
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
+    hlink_version = pkg_resources.get_distribution("hlink").version
+
     # format_string = f"%(levelname)s %(asctime)s {user} {session_id} %(message)s -- {conf['conf_path']}"
     format_string = "%(levelname)s %(asctime)s -- %(message)s"
     print(f"*** Hlink log: {log_file}")
@@ -254,6 +256,7 @@ def _setup_logging(conf):
     )
     logging.info(f"   New Session {session_id} by user {user} ")
     logging.info(f"   Configured with  {conf['conf_path']}")
+    logging.info(f"   Running hlink version {hlink_version}")
     logging.info(
         "-------------------------------------------------------------------------------------"
     )
