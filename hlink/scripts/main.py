@@ -15,6 +15,7 @@ import readline
 import sys
 import traceback
 import uuid
+from timeit import default_timer as timer
 
 from hlink.spark.session import SparkConnection
 from hlink.configs.load_config import load_conf_file
@@ -100,7 +101,14 @@ def cli():
         sys.exit(1)
 
     _setup_logging(run_conf)
+
+    logging.info("Initializing spark")
+    spark_init_start = timer()
     spark = _get_spark(run_conf, args)
+    spark_init_end = timer()
+    spark_init_time = round(spark_init_end - spark_init_start, 2)
+    logging.info(f"Initialized spark in {spark_init_time}s")
+
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
 
