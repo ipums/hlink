@@ -44,9 +44,9 @@ def test_household_matching_training_integration(
     hh_training.run_step(0)
     hh_training.run_step(1)
 
-    assert spark.table("hh_training_data").toPandas().shape == (4349, 60)
+    assert spark.table("hh_training_data").toPandas().shape == (198, 60)
     hhtf = spark.table("hh_training_features").toPandas()
-    assert hhtf.shape == (4349, 10)
+    assert hhtf.shape == (10, 10)
     assert all(
         elem in list(hhtf.columns)
         for elem in [
@@ -67,15 +67,15 @@ def test_household_matching_training_integration(
 
     hh_matching.run_step(0)
 
-    assert spark.table("indiv_matches").count() == 526
-    assert spark.table("unmatched_a").count() == 1787
-    assert spark.table("unmatched_b").count() == 1716
-    assert spark.table("hh_blocked_matches").count() == 7681
+    assert spark.table("indiv_matches").count() == 20
+    assert spark.table("unmatched_a").count() == 80
+    assert spark.table("unmatched_b").count() == 89
+    assert spark.table("hh_blocked_matches").count() == 247
 
     hh_matching.run_step(1)
     hh_matching.run_step(2)
 
-    assert spark.table("hh_potential_matches_prepped").toPandas().shape == (7681, 9)
+    assert spark.table("hh_potential_matches_prepped").toPandas().shape == (247, 9)
     hhspms = spark.table("hh_scored_potential_matches").toPandas()
     assert all(
         elem in list(hhspms.columns)
@@ -101,30 +101,37 @@ def test_household_matching_training_integration(
             "prediction",
         ]
     )
+
+    # Nancy Brummit (A) does match Nancy Brummitt (B)
     assert (
         hhspms.query(
-            "histid_a == '95004C6D-041B-4F18-8140-07B3296A16E0' and histid_b == '65FA5A10-2E13-4CC0-BDAE-F0D395950DD7'"
-        )["prediction"].iloc[0]
-        == 0
-    )
-    assert (
-        hhspms.query(
-            "histid_a == '95004C6D-041B-4F18-8140-07B3296A16E0' and histid_b == '6BA3BFF0-AAF5-4C11-AE97-84517DE40234'"
+            "histid_a == 'C2A27CFE-5E4C-47A7-9C48-CB07FC64E49F' and histid_b == '34EF9DE2-CFEF-492D-BE92-26865C3CEE84'"
         )["prediction"].iloc[0]
         == 1
     )
 
+    # Sam Brummit (A) does not match Nancy Brummitt (B)
     assert (
         hhspms.query(
-            "histid_a == '01301C1A-28FE-41CF-8DAB-83E80DBAC4D6' and histid_b == '18F9B112-3971-4222-B124-593E88F8FF5B'"
+            "histid_a == 'A733F5D3-38F7-4D61-8F02-9DB4BD2D64E0' and histid_b == '34EF9DE2-CFEF-492D-BE92-26865C3CEE84'"
         )["prediction"].iloc[0]
         == 0
     )
+
+    # Margaret Kenefick (A) does match Margaret Kenefick (B)
     assert (
         hhspms.query(
-            "histid_a == '24E352C2-9CB3-458E-98F9-70EE2AD82D89' and histid_b == '18F9B112-3971-4222-B124-593E88F8FF5B'"
+            "histid_a == '006CA56D-1620-459E-9EB1-DCCE5E08949E' and histid_b == '2670520B-6B0A-4B2A-8A04-B876BB5A707C'"
         )["prediction"].iloc[0]
         == 1
+    )
+
+    # Margaret Kenefick (A) does not match William Kenefick (B)
+    assert (
+        hhspms.query(
+            "histid_a == '006CA56D-1620-459E-9EB1-DCCE5E08949E' and histid_b == '68977EB4-AE65-4D6F-9AD8-144AFA6FBF27'"
+        )["prediction"].iloc[0]
+        == 0
     )
 
 

@@ -70,13 +70,21 @@ def test_all_hh_mod_ev(
     )
     assert tr.__len__() == 2
     assert (
-        tr.query("model == 'logistic_regression'")["precision_test_mean"].iloc[0] > 0.9
+        0.6
+        < tr.query("model == 'logistic_regression'")["precision_test_mean"].iloc[0]
+        <= 1.0
     )
     assert tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0] == 0.5
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 5
-    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 0.9
-    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] > 0.9
-    assert tr.query("model == 'logistic_regression'")["recall_test_mean"].iloc[0] > 0.9
+    assert 0.9 < tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] <= 1.0
+    assert (
+        0.8 < tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] <= 1.0
+    )
+    assert (
+        0.9
+        < tr.query("model == 'logistic_regression'")["recall_test_mean"].iloc[0]
+        <= 1.0
+    )
 
     preds = spark.table("hh_model_eval_predictions").toPandas()
     assert all(
@@ -92,13 +100,14 @@ def test_all_hh_mod_ev(
             "match",
         ]
     )
+
     pm0 = preds.query(
-        "histid_a == '790BFA1D-E8A8-4C96-B005-6C36DD5154F0' and histid_b == 'B0BFE02E-DDEE-4DD1-86E3-15F297D18DAE'"
+        "histid_a == 'F0FAEAD5-D0D0-4B97-BED3-87B272F1ACA6' and histid_b == 'EE52A802-2F8E-4799-8CF4-A0A8A9F1C80F'"
     )
-    assert pm0["second_best_prob"].round(2).iloc[0] >= 0.90
-    assert pm0["ratio"].round(2).iloc[0] >= 1.01
-    assert pm0["prediction"].iloc[0] == 0
-    assert pm0["probability"].round(2).iloc[0] >= 0.91
+    assert pm0["prediction"].iloc[0] == 1
+    assert pm0["match"].iloc[0] == 1
+    assert 0.5 < pm0["probability"].iloc[0] <= 1.0
+    assert 0.0 < pm0["second_best_prob"].iloc[0] < 0.5
 
     pred_train = spark.table("hh_model_eval_predict_train").toPandas()
     assert all(
@@ -114,13 +123,13 @@ def test_all_hh_mod_ev(
             "match",
         ]
     )
+
     pm1 = pred_train.query(
-        "histid_a == '014470B1-63E5-4A64-BB9A-70F5A9340130' and histid_b == '4E713690-5206-41FD-ABE1-5F545E55A5BB'"
+        "histid_a == 'B1DF9242-4BB1-4BB9-8C08-C1C12AB65AE4' and histid_b == '3C3438B9-A2C2-4B53-834A-2A12D540EA5F'"
     )
-    assert pm1["match"].iloc[0] == 1
-    assert pm1["probability"].iloc[0] > 0.9
-    assert pm1["second_best_prob"].iloc[0] < 0.2
-    assert pd.isnull(pm1["ratio"].iloc[0])
-    assert pm1["prediction"].iloc[0] == 1
+    assert pm1["prediction"].iloc[0] == 0
+    assert pm1["match"].iloc[0] == 0
+    assert 0.0 < pm1["probability"].iloc[0] < 0.5
+    assert pd.isnull(pm1["second_best_prob"].iloc[0])
 
     main.do_drop_all("")
