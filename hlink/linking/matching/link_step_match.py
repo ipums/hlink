@@ -3,9 +3,12 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import logging
+
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.dist_table as dist_table_core
 import hlink.linking.core.comparison as comparison_core
+from hlink.linking.util import spark_shuffle_partitions_heuristic
 from . import _helpers as matching_helpers
 
 from hlink.linking.link_step import LinkStep
@@ -22,6 +25,15 @@ class LinkStepMatch(LinkStep):
 
     def _run(self):
         config = self.task.link_run.config
+
+        dataset_size_a = self.task.spark.table("exploded_df_a").count()
+        dataset_size_b = self.task.spark.table("exploded_df_b").count()
+        dataset_size_max = max(dataset_size_a, dataset_size_b)
+        num_partitions = spark_shuffle_partitions_heuristic(dataset_size_max)
+        self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
+        logging.info(
+            f"Dataset sizes are A={dataset_size_a}, B={dataset_size_b}, so set Spark partitions to {num_partitions} for this step"
+        )
 
         blocking = matching_helpers.get_blocking(config)
 

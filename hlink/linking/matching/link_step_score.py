@@ -3,12 +3,14 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import logging
 from pyspark.sql import Row, Window
 from pyspark.sql import functions as f
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.threshold as threshold_core
 import hlink.linking.core.dist_table as dist_table_core
+from hlink.linking.util import spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
@@ -38,11 +40,19 @@ class LinkStepScore(LinkStep):
             )
             return
 
+        dataset_size = self.task.spark.table(f"{table_prefix}potential_matches").count()
+        num_partitions = spark_shuffle_partitions_heuristic(dataset_size)
+        self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
+        logging.info(
+            f"Dataset size is {dataset_size}, so set Spark partitions to {num_partitions} for this step"
+        )
+
         id_a = config["id_column"] + "_a"
         id_b = config["id_column"] + "_b"
         chosen_model_params = config[training_conf]["chosen_model"].copy()
         self._create_features(config)
         pm = self.task.spark.table(f"{table_prefix}potential_matches_prepped")
+
         ind_var_columns = config[training_conf]["independent_vars"]
         flatten = lambda l: [item for sublist in l for item in sublist]
         if config.get("pipeline_features", False):
