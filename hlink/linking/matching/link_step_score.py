@@ -40,18 +40,18 @@ class LinkStepScore(LinkStep):
             )
             return
 
-        id_a = config["id_column"] + "_a"
-        id_b = config["id_column"] + "_b"
-        chosen_model_params = config[training_conf]["chosen_model"].copy()
-        self._create_features(config)
-        pm = self.task.spark.table(f"{table_prefix}potential_matches_prepped")
-
-        dataset_size = pm.count()
+        dataset_size = self.task.spark.table(f"{table_prefix}potential_matches").count()
         num_partitions = spark_shuffle_partitions_heuristic(dataset_size)
         self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
         logging.info(
             f"Dataset size is {dataset_size}, so set Spark partitions to {num_partitions} for this step"
         )
+
+        id_a = config["id_column"] + "_a"
+        id_b = config["id_column"] + "_b"
+        chosen_model_params = config[training_conf]["chosen_model"].copy()
+        self._create_features(config)
+        pm = self.task.spark.table(f"{table_prefix}potential_matches_prepped")
 
         ind_var_columns = config[training_conf]["independent_vars"]
         flatten = lambda l: [item for sublist in l for item in sublist]
