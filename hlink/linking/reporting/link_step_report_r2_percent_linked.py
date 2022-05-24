@@ -3,8 +3,11 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import logging
 import pyspark.sql.functions as f
 from pyspark.sql.window import Window
+
+from hlink.linking.util import spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
@@ -24,6 +27,16 @@ class LinkStepReportR2PercentLinked(LinkStep):
 
     def _run(self):
         """For households with anyone linked in round 1, report percent of remaining household members linked in round 2."""
+
+        dataset_size1 = self.task.spark.table("prepped_df_a").count()
+        dataset_size2 = self.task.spark.table("predicted_matches").count()
+        dataset_size3 = self.task.spark.table("hh_predicted_matches").count()
+        dataset_size_max = max(dataset_size1, dataset_size2, dataset_size3)
+        num_partitions = spark_shuffle_partitions_heuristic(dataset_size_max)
+        self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
+        logging.info(
+            f"Dataset sizes are {dataset_size1}, {dataset_size2}, {dataset_size3}, so set Spark partitions to {num_partitions} for this step"
+        )
 
         pdfa = self.task.spark.table("prepped_df_a").select("serialp", "histid")
         pm = (
