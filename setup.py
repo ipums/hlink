@@ -54,12 +54,13 @@ dev_requires = [
 
 setup(
     name="hlink",
-    version="3.2.5",
+    version="3.2.6",
     packages=find_packages(),
     description="Fast supervised pyspark record linkage software",
     package_data=package_data,
     install_requires=install_requires,
     extras_require={"dev": dev_requires},
+    project_urls={'Homepage': 'https://github.com/ipums/hlink'},
     entry_points="""
     [console_scripts]
     hlink=hlink.scripts.main:cli
