@@ -54,10 +54,9 @@ dev_requires = [
 
 setup(
     name="hlink",
-    version="3.2.3",
+    version="3.2.4",
     packages=find_packages(),
     description="Fast supervised pyspark record linkage software",
-    long_description=open("README.md").read(),
     package_data=package_data,
     install_requires=install_requires,
     extras_require={"dev": dev_requires},
