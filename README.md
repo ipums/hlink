@@ -4,6 +4,13 @@
 
 A paper on the creation and applications of this program can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>.
 
+## Installation
+
+Java 8 or [Java 11](https://openjdk.org/install/) is requried for the PySpark integration. 
+
+You can install the python package from pip:
+`pip install hlink`
+
 ## Docs
 
 The documentation site can be found at [hlink.docs.ipums.org](https://hlink.docs.ipums.org).

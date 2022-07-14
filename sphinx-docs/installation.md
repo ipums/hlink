@@ -6,7 +6,11 @@ Make sure that you have each of these installed on your system.
 - Java 8 or Java 11
 - Python 3.10
 
-## Installing the program
+## Installing from pypi
+
+`pip install hlink`
+
+## Installing from source
 
 In the root project directory, run `pip install .`
 

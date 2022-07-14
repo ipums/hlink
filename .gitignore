@@ -29,3 +29,4 @@ working_dir/
 .coverage
 coverage_*
 *_coverage.xlsx
+tags
