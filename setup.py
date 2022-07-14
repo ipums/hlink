@@ -54,7 +54,7 @@ dev_requires = [
 
 setup(
     name="hlink",
-    version="3.2.1",
+    version="3.2.2",
     packages=find_packages(),
     package_data=package_data,
     install_requires=install_requires,
