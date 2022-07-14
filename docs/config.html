@@ -1,17 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Configuration &#8212; hlink 3.2.1 documentation</title>
+    <title>Configuration &#8212; hlink 3.2.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,7 +35,7 @@
           <div class="body" role="main">
             
   <section id="configuration">
-<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h1>
 <ol class="simple">
 <li><p><a class="reference external" href="#basic-config-file">Basic Example Config File</a></p></li>
 <li><p><a class="reference external" href="#advanced-config-file">Advanced Example Config File</a></p></li>
@@ -54,7 +55,7 @@
 <li><p><a class="reference external" href="#household-training-and-models">Household training and models</a></p></li>
 </ol>
 <section id="basic-config-file">
-<h2>Basic Config File<a class="headerlink" href="#basic-config-file" title="Permalink to this headline">¶</a></h2>
+<h2>Basic Config File<a class="headerlink" href="#basic-config-file" title="Permalink to this heading">¶</a></h2>
 <p>The config file tells the hlink program what to link and how to link it. A description of the different sections of
 a configuration file are below. For reference, here is an example of a relatively basic config file. This config file
 is used by the <code class="docutils literal notranslate"><span class="pre">examples/tutorial/tutorial.py</span></code> script for linking, and there is a more detailed discussion of the config
@@ -128,7 +129,7 @@ file in the README in <code class="docutils literal notranslate"><span class="pr
 </div>
 </section>
 <section id="advanced-config-file">
-<h2>Advanced Config File<a class="headerlink" href="#advanced-config-file" title="Permalink to this headline">¶</a></h2>
+<h2>Advanced Config File<a class="headerlink" href="#advanced-config-file" title="Permalink to this heading">¶</a></h2>
 <p>Here is an example of a more complex config file that makes use of more of hlink’s features.
 It uses machine learning to probabilistically link the two datasets.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">id_column</span> <span class="o">=</span> <span class="s2">&quot;histid&quot;</span>
@@ -407,7 +408,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="top-level-configs">
-<h2>Top level configs<a class="headerlink" href="#top-level-configs" title="Permalink to this headline">¶</a></h2>
+<h2>Top level configs<a class="headerlink" href="#top-level-configs" title="Permalink to this heading">¶</a></h2>
 <p>These configs should go at the top of your config file under no header:</p>
 <p><em>id_column</em></p>
 <p>Required.  Specify the id column that uniquely identifies a record in each dataset.</p>
@@ -421,7 +422,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="data-sources">
-<h2>Data sources<a class="headerlink" href="#data-sources" title="Permalink to this headline">¶</a></h2>
+<h2>Data sources<a class="headerlink" href="#data-sources" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header names: <code class="docutils literal notranslate"><span class="pre">datasource_a</span></code>, <code class="docutils literal notranslate"><span class="pre">datasource_b</span></code></p></li>
 <li><p>Description: Specifies your input data.</p></li>
@@ -441,7 +442,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="filter">
-<h2>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
+<h2>Filter<a class="headerlink" href="#filter" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">filter</span></code></p></li>
 <li><p>Description: Specifies filters to apply to your input data.</p></li>
@@ -469,7 +470,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="column-mappings">
-<h2><a class="reference internal" href="column_mapping_transforms.html"><span class="doc">Column Mappings</span></a><a class="headerlink" href="#column-mappings" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="column_mapping_transforms.html"><span class="doc">Column Mappings</span></a><a class="headerlink" href="#column-mappings" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">column_mappings</span></code></p></li>
 <li><p>Description: Base column mappings and transformations to extract from your input datasets.</p></li>
@@ -502,7 +503,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="substitution-columns">
-<h2><a class="reference internal" href="substitutions.html"><span class="doc">Substitution Columns</span></a><a class="headerlink" href="#substitution-columns" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="substitutions.html"><span class="doc">Substitution Columns</span></a><a class="headerlink" href="#substitution-columns" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">substitution_columns</span></code></p></li>
 <li><p>Description: Substitutions to apply to data after column mappings.</p></li>
@@ -531,7 +532,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="feature-selections">
-<h2><a class="reference internal" href="feature_selection_transforms.html"><span class="doc">Feature Selections</span></a><a class="headerlink" href="#feature-selections" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="feature_selection_transforms.html"><span class="doc">Feature Selections</span></a><a class="headerlink" href="#feature-selections" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">feature_selections</span></code></p></li>
 <li><p>Description: A list of feature selections to apply to the input data after substitutions and column mappings. See the <a class="reference internal" href="feature_selection_transforms.html"><span class="doc">feature selection transforms</span></a> section for more information, including information on the specific transforms available.</p></li>
@@ -564,7 +565,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="potential-matches-universe">
-<h2>Potential Matches Universe<a class="headerlink" href="#potential-matches-universe" title="Permalink to this headline">¶</a></h2>
+<h2>Potential Matches Universe<a class="headerlink" href="#potential-matches-universe" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">potential_matches_universe</span></code></p></li>
 <li><p>Description: Limits the universe of created potential matches generated using an expression fed to a SQL query.</p></li>
@@ -583,7 +584,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="blocking">
-<h2>Blocking<a class="headerlink" href="#blocking" title="Permalink to this headline">¶</a></h2>
+<h2>Blocking<a class="headerlink" href="#blocking" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">blocking</span></code></p></li>
 <li><p>Description: Describes what columns to block on and how to create the blocks for the potential matches.</p></li>
@@ -612,7 +613,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="comparisons">
-<h2><a class="reference internal" href="comparison_types.html"><span class="doc">Comparisons</span></a><a class="headerlink" href="#comparisons" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="comparison_types.html"><span class="doc">Comparisons</span></a><a class="headerlink" href="#comparisons" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">comparisons</span></code></p></li>
 <li><p>Description: A list of comparisons to threshold the potential matches on. Only potential matches that pass the thresholds will be created. See <a class="reference internal" href="comparison_types.html"><span class="doc">comparison types</span></a> for more information.</p></li>
@@ -641,7 +642,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="household-comparisons">
-<h2><a class="reference internal" href="comparison_types.html"><span class="doc">Household Comparisons</span></a><a class="headerlink" href="#household-comparisons" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="comparison_types.html"><span class="doc">Household Comparisons</span></a><a class="headerlink" href="#household-comparisons" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">hh_comparisons</span></code></p></li>
 <li><p>Description: A list of comparisons to threshold the household potential matches on. Also referred to as post-blocking filters, as all household potential matches are created, then only potential matches that pass the post-blocking filters will be kept for scoring. See <a class="reference internal" href="comparison_types.html"><span class="doc">comparison types</span></a> for more information.</p></li>
@@ -663,7 +664,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="comparison-features">
-<h2><a class="reference internal" href="comparison_types.html"><span class="doc">Comparison Features</span></a><a class="headerlink" href="#comparison-features" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="comparison_types.html"><span class="doc">Comparison Features</span></a><a class="headerlink" href="#comparison-features" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">comparison_features</span></code></p></li>
 <li><p>Description: A list of comparison features to create when comparing records. Comparisons for individual and household linking rounds are both represented here – no need to duplicate comparisons if used in both rounds, simply specify the <code class="docutils literal notranslate"><span class="pre">column_name</span></code> in the appropriate <code class="docutils literal notranslate"><span class="pre">training</span></code> or <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> section of the config.  See the <a class="reference internal" href="comparison_types.html"><span class="doc">comparison types</span></a> section for more information.</p></li>
@@ -698,7 +699,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="pipeline-generated-features">
-<h2><a class="reference internal" href="pipeline_features.html"><span class="doc">Pipeline-generated Features</span></a><a class="headerlink" href="#pipeline-generated-features" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="pipeline_features.html"><span class="doc">Pipeline-generated Features</span></a><a class="headerlink" href="#pipeline-generated-features" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">pipeline_features</span></code></p></li>
 <li><p>Description: Features to be added in the model pipeline created for scoring a dataset. These features cannot be used in the <code class="docutils literal notranslate"><span class="pre">comparisons</span></code> section of the config and are for creating more robust ML models.  They typically leverage code available in the Spark Pipeline API.</p></li>
@@ -730,7 +731,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="training-and-models">
-<h2>Training and <a class="reference internal" href="models.html"><span class="doc">models</span></a><a class="headerlink" href="#training-and-models" title="Permalink to this headline">¶</a></h2>
+<h2>Training and <a class="reference internal" href="models.html"><span class="doc">models</span></a><a class="headerlink" href="#training-and-models" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">training</span></code></p></li>
 <li><p>Description: Specifies the training data set as well as a myriad of attributes related to training a model including the dependent variable within that dataset, the independent variables created from the <code class="docutils literal notranslate"><span class="pre">comparison_features</span></code> section, and the different models you want to use for either model exploration or scoring.</p></li>
@@ -783,7 +784,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 </div>
 </section>
 <section id="household-training-and-models">
-<h2>Household training and models<a class="headerlink" href="#household-training-and-models" title="Permalink to this headline">¶</a></h2>
+<h2>Household training and models<a class="headerlink" href="#household-training-and-models" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">hh_training</span></code></p></li>
 <li><p>Description: Specifies the household training data set as well as a myriad of attributes related to training a model including the dependent var within that data set, the independent vars created from the <code class="docutils literal notranslate"><span class="pre">comparison_features</span></code> section, and the different models you want to use.</p></li>
@@ -897,7 +898,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -914,7 +915,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
       &copy;2019-2022, IPUMS.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

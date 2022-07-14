@@ -1,17 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Link Tasks &#8212; hlink 3.2.1 documentation</title>
+    <title>Link Tasks &#8212; hlink 3.2.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,15 +35,15 @@
           <div class="body" role="main">
             
   <section id="link-tasks">
-<h1>Link Tasks<a class="headerlink" href="#link-tasks" title="Permalink to this headline">¶</a></h1>
+<h1>Link Tasks<a class="headerlink" href="#link-tasks" title="Permalink to this heading">¶</a></h1>
 <section id="preprocessing">
-<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this heading">¶</a></h2>
 <section id="overview">
-<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h3>
 <p>Read in raw data and prepare it for linking.</p>
 </section>
 <section id="task-steps">
-<h3>Task steps<a class="headerlink" href="#task-steps" title="Permalink to this headline">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#task-steps" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Register raw dataframes with the program. Read raw data in from .parquet or .csv files.</p></li>
 <li><p>Step 1: Prepare the dataframes for linking. Perform substitutions, transformations, and column mappings as requested.</p></li>
@@ -50,13 +51,13 @@
 </section>
 </section>
 <section id="training-and-household-training">
-<h2>Training and Household Training<a class="headerlink" href="#training-and-household-training" title="Permalink to this headline">¶</a></h2>
+<h2>Training and Household Training<a class="headerlink" href="#training-and-household-training" title="Permalink to this heading">¶</a></h2>
 <section id="id1">
-<h3>Overview<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p>Train a machine learning model to use for classification of potential links.</p>
 </section>
 <section id="id2">
-<h3>Task steps<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>The steps in each of these tasks are the same:</p>
 <ul class="simple">
 <li><p>Step 0: Ingest the training data from a .csv file.</p></li>
@@ -66,13 +67,13 @@
 </section>
 </section>
 <section id="matching">
-<h2>Matching<a class="headerlink" href="#matching" title="Permalink to this headline">¶</a></h2>
+<h2>Matching<a class="headerlink" href="#matching" title="Permalink to this heading">¶</a></h2>
 <section id="id3">
-<h3>Overview<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <p>Run the linking algorithm, generating a table with potential matches between individuals in the two datasets.</p>
 </section>
 <section id="id4">
-<h3>Task steps<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Perform blocking, exploding any columns that need it.</p></li>
 <li><p>Step 1: Run the matching algorithm, outputting potential matches to a <code class="docutils literal notranslate"><span class="pre">potential_matches</span></code> table.</p></li>
@@ -81,13 +82,13 @@
 </section>
 </section>
 <section id="household-matching">
-<h2>Household Matching<a class="headerlink" href="#household-matching" title="Permalink to this headline">¶</a></h2>
+<h2>Household Matching<a class="headerlink" href="#household-matching" title="Permalink to this heading">¶</a></h2>
 <section id="id5">
-<h3>Overview<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <p>Generate a table with potential matches between households in the two datasets.</p>
 </section>
 <section id="id6">
-<h3>Task steps<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Block on households.</p></li>
 <li><p>Step 1: Filter households based on <code class="docutils literal notranslate"><span class="pre">hh_comparisons</span></code> configuration settings.</p></li>
@@ -96,13 +97,13 @@
 </section>
 </section>
 <section id="model-exploration-and-household-model-exploration">
-<h2>Model Exploration and Household Model Exploration<a class="headerlink" href="#model-exploration-and-household-model-exploration" title="Permalink to this headline">¶</a></h2>
+<h2>Model Exploration and Household Model Exploration<a class="headerlink" href="#model-exploration-and-household-model-exploration" title="Permalink to this heading">¶</a></h2>
 <section id="id7">
-<h3>Overview<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
 <p>There are two dedicated linking tasks for model exploration.  <code class="docutils literal notranslate"><span class="pre">model_exploration</span></code> uses configuration settings from the Training section of the config file.  <code class="docutils literal notranslate"><span class="pre">hh_model_exploration</span></code> uses configuration settings from the Household Training section of the config file. See documentation of the <a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">[training]</span></code></a> and <a class="reference external" href="config.html#household-training-and-models"><code class="docutils literal notranslate"><span class="pre">[hh_training]</span></code></a> config sections for more details.</p>
 </section>
 <section id="id8">
-<h3>Task steps<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
 <p>The steps in each of these tasks are the same:</p>
 <ul class="simple">
 <li><p>Step 0: Ingest the specified training data file specified in the config with the  <code class="docutils literal notranslate"><span class="pre">dataset</span></code> tag.</p></li>
@@ -112,13 +113,13 @@
 </section>
 </section>
 <section id="reporting">
-<h2>Reporting<a class="headerlink" href="#reporting" title="Permalink to this headline">¶</a></h2>
+<h2>Reporting<a class="headerlink" href="#reporting" title="Permalink to this heading">¶</a></h2>
 <section id="id9">
-<h3>Overview<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
 <p>Report on characteristics of the linked data.</p>
 </section>
 <section id="id10">
-<h3>Task steps<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: For households with anyone linked in round 1, report the percent of remaining household members linked in round 2.</p></li>
 <li><p>Step 1: Report on the representivity of linked data compared to source populations.</p></li>
@@ -189,7 +190,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -206,7 +207,7 @@
       &copy;2019-2022, IPUMS.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,17 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Comparison types, transform add-ons, aggregate features, and household aggregate features &#8212; hlink 3.2.1 documentation</title>
+    <title>Comparison types, transform add-ons, aggregate features, and household aggregate features &#8212; hlink 3.2.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,12 +35,12 @@
           <div class="body" role="main">
             
   <section id="comparison-types-transform-add-ons-aggregate-features-and-household-aggregate-features">
-<h1>Comparison types, transform add-ons, aggregate features, and household aggregate features<a class="headerlink" href="#comparison-types-transform-add-ons-aggregate-features-and-household-aggregate-features" title="Permalink to this headline">¶</a></h1>
+<h1>Comparison types, transform add-ons, aggregate features, and household aggregate features<a class="headerlink" href="#comparison-types-transform-add-ons-aggregate-features-and-household-aggregate-features" title="Permalink to this heading">¶</a></h1>
 <p>This page has information on the different comparison types available for the <code class="docutils literal notranslate"><span class="pre">[[comparison_features]]</span></code>
 section, along with some attributes available to all of the comparison types and some aggregate features
 that are not configurable.</p>
 <section id="comparison-types">
-<h2>Comparison types<a class="headerlink" href="#comparison-types" title="Permalink to this headline">¶</a></h2>
+<h2>Comparison types<a class="headerlink" href="#comparison-types" title="Permalink to this heading">¶</a></h2>
 <p>Each header below represents a comparison type.  Transforms are used in the context of <code class="docutils literal notranslate"><span class="pre">comparison_features</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;relatematch&quot;</span>
@@ -49,7 +50,7 @@ that are not configurable.</p>
 </pre></div>
 </div>
 <section id="maximum-jaro-winkler">
-<h3>maximum_jaro_winkler<a class="headerlink" href="#maximum-jaro-winkler" title="Permalink to this headline">¶</a></h3>
+<h3>maximum_jaro_winkler<a class="headerlink" href="#maximum-jaro-winkler" title="Permalink to this heading">¶</a></h3>
 <p>Finds the greatest Jaro-Winkler value among the cartesian product of multiple columns.  For example, given an input of <code class="docutils literal notranslate"><span class="pre">column_names</span> <span class="pre">=</span> <span class="pre">['namefrst',</span> <span class="pre">'namelast']</span></code>, it would return the maximum Jaro-Winkler name comparison value among the following four comparisons:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;namefrst_a&#39;</span><span class="p">,</span> <span class="s1">&#39;namefrst_b&#39;</span><span class="p">),</span>
  <span class="p">(</span><span class="s1">&#39;namefrst_a&#39;</span><span class="p">,</span> <span class="s1">&#39;namelast_b&#39;</span><span class="p">),</span>
@@ -72,7 +73,7 @@ that are not configurable.</p>
 </div>
 </section>
 <section id="jaro-winkler">
-<h3>jaro_winkler<a class="headerlink" href="#jaro-winkler" title="Permalink to this headline">¶</a></h3>
+<h3>jaro_winkler<a class="headerlink" href="#jaro-winkler" title="Permalink to this heading">¶</a></h3>
 <p>Returns the Jaro-Winkler comparison score for a given column.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -89,7 +90,7 @@ that are not configurable.</p>
 </div>
 </section>
 <section id="jaro-winkler-street">
-<h3>jaro_winkler_street<a class="headerlink" href="#jaro-winkler-street" title="Permalink to this headline">¶</a></h3>
+<h3>jaro_winkler_street<a class="headerlink" href="#jaro-winkler-street" title="Permalink to this heading">¶</a></h3>
 <p>Uses an additional geographic column value to filter for major location changes before comparing street names.  If boundary column A is not equal to boundary column B, a Jaro-Winkler score of zero is returned.  If boundary column A and B are equal, the Jaro-Winkler comparison score of the street columns is returned.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -108,7 +109,7 @@ that are not configurable.</p>
 </div>
 </section>
 <section id="max-jaro-winkler">
-<h3>max_jaro_winkler<a class="headerlink" href="#max-jaro-winkler" title="Permalink to this headline">¶</a></h3>
+<h3>max_jaro_winkler<a class="headerlink" href="#max-jaro-winkler" title="Permalink to this heading">¶</a></h3>
 <p>Returns the greatest Jaro-Winkler value from the comparisons of a list of names.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -125,7 +126,7 @@ that are not configurable.</p>
 </div>
 </section>
 <section id="equals">
-<h3>equals<a class="headerlink" href="#equals" title="Permalink to this headline">¶</a></h3>
+<h3>equals<a class="headerlink" href="#equals" title="Permalink to this heading">¶</a></h3>
 <p>Asserts that values are the same for both compared columns using SQL: <code class="docutils literal notranslate"><span class="pre">a.{column_name}</span> <span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">b.{column_name}</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;relatematch&quot;</span>
@@ -136,7 +137,7 @@ that are not configurable.</p>
 </div>
 </section>
 <section id="f1-match">
-<h3>f1_match<a class="headerlink" href="#f1-match" title="Permalink to this headline">¶</a></h3>
+<h3>f1_match<a class="headerlink" href="#f1-match" title="Permalink to this heading">¶</a></h3>
 <p>Evaluates if the first name initial A matches either the first name first initial B or either the first or second middle initial of B.  If so, returns 1.  Otherwise, returns 2.</p>
 <p>1 = First initial of first first name A matches first initial of any of potential match first names B</p>
 <p>2 = mismatch</p>
@@ -158,7 +159,7 @@ that are not configurable.</p>
 </div>
 </section>
 <section id="f2-match">
-<h3>f2_match<a class="headerlink" href="#f2-match" title="Permalink to this headline">¶</a></h3>
+<h3>f2_match<a class="headerlink" href="#f2-match" title="Permalink to this heading">¶</a></h3>
 <p>Evaluates if first middle initial A is empty/null.  If so, return 0.
 Otherwise, if either first or second middle initial A is not null and matches first name initial B, or first or second middle initial B, return 1.
 Otherwise, return 2.</p>
@@ -194,7 +195,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="not-equals">
-<h3>not_equals<a class="headerlink" href="#not-equals" title="Permalink to this headline">¶</a></h3>
+<h3>not_equals<a class="headerlink" href="#not-equals" title="Permalink to this heading">¶</a></h3>
 <p>Asserts that values are distinct between compared individuals using SQL: <code class="docutils literal notranslate"><span class="pre">a.{column_name}</span> <span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span> <span class="pre">b.{column_name}</span></code>.  Used mainly in caution flag features (f_caution, m_caution, sp_caution).</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -225,7 +226,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="equals-as-int">
-<h3>equals_as_int<a class="headerlink" href="#equals-as-int" title="Permalink to this headline">¶</a></h3>
+<h3>equals_as_int<a class="headerlink" href="#equals-as-int" title="Permalink to this heading">¶</a></h3>
 <p>Checks for equality using equals sign and returns boolean result in integer form.  Uses SQL: <code class="docutils literal notranslate"><span class="pre">CAST(a.{col}</span> <span class="pre">=</span> <span class="pre">b.{col}</span> <span class="pre">as</span> <span class="pre">INT)</span></code></p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -242,7 +243,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="all-equals">
-<h3>all_equals<a class="headerlink" href="#all-equals" title="Permalink to this headline">¶</a></h3>
+<h3>all_equals<a class="headerlink" href="#all-equals" title="Permalink to this heading">¶</a></h3>
 <p>Asserts whether the values in all given columns match.  Uses a SQL expression generated by joining <code class="docutils literal notranslate"><span class="pre">a.{col}</span> <span class="pre">=</span> <span class="pre">b.{col}</span></code> and <code class="docutils literal notranslate"><span class="pre">AND</span></code> for each given column.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -259,7 +260,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="or">
-<h3>or<a class="headerlink" href="#or" title="Permalink to this headline">¶</a></h3>
+<h3>or<a class="headerlink" href="#or" title="Permalink to this heading">¶</a></h3>
 <p>Allows for the concatenation of up to four comparison features into one feature using a SQL <code class="docutils literal notranslate"><span class="pre">OR</span></code> between the generated clause for each sub-comparison.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -289,7 +290,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="and">
-<h3>and<a class="headerlink" href="#and" title="Permalink to this headline">¶</a></h3>
+<h3>and<a class="headerlink" href="#and" title="Permalink to this heading">¶</a></h3>
 <p>Allows for the concatenation of up to four comparison features into one feature using a SQL <code class="docutils literal notranslate"><span class="pre">AND</span></code> between the generated clause for each sub-comparison.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -322,7 +323,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="times">
-<h3>times<a class="headerlink" href="#times" title="Permalink to this headline">¶</a></h3>
+<h3>times<a class="headerlink" href="#times" title="Permalink to this heading">¶</a></h3>
 <p>Takes the output of two sub-comparisons and multiplies them together after casting as floats.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -353,7 +354,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="caution-comp-3">
-<h3>caution_comp_3<a class="headerlink" href="#caution-comp-3" title="Permalink to this headline">¶</a></h3>
+<h3>caution_comp_3<a class="headerlink" href="#caution-comp-3" title="Permalink to this heading">¶</a></h3>
 <p>Generates an SQL expression in the form <code class="docutils literal notranslate"><span class="pre">(({expr_a}</span>&#160; <span class="pre">OR</span> <span class="pre">{expr_b})</span> <span class="pre">AND</span> <span class="pre">{expr_c})</span></code>.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -383,7 +384,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="caution-comp-4">
-<h3>caution_comp_4<a class="headerlink" href="#caution-comp-4" title="Permalink to this headline">¶</a></h3>
+<h3>caution_comp_4<a class="headerlink" href="#caution-comp-4" title="Permalink to this heading">¶</a></h3>
 <p>Generates an SQL expression in the form <code class="docutils literal notranslate"><span class="pre">(({expr_a}</span>&#160; <span class="pre">OR</span> <span class="pre">{expr_b}</span> <span class="pre">OR</span> <span class="pre">{expr_c})</span> <span class="pre">AND</span> <span class="pre">{expr_d})</span></code>.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -415,7 +416,7 @@ Otherwise, return 2.</p>
 </div>
 </section>
 <section id="any-equals">
-<h3>any_equals<a class="headerlink" href="#any-equals" title="Permalink to this headline">¶</a></h3>
+<h3>any_equals<a class="headerlink" href="#any-equals" title="Permalink to this heading">¶</a></h3>
 <p>Used to compare middle initials and first names under specific circumstances.<br />If middle initial A is not empty/null and is the same as either middle initial B or first name B,
 OR if first name A is not empty/null and is the same as middle initial B.</p>
 <ul class="simple">
@@ -433,7 +434,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="either-are-1">
-<h3>either_are_1<a class="headerlink" href="#either-are-1" title="Permalink to this headline">¶</a></h3>
+<h3>either_are_1<a class="headerlink" href="#either-are-1" title="Permalink to this heading">¶</a></h3>
 <p>Checks if the column value for either A or B is equal to 1.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -451,7 +452,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="either-are-0">
-<h3>either_are_0<a class="headerlink" href="#either-are-0" title="Permalink to this headline">¶</a></h3>
+<h3>either_are_0<a class="headerlink" href="#either-are-0" title="Permalink to this heading">¶</a></h3>
 <p>Checks if the column value for either A or B is equal to 0.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -469,7 +470,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="second-gen-imm">
-<h3>second_gen_imm<a class="headerlink" href="#second-gen-imm" title="Permalink to this headline">¶</a></h3>
+<h3>second_gen_imm<a class="headerlink" href="#second-gen-imm" title="Permalink to this heading">¶</a></h3>
 <p>Checks if individual A is a second-generation immigrant by looking for <code class="docutils literal notranslate"><span class="pre">nativity</span></code> value of 2, 3, or 4 (one or both parents foreign-born).</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -487,7 +488,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="rel-jaro-winkler">
-<h3>rel_jaro_winkler<a class="headerlink" href="#rel-jaro-winkler" title="Permalink to this headline">¶</a></h3>
+<h3>rel_jaro_winkler<a class="headerlink" href="#rel-jaro-winkler" title="Permalink to this heading">¶</a></h3>
 <p>Uses a Scala function to determine the number of people in the input column with a name similarity score (Jaro-Winkler) greater than or equal to the given <code class="docutils literal notranslate"><span class="pre">jw_threshold</span></code>, an age difference less than or equal to the given <code class="docutils literal notranslate"><span class="pre">age_threshold</span></code>, and matching sex for the sample A individual and the sample B potential match.  Takes a column generated with the feature selection transform <code class="docutils literal notranslate"><span class="pre">related_individual_rows</span></code> as input (list of person data objects to compare).  Can be used for related or unrelated individuals, depending on the input column specified.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -512,7 +513,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="extra-children">
-<h3>extra_children<a class="headerlink" href="#extra-children" title="Permalink to this headline">¶</a></h3>
+<h3>extra_children<a class="headerlink" href="#extra-children" title="Permalink to this heading">¶</a></h3>
 <p>Using a Scala function, checks to see if there are children present in sample B who are not present in sample A, but based on relate codes, age, sex, and name, we would have expected to be present in A.  Returns a count of suspected “extra” children.  Takes a column generated with the feature selection transform <code class="docutils literal notranslate"><span class="pre">related_individual_rows</span></code> as input (list of person data objects to compare).</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -543,7 +544,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="jaro-winkler-rate">
-<h3>jaro_winkler_rate<a class="headerlink" href="#jaro-winkler-rate" title="Permalink to this headline">¶</a></h3>
+<h3>jaro_winkler_rate<a class="headerlink" href="#jaro-winkler-rate" title="Permalink to this heading">¶</a></h3>
 <p>Uses a Scala function to calculate the percentage of individuals who have a Jaro-Winkler score greater than or equal to the given threshold.  Rate returned as a percentage as a float data type.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -576,7 +577,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="sum">
-<h3>sum<a class="headerlink" href="#sum" title="Permalink to this headline">¶</a></h3>
+<h3>sum<a class="headerlink" href="#sum" title="Permalink to this heading">¶</a></h3>
 <p>Adds the column values for A and B together (takes the sum).</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -593,7 +594,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="length-b">
-<h3>length_b<a class="headerlink" href="#length-b" title="Permalink to this headline">¶</a></h3>
+<h3>length_b<a class="headerlink" href="#length-b" title="Permalink to this heading">¶</a></h3>
 <p>Returns the length of the column value in record B using the SQL <code class="docutils literal notranslate"><span class="pre">size()</span></code> function.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -604,7 +605,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </ul>
 </section>
 <section id="abs-diff">
-<h3>abs_diff<a class="headerlink" href="#abs-diff" title="Permalink to this headline">¶</a></h3>
+<h3>abs_diff<a class="headerlink" href="#abs-diff" title="Permalink to this heading">¶</a></h3>
 <p>Takes the absolute value of the difference between the values of the given column in datasets A and B.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -630,7 +631,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="b-minus-a">
-<h3>b_minus_a<a class="headerlink" href="#b-minus-a" title="Permalink to this headline">¶</a></h3>
+<h3>b_minus_a<a class="headerlink" href="#b-minus-a" title="Permalink to this heading">¶</a></h3>
 <p>Returns the value of subtracting the value of column A from the value of column B.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -651,7 +652,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="geo-distance">
-<h3>geo_distance<a class="headerlink" href="#geo-distance" title="Permalink to this headline">¶</a></h3>
+<h3>geo_distance<a class="headerlink" href="#geo-distance" title="Permalink to this heading">¶</a></h3>
 <p>Uses a lookup table to find the geographic distance between locations.  The SQL expression is generated by <code class="docutils literal notranslate"><span class="pre">hlink/linking/core/dist_table.py</span></code>. There are several ways to configure this feature. You can look up distances in the given file using one or two keys (specified with the <code class="docutils literal notranslate"><span class="pre">key_count</span></code> attribute).  You can also optionally have a secondary look-up table that serves as a back-up value in the case that the primary look-up does not contain a value for the locations given.  This is particularly useful for county distance, as you can set the primary join to be across counties, but set up a secondary join on state, which has much fewer combinations and thus less risk of nulls, to fill in when the counties specified aren’t in the look-up.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -735,7 +736,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="fetch-a">
-<h3>fetch_a<a class="headerlink" href="#fetch-a" title="Permalink to this headline">¶</a></h3>
+<h3>fetch_a<a class="headerlink" href="#fetch-a" title="Permalink to this heading">¶</a></h3>
 <p>Gets the value of column A.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -753,7 +754,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="fetch-b">
-<h3>fetch_b<a class="headerlink" href="#fetch-b" title="Permalink to this headline">¶</a></h3>
+<h3>fetch_b<a class="headerlink" href="#fetch-b" title="Permalink to this heading">¶</a></h3>
 <p>Gets the value of column B.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -771,7 +772,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="present-both-years">
-<h3>present_both_years<a class="headerlink" href="#present-both-years" title="Permalink to this headline">¶</a></h3>
+<h3>present_both_years<a class="headerlink" href="#present-both-years" title="Permalink to this heading">¶</a></h3>
 <p>Checks whether both column A and column B are present.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -803,7 +804,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="neither-are-null">
-<h3>neither_are_null<a class="headerlink" href="#neither-are-null" title="Permalink to this headline">¶</a></h3>
+<h3>neither_are_null<a class="headerlink" href="#neither-are-null" title="Permalink to this heading">¶</a></h3>
 <p>Checks that neither column A nor column B is null.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -814,7 +815,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </ul>
 </section>
 <section id="present-and-not-equal">
-<h3>present_and_not_equal<a class="headerlink" href="#present-and-not-equal" title="Permalink to this headline">¶</a></h3>
+<h3>present_and_not_equal<a class="headerlink" href="#present-and-not-equal" title="Permalink to this heading">¶</a></h3>
 <p>Checks that column A and column B are both present but are not equal.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -826,10 +827,10 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </section>
 </section>
 <section id="feature-add-ons">
-<h2>Feature add-ons<a class="headerlink" href="#feature-add-ons" title="Permalink to this headline">¶</a></h2>
+<h2>Feature add-ons<a class="headerlink" href="#feature-add-ons" title="Permalink to this heading">¶</a></h2>
 <p>These attributes can be added to most comparison feature types above to extend the type of output returned beyond the standard comparison feature.</p>
 <section id="alias">
-<h3>alias<a class="headerlink" href="#alias" title="Permalink to this headline">¶</a></h3>
+<h3>alias<a class="headerlink" href="#alias" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -845,7 +846,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="power">
-<h3>power<a class="headerlink" href="#power" title="Permalink to this headline">¶</a></h3>
+<h3>power<a class="headerlink" href="#power" title="Permalink to this heading">¶</a></h3>
 <p>Raises a comparison feature to a given exponential power.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
@@ -886,7 +887,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="threshold">
-<h3>threshold<a class="headerlink" href="#threshold" title="Permalink to this headline">¶</a></h3>
+<h3>threshold<a class="headerlink" href="#threshold" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -904,7 +905,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="lower-threshold">
-<h3>lower_threshold<a class="headerlink" href="#lower-threshold" title="Permalink to this headline">¶</a></h3>
+<h3>lower_threshold<a class="headerlink" href="#lower-threshold" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -933,7 +934,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="upper-threshold">
-<h3>upper_threshold<a class="headerlink" href="#upper-threshold" title="Permalink to this headline">¶</a></h3>
+<h3>upper_threshold<a class="headerlink" href="#upper-threshold" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -964,7 +965,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="gt-threshold">
-<h3>gt_threshold<a class="headerlink" href="#gt-threshold" title="Permalink to this headline">¶</a></h3>
+<h3>gt_threshold<a class="headerlink" href="#gt-threshold" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -995,7 +996,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="btwn-threshold">
-<h3>btwn_threshold<a class="headerlink" href="#btwn-threshold" title="Permalink to this headline">¶</a></h3>
+<h3>btwn_threshold<a class="headerlink" href="#btwn-threshold" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -1014,7 +1015,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </div>
 </section>
 <section id="look-at-addl-var">
-<h3>look_at_addl_var<a class="headerlink" href="#look-at-addl-var" title="Permalink to this headline">¶</a></h3>
+<h3>look_at_addl_var<a class="headerlink" href="#look-at-addl-var" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -1040,30 +1041,30 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </section>
 </section>
 <section id="aggregate-features">
-<h2>Aggregate Features<a class="headerlink" href="#aggregate-features" title="Permalink to this headline">¶</a></h2>
+<h2>Aggregate Features<a class="headerlink" href="#aggregate-features" title="Permalink to this heading">¶</a></h2>
 <p>These features are not configurable.  To include them in the generated comparison features, they just need to be included in the <code class="docutils literal notranslate"><span class="pre">[training][independent_vars]</span></code> section of the config.  They are generated using the “aggregate_features” SQL template.</p>
 <section id="hits">
-<h3>hits<a class="headerlink" href="#hits" title="Permalink to this headline">¶</a></h3>
+<h3>hits<a class="headerlink" href="#hits" title="Permalink to this heading">¶</a></h3>
 <p>The number of potential matches generated for the given individual (counted by aggregating on <code class="docutils literal notranslate"><span class="pre">{id_column}_a</span></code>).</p>
 </section>
 <section id="hits2">
-<h3>hits2<a class="headerlink" href="#hits2" title="Permalink to this headline">¶</a></h3>
+<h3>hits2<a class="headerlink" href="#hits2" title="Permalink to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">hits</span></code> squared.</p>
 </section>
 <section id="exact-mult">
-<h3>exact_mult<a class="headerlink" href="#exact-mult" title="Permalink to this headline">¶</a></h3>
+<h3>exact_mult<a class="headerlink" href="#exact-mult" title="Permalink to this heading">¶</a></h3>
 <p>Indicator for the existence of multiple potential matches with the exact same first and last name as the A sample individual within the B data.  Returns numeric boolean (0 or 1).</p>
 </section>
 </section>
 <section id="household-aggregate-features">
-<h2>Household Aggregate Features<a class="headerlink" href="#household-aggregate-features" title="Permalink to this headline">¶</a></h2>
+<h2>Household Aggregate Features<a class="headerlink" href="#household-aggregate-features" title="Permalink to this heading">¶</a></h2>
 <p>These features are not configurable.  To include them in the generated comparison features, they just need to be included in the <code class="docutils literal notranslate"><span class="pre">[hh_training][independent_vars]</span></code> section of the config.  They are generated using the “hh_aggregate_features” SQL template.</p>
 <section id="jw-max-a">
-<h3>jw_max_a<a class="headerlink" href="#jw-max-a" title="Permalink to this headline">¶</a></h3>
+<h3>jw_max_a<a class="headerlink" href="#jw-max-a" title="Permalink to this heading">¶</a></h3>
 <p>The highest Jaro-Winkler score for any of the first names in linked household A against the first name in linked household B where birth year difference is less than or equal to ten, excluding the individual A in the current potential match.  Returns <code class="docutils literal notranslate"><span class="pre">0</span></code> if no other individuals are in the household for comparison.</p>
 </section>
 <section id="jw-max-b">
-<h3>jw_max_b<a class="headerlink" href="#jw-max-b" title="Permalink to this headline">¶</a></h3>
+<h3>jw_max_b<a class="headerlink" href="#jw-max-b" title="Permalink to this heading">¶</a></h3>
 <p>The highest Jaro-Winkler score for any of the first names in linked household A against the first name in linked household B where sex matches and birth year difference is less than or equal to ten, excluding the individual A in the current potential match.  Returns <code class="docutils literal notranslate"><span class="pre">0</span></code> if no other individuals are in the household for comparison.</p>
 </section>
 </section>
@@ -1128,7 +1129,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -1145,7 +1146,7 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
       &copy;2019-2022, IPUMS.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
