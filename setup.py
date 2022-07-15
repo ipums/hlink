@@ -60,7 +60,7 @@ setup(
     package_data=package_data,
     install_requires=install_requires,
     extras_require={"dev": dev_requires},
-    project_urls={'Homepage': 'https://github.com/ipums/hlink'},
+    project_urls={"Homepage": "https://github.com/ipums/hlink"},
     entry_points="""
     [console_scripts]
     hlink=hlink.scripts.main:cli
