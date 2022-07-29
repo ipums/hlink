@@ -31,8 +31,8 @@ version := "1.0"
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1",
   "org.apache.commons" % "commons-text" % "1.9",
-  "org.apache.spark" % "spark-sql_2.12" % "3.2.1" % "provided",
-  "org.apache.spark" % "spark-mllib_2.12" % "3.2.1" % "provided"
+  "org.apache.spark" % "spark-sql_2.12" % "3.3.0" % "provided",
+  "org.apache.spark" % "spark-mllib_2.12" % "3.3.0" % "provided"
  )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
