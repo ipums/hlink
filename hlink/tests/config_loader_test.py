@@ -23,9 +23,7 @@ def test_load_conf_file_toml(conf_path):
 
 
 @pytest.mark.quickcheck
-def test_load_conf_file_nested(package_path):
-    running_path = package_path.rpartition("hlink/tests")[0]
-    conf_name = "hlink_config/config/test_conf_flag_run"
-    conf_file = os.path.join(running_path, conf_name)
+def test_load_conf_file_json2(conf_path):
+    conf_file = os.path.join(conf_path, "test_conf_flag_run")
     conf = load_conf_file(conf_file)
     assert conf["id_column"] == "id_conf_flag"
