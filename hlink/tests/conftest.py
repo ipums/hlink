@@ -66,12 +66,6 @@ def package_path():
 
 
 @pytest.fixture()
-def conf_path(package_path):
-    """The path to the directory containing test config files."""
-    return os.path.join(package_path, "conf")
-
-
-@pytest.fixture()
 def input_data_dir_path(package_path):
     """The path to the directory containing test input data."""
     return os.path.join(package_path, "input_data")
