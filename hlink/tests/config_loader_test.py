@@ -9,16 +9,14 @@ import pytest
 
 
 @pytest.mark.quickcheck
-def test_load_conf_file_json(package_path):
-    conf_path = os.path.join(package_path, "conf")
+def test_load_conf_file_json(conf_path):
     conf_file = os.path.join(conf_path, "test")
     conf = load_conf_file(conf_file)
     assert conf["id_column"] == "id"
 
 
 @pytest.mark.quickcheck
-def test_load_conf_file_toml(package_path):
-    conf_path = os.path.join(package_path, "conf")
+def test_load_conf_file_toml(conf_path):
     conf_file = os.path.join(conf_path, "test1")
     conf = load_conf_file(conf_file)
     assert conf["id_column"] == "id-toml"
