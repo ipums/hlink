@@ -358,7 +358,7 @@ def generate_transforms(
         if attach_ts:
             attach_hh_column = spark._jvm.com.isrdi.udfs.AttachHHColumn()
             attach_hh_column.createAttachUDF(
-                spark._jwrapped, df_grouped._jdf, attach_ts, "attach_hh_scala"
+                spark._jsparkSession, df_grouped._jdf, attach_ts, "attach_hh_scala"
             )
             all_cols_but_hh_rows = list(set(df_grouped.columns) - set(["hh_rows"]))
             df_grouped_selects = all_cols_but_hh_rows + [
@@ -369,7 +369,7 @@ def generate_transforms(
             attach_rel_rows = spark._jvm.com.isrdi.udfs.AttachRelatedRows()
             a_or_b = "a" if is_a else "b"
             attach_rel_rows.createAttachUDF(
-                spark._jwrapped,
+                spark._jsparkSession,
                 df_grouped._jdf,
                 related_ts,
                 id_col,

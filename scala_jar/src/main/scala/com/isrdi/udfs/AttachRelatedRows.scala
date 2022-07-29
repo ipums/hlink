@@ -13,14 +13,14 @@ import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import scala.util.control.Breaks._
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
 import scala.math.abs
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConverters._
 
 class AttachRelatedRows {
-  def createAttachUDF(spark: SQLContext, df: Dataset[Row], transforms: java.util.List[java.util.Map[String, Any]], id_col: String, a_or_b: String, udf_name: String ) = {
+  def createAttachUDF(spark: SparkSession, df: Dataset[Row], transforms: java.util.List[java.util.Map[String, Any]], id_col: String, a_or_b: String, udf_name: String ) = {
     val attach_udf = (hh_rows: Seq[Row]) => {
       val related_rows_list = transforms.asScala.map { transform =>
         val input_cols = transform.get("input_cols").asInstanceOf[java.util.List[String]].asScala

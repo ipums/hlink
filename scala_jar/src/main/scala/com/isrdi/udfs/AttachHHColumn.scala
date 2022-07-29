@@ -13,14 +13,14 @@ import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import scala.util.control.Breaks._
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
 import scala.math.abs
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConverters._
 
 class AttachHHColumn {
-  def createAttachUDF(spark: SQLContext, df: Dataset[Row], transforms: java.util.List[java.util.Map[String, String]], udf_name: String ) = {
+  def createAttachUDF(spark: SparkSession, df: Dataset[Row], transforms: java.util.List[java.util.Map[String, String]], udf_name: String ) = {
     val person_id = transforms.get(0).get("person_id")
     val attach_udf = (hh_rows: Seq[Row]) => {
       val hh_map = hh_rows.map { row => row.getAs[Any](person_id) -> row }.toMap
