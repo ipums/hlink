@@ -23,10 +23,12 @@ def analyze_conf(link_run):
     try:
         print_checking("datasource_a")
         df_a = parse_datasource(link_run, "datasource_a")
+        check_datasource(link_run.config, df_a, "A")
         print_ok()
 
         print_checking("datasource_b")
         df_b = parse_datasource(link_run, "datasource_b")
+        check_datasource(link_run.config, df_b, "B")
         print_ok()
 
         print_checking("filters")
@@ -340,3 +342,9 @@ def parse_datasource(link_run, section_name: str):
             raise ValueError(
                 f"Within [{section_name}] file {file} is neither a CSV file nor a parquet file."
             )
+
+
+def check_datasource(config, df, a_or_b):
+    id_column = config["id_column"]
+    if id_column not in df.columns:
+        raise ValueError(f"Datasource {a_or_b} is missing the id column '{id_column}'")
