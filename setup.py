@@ -38,7 +38,7 @@ install_requires = [
     "Jinja2==3.1.2",
     "numpy==1.22.3",
     "pandas==1.4.2",
-    "pyspark==3.2.1",
+    "pyspark==3.3.0",
     "scikit-learn==1.1.0",
     "toml==0.10.2",
 ]
