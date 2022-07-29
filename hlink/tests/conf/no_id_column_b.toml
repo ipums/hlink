@@ -3,7 +3,7 @@ id_column = "ID"
 [datasource_a]
 file = "hlink/tests/input_data/conf_validation/a.csv"
 
-# b's input file does not have the "ID" column, which should
+# b's input file does not have the "ID" column. This will
 # cause an error in config validation.
 [datasource_b]
 file = "hlink/tests/input_data/conf_validation/empty.csv"
