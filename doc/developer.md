@@ -66,3 +66,9 @@ Here are the steps to follow when creating the new version.
 - After committing your changes, create a git tag `vA.B.C` and push it to GitHub.
 - Finally, create a GitHub release for the tag and add change notes describing the important
 changes that are part of the release.
+
+## Deploying a new version to pypi
+
+1) Make sure that the package is installed with dev dependencies: `pip install -e .[dev]`
+1) Run: `python setup.py sdist`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
+2) Run: `twine upload dist/hlink-x.x.x.tar.gz` where x.x.x is the version number of the software.
