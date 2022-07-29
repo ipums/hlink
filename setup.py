@@ -50,7 +50,7 @@ dev_requires = [
     "sphinx",
     "recommonmark",
     "pytest==7.1.2",
-    "twine"
+    "twine",
 ]
 
 setup(
