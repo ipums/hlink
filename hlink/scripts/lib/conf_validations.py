@@ -263,7 +263,7 @@ def check_column_mappings(config, df_a, df_b):
         set_value_column_b = c.get("set_value_column_b")
         if not column_name:
             raise ValueError(
-                "The following [[column_mappings]] has no 'column_name' attribute: {c}"
+                f"The following [[column_mappings]] has no 'column_name' attribute: {c}"
             )
         if set_value_column_a is None:
             if column_name.lower() not in [c.lower() for c in df_a.columns]:
