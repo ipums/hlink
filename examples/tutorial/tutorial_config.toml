@@ -1,5 +1,4 @@
 id_column = "id"
-feature_selections = []
 
 [datasource_a]
 alias = "a"
