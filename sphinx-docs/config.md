@@ -5,7 +5,7 @@
 4. [Data sources](#data-sources)
 5. [Filter](#filter)
 6. [Column mappings](#column-mappings)
-7. [Substitution columns](#subsitution-columns)
+7. [Substitution columns](#substitution-columns)
 8. [Feature selections](#feature-selections)
 9. [Potential matches universe](#potential-matches-universe)
 10. [Blocking](#blocking)
