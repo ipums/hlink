@@ -75,11 +75,6 @@ An example configuration file:
 # The name of the unique identifier in the datasets
 id_column = "id" 
 
-# Extra preprocessing transformations to the data.
-# See the docs for more information about its functionality.
-feature_selections = []
-
-
 ### INPUT ###
 
 # The input datasets
