@@ -147,7 +147,7 @@ def cli():
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser(description="Historical linking program.")
+    parser = argparse.ArgumentParser(description="Hierarchical linking program.")
     parser.add_argument(
         "--user", help="run as a specific user", default=getpass.getuser()
     )

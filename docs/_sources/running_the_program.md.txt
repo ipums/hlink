@@ -90,7 +90,7 @@ usage: hlink [-h] [--user USER] [--cores CORES]
              [--execute_command EXECUTE_COMMAND [EXECUTE_COMMAND ...]]
              [--conf CONF]
 
-Historical linking program.
+Hierarchical linking program.
 
 optional arguments:
   -h, --help            show this help message and exit
