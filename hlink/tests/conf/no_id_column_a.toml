@@ -1,0 +1,9 @@
+id_column = "ID"
+
+# a's input file does not have the "ID" column. This will
+# cause an error in config validation.
+[datasource_a]
+file = "hlink/tests/input_data/conf_validation/empty.csv"
+
+[datasource_b]
+file = "hlink/tests/input_data/conf_validation/b.csv"

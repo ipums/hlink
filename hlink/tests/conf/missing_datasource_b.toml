@@ -1,0 +1,4 @@
+id_column = "ID"
+
+[datasource_a]
+file = "hlink/tests/input_data/conf_validation/a.csv"
