@@ -27,7 +27,6 @@ Note that this config is written in TOML, but hlink is also able to work with JS
 
 ```
 id_column = "id"
-feature_selections = []
 
 [datasource_a]
 alias = "a"

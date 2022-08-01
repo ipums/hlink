@@ -1,5 +1,4 @@
 id_column = "id"
-feature_selections = []
 generate_potential_matches_with_full_data = true
 
 [datasource_a]
