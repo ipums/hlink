@@ -5,7 +5,7 @@
 hlink is a Python package that provides a flexible, configuration-driven solution to probabilistic record linking at scale. It provides a high-level API for python as well as a standalone command line interface for running linking jobs with little to no programming. hlink supports the linking process from beginning to end, including preprocessing, filtering, training, model exploration, blocking, feature generation and scoring.
 
 It is used at [IPUMS](https://www.ipums.org/) to link U.S. historical census data, but can be applied to any record linkage job. 
-A paper on the creation and applications of this program can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>.
+A paper on the creation and applications of this program on historical census data can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>.
 
 ## Installation
 
@@ -23,7 +23,7 @@ An example script and configuration file can be found in the `examples` director
 
 ## Quick Start
 
-The main class in the library is LinkRun, which represents a complete linking job. It provides access to each of the link tasks and their steps. Here is an example script that uses LinkRun to do some linking. Below we go into more detail on each of the important aspects of the script.
+The main class in the library is LinkRun, which represents a complete linking job. It provides access to each of the link tasks and their steps. Here is an example script that uses LinkRun to do some linking.
 
 ```python
 from hlink.linking.link_run import LinkRun
