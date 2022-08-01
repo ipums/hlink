@@ -36,13 +36,15 @@ class LinkStepPrepDataframes(LinkStep):
         )
 
         substitution_columns = config.get("substitution_columns", [])
+        feature_selections = config.get("feature_selections", [])
+
         self.task.run_register_python(
             name="prepped_df_a",
             func=lambda: self._prep_dataframe(
                 self.task.spark.table("raw_df_a"),
                 config["column_mappings"],
                 substitution_columns,
-                config["feature_selections"],
+                feature_selections,
                 True,
                 config["id_column"],
             ),
@@ -54,7 +56,7 @@ class LinkStepPrepDataframes(LinkStep):
                 self.task.spark.table("raw_df_b"),
                 config["column_mappings"],
                 substitution_columns,
-                config["feature_selections"],
+                feature_selections,
                 False,
                 config["id_column"],
             ),
