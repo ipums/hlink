@@ -4,6 +4,9 @@
 
 hlink is a Python package that provides a flexible, configuration-driven solution to probabilistic record linking at scale. It provides a high-level API for python as well as a standalone command line interface for running linking jobs with little to no programming. hlink supports the linking process from beginning to end, including preprocessing, filtering, training, model exploration, blocking, feature generation and scoring.
 
+It is used at [IPUMS](https://www.ipums.org/) to link U.S. historical census data, but can be applied to any record linkage job. 
+A paper on the creation and applications of this program can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>.
+
 ## Installation
 
 Java 8 or [Java 11](https://openjdk.org/install/) is required for the PySpark integration. 
