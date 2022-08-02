@@ -1,32 +1,26 @@
-derby.log
-*.egg-info
-metastore_db
+# Python
 __pycache__
-activate-env.bash
-build
-conda_env/
-dist
-scala_jar/data
-scala_jar/target
-scala_jar/project/target
-output_data/
-.ipynb_checkpoints
-.idea/
-*.class
-*.cache
-.DS_Store
-hlink/tests/output_data
-hlink/linking/reporting/output_reports
-hlink_config/derby
-hlink_config/spark_tmp_dir
-hlink_config/warehouse
-hlink_config/run.log
 *.pyc
+*.egg-info
+build
+dist
+venv
+.ipynb_checkpoints
 sphinx-docs/_*
-run_test.sh
-venv/
-working_dir/
 .coverage
 coverage_*
-*_coverage.xlsx
+
+# Scala
+scala_jar/target
+scala_jar/project/target
+*.class
+*.cache
+
+# MacOS
+.DS_Store
+
+# Misc
+metastore_db
+derby.log
+hlink_config
 tags
