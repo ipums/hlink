@@ -62,6 +62,7 @@ Here are the steps to follow when creating the new version.
 
 - Decide on the new version number A.B.C, following the scheme above.
 - Set the new version number in `setup.py`, in the call to `setup()`.
+- Reinstall hlink with `pip install -e .[dev]` to update the version. Confirm that this worked by running `hlink --version`.
 - Regenerate the Sphinx docs so that they show the correct hlink version number.
 - After committing your changes, create a git tag `vA.B.C` and push it to GitHub.
 - Finally, create a GitHub release for the tag and add change notes describing the important
