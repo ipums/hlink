@@ -28,7 +28,7 @@ class SparkConnection(object):
         self.tmp_dir = tmp_dir
         self.python = python
 
-    def spark_conf(self, executor_cores, executor_memory, cores):
+    def spark_conf(self, executor_cores, executor_memory, driver_memory, cores):
         spark_package_path = os.path.dirname(hlink.spark.__file__)
         jar_path = os.path.join(
             spark_package_path, "jars", "hlink_lib-assembly-1.0.jar"
@@ -50,7 +50,8 @@ class SparkConnection(object):
         )
         if executor_memory:
             conf.set("spark.executor.memory", executor_memory)
-            # conf.set("spark.driver.memory", executor_memory)
+        if driver_memory:
+            conf.set("spark.driver.memory", driver_memory)
         if cores:
             conf.set("spark.cores.max", cores)
 
@@ -60,13 +61,25 @@ class SparkConnection(object):
 
     def local(self, cores=1, executor_memory="10G"):
         """Create a local 'cluster'."""
-        return self.connect(f"local[{cores}]", cores, executor_memory, cores)
+        # When the cluster is local, the executor and driver are the same machine. So set
+        # driver_memory = executor_memory automatically.
+        return self.connect(
+            f"local[{cores}]", cores, executor_memory, executor_memory, cores
+        )
 
     def connect(
-        self, connection_string, executor_cores=None, executor_memory=None, cores=None
+        self,
+        connection_string,
+        executor_cores=None,
+        executor_memory=None,
+        driver_memory=None,
+        cores=None,
     ):
         conf = self.spark_conf(
-            executor_cores=executor_cores, executor_memory=executor_memory, cores=cores
+            executor_cores=executor_cores,
+            executor_memory=executor_memory,
+            driver_memory=driver_memory,
+            cores=cores,
         )
         session = (
             SparkSession.builder.config(conf=conf)
