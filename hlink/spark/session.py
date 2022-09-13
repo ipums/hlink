@@ -44,7 +44,6 @@ class SparkConnection(object):
             )
             .set("spark.executorEnv.SPARK_LOCAL_DIRS", self.tmp_dir)
             .set("spark.sql.legacy.allowUntypedScalaUDF", True)
-            .set("spark.driver.memory", "20g")
             .setAppName("linking")
             # .set("spark.executor.cores", executor_cores) \
         )
