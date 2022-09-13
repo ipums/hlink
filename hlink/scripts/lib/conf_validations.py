@@ -346,5 +346,6 @@ def parse_datasource(link_run, section_name: str):
 
 def check_datasource(config, df, a_or_b):
     id_column = config["id_column"]
-    if id_column not in df.columns:
+    input_columns = map((lambda s: s.lower()), df.columns)
+    if id_column.lower() not in input_columns:
         raise ValueError(f"Datasource {a_or_b} is missing the id column '{id_column}'")
