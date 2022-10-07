@@ -196,6 +196,9 @@ Checks that both values are present (not null) and nonzero and that they are not
 to a boolean. This is primarily useful when a value of 0 indicates some kind of incomparibility akin to the
 value being missing.
 
+See also [present_and_equal_categorical_in_universe](#present-and-equal-categorical-in-universe), which is a similar
+but more general comparison type.
+
 * Attributes:
   * `column_name` -- Type: `string`. Required. Input column to compare.
 
@@ -696,6 +699,26 @@ Checks that column A and column B are both present but are not equal.
 
 * Attributes:
   * `column_name` -- Type: `string`. The column to check.
+
+### present_and_equal_categorical_in_universe
+
+Checks that column A and column B are both present, are not equal to the not-in-universe value NIU,
+and are equal to each other according to SQL's `IS DISTINCT FROM`. Evaluates to 0 if either column is missing or
+if either column is the NIU value. Otherwise, evaluates to 0 if the columns are distinct or 1 if
+the columns are equal.
+
+* Attributes:
+  * `column_name` -- Type: `string`. Required. The column to check.
+  * `NIU` -- Type: same as the type of the input column. Required. The not-in-universe value to use in the check.
+
+```
+[[comparison_features]]
+alias = "mfbplmatch"
+column_name = "nativity"
+comparison_type = "present_and_equal_categorical_in_universe"
+NIU = "0"
+categorical = true
+```
 
 ### sql_condition
 

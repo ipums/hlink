@@ -264,6 +264,8 @@ Otherwise, return 2.</p>
 <p>Checks that both values are present (not null) and nonzero and that they are not equal to one another. Evaluates
 to a boolean. This is primarily useful when a value of 0 indicates some kind of incomparibility akin to the
 value being missing.</p>
+<p>See also <a class="reference external" href="#present-and-equal-categorical-in-universe">present_and_equal_categorical_in_universe</a>, which is a similar
+but more general comparison type.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
@@ -883,6 +885,29 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </ul>
 </li>
 </ul>
+</section>
+<section id="present-and-equal-categorical-in-universe">
+<h3>present_and_equal_categorical_in_universe<a class="headerlink" href="#present-and-equal-categorical-in-universe" title="Permalink to this heading">¶</a></h3>
+<p>Checks that column A and column B are both present, are not equal to the not-in-universe value NIU,
+and are equal to each other according to SQL’s <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span></code>. Evaluates to 0 if either column is missing or
+if either column is the NIU value. Otherwise, evaluates to 0 if the columns are distinct or 1 if
+the columns are equal.</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Required. The column to check.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NIU</span></code> – Type: same as the type of the input column. Required. The not-in-universe value to use in the check.</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
+<span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;mfbplmatch&quot;</span>
+<span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;nativity&quot;</span>
+<span class="n">comparison_type</span> <span class="o">=</span> <span class="s2">&quot;present_and_equal_categorical_in_universe&quot;</span>
+<span class="n">NIU</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">true</span>
+</pre></div>
+</div>
 </section>
 <section id="sql-condition">
 <h3>sql_condition<a class="headerlink" href="#sql-condition" title="Permalink to this heading">¶</a></h3>
