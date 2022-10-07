@@ -259,6 +259,27 @@ Otherwise, return 2.</p>
 </pre></div>
 </div>
 </section>
+<section id="not-zero-and-not-equals">
+<h3>not_zero_and_not_equals<a class="headerlink" href="#not-zero-and-not-equals" title="Permalink to this heading">¶</a></h3>
+<p>Checks that both values are present (not null) and nonzero and that they are not equal to one another. Evaluates
+to a boolean. This is primarily useful when a value of 0 indicates some kind of incomparibility akin to the
+value being missing.</p>
+<p>See also <a class="reference external" href="#present-and-equal-categorical-in-universe">present_and_equal_categorical_in_universe</a>, which is a similar
+but more general comparison type.</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Required. Input column to compare.</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
+<span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;fbpl_nomatch&quot;</span>
+<span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;fbpl&quot;</span>
+<span class="n">comparison_type</span> <span class="o">=</span> <span class="s2">&quot;not_zero_and_not_equals&quot;</span>
+</pre></div>
+</div>
+</section>
 <section id="or">
 <h3>or<a class="headerlink" href="#or" title="Permalink to this heading">¶</a></h3>
 <p>Allows for the concatenation of up to four comparison features into one feature using a SQL <code class="docutils literal notranslate"><span class="pre">OR</span></code> between the generated clause for each sub-comparison.</p>
@@ -355,12 +376,12 @@ Otherwise, return 2.</p>
 </section>
 <section id="caution-comp-3">
 <h3>caution_comp_3<a class="headerlink" href="#caution-comp-3" title="Permalink to this heading">¶</a></h3>
-<p>Generates an SQL expression in the form <code class="docutils literal notranslate"><span class="pre">(({expr_a}</span>&#160; <span class="pre">OR</span> <span class="pre">{expr_b})</span> <span class="pre">AND</span> <span class="pre">{expr_c})</span></code>.</p>
+<p>Generates an SQL expression in the form <code class="docutils literal notranslate"><span class="pre">(comparison</span> <span class="pre">A</span> <span class="pre">OR</span> <span class="pre">comparison</span> <span class="pre">B)</span> <span class="pre">AND</span> <span class="pre">comparison</span> <span class="pre">C</span></code>.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">column_names</span></code> – Type: list of strings. Required. A list of all input columns used by sub-comparisons.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code> – Type: Object. Required.  Sub-comparison using any of the comparison feature types documented in this section.  <code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, and <code class="docutils literal notranslate"><span class="pre">comp_c</span></code> can also have sub-comparisons.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code> – Type: Object. Required.  Sub-comparisons using any of the comparison feature types documented in this section.</p></li>
 </ul>
 </li>
 </ul>
@@ -383,14 +404,27 @@ Otherwise, return 2.</p>
 </pre></div>
 </div>
 </section>
-<section id="caution-comp-4">
-<h3>caution_comp_4<a class="headerlink" href="#caution-comp-4" title="Permalink to this heading">¶</a></h3>
-<p>Generates an SQL expression in the form <code class="docutils literal notranslate"><span class="pre">(({expr_a}</span>&#160; <span class="pre">OR</span> <span class="pre">{expr_b}</span> <span class="pre">OR</span> <span class="pre">{expr_c})</span> <span class="pre">AND</span> <span class="pre">{expr_d})</span></code>.</p>
+<section id="caution-comp-3-012">
+<h3>caution_comp_3_012<a class="headerlink" href="#caution-comp-3-012" title="Permalink to this heading">¶</a></h3>
+<p>Similar to <code class="docutils literal notranslate"><span class="pre">caution_comp_3</span></code>, but first checks the value of comparison C. If comparison C evaluates to false,
+then <code class="docutils literal notranslate"><span class="pre">caution_comp_3_012</span></code> evaluates to 2. Otherwise, it evaluates to the result of <code class="docutils literal notranslate"><span class="pre">caution_comp_3</span></code>, so 0 or 1.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">column_names</span></code> – Type: list of strings. Required. A list of all input columns used by sub-comparisons.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_d</span></code> – Type: Object. Required.  Sub-comparison using any of the comparison feature types documented in this section.  <code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code>, and <code class="docutils literal notranslate"><span class="pre">comp_d</span></code> can also have sub-comparisons.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code> – Type: Object. Required. Sub-comparison using any of the comparison feature types documented in this section.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="caution-comp-4">
+<h3>caution_comp_4<a class="headerlink" href="#caution-comp-4" title="Permalink to this heading">¶</a></h3>
+<p>Generates an SQL expression in the form <code class="docutils literal notranslate"><span class="pre">(comparison</span> <span class="pre">A</span> <span class="pre">OR</span> <span class="pre">comparison</span> <span class="pre">B</span> <span class="pre">OR</span> <span class="pre">comparison</span> <span class="pre">C)</span> <span class="pre">AND</span> <span class="pre">comparison</span> <span class="pre">D</span></code>.</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_names</span></code> – Type: list of strings. Required. A list of all input columns used by sub-comparisons.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_d</span></code> – Type: Object. Required.  Sub-comparisons using any of the comparison feature types documented in this section.</p></li>
 </ul>
 </li>
 </ul>
@@ -414,6 +448,19 @@ Otherwise, return 2.</p>
 <span class="n">comparison_type</span> <span class="o">=</span> <span class="s2">&quot;present_both_years&quot;</span>
 </pre></div>
 </div>
+</section>
+<section id="caution-comp-4-012">
+<h3>caution_comp_4_012<a class="headerlink" href="#caution-comp-4-012" title="Permalink to this heading">¶</a></h3>
+<p>Similar to <code class="docutils literal notranslate"><span class="pre">caution_comp_4</span></code>, but first checks the value of comparison D. If comparison D evaluates to false,
+then <code class="docutils literal notranslate"><span class="pre">caution_comp_4_012</span></code> evaluates to 2. Otherwise, it evaluates to the result of <code class="docutils literal notranslate"><span class="pre">caution_comp_4</span></code>, so 0 or 1.</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_names</span></code> – Type: list of strings. Required. A list of all input columns used by sub-comparisons.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp_a</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_b</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_c</span></code>, <code class="docutils literal notranslate"><span class="pre">comp_d</span></code> – Type: Object. Required. Sub-comparisons using any of the comparison feature types documented in this section.</p></li>
+</ul>
+</li>
+</ul>
 </section>
 <section id="any-equals">
 <h3>any_equals<a class="headerlink" href="#any-equals" title="Permalink to this heading">¶</a></h3>
@@ -814,6 +861,20 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </li>
 </ul>
 </section>
+<section id="present-and-matching-categorical">
+<h3>present_and_matching_categorical<a class="headerlink" href="#present-and-matching-categorical" title="Permalink to this heading">¶</a></h3>
+<p>Checks that both column A and column B are present and that they match according to SQL’s <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span></code>. Evaluates to 0, 1, or 2:</p>
+<p>0 -&gt; columns are both present and match</p>
+<p>1 -&gt; columns are both present but are distinct</p>
+<p>2 -&gt; one or both columns are missing</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Required. The column to check.</p></li>
+</ul>
+</li>
+</ul>
+</section>
 <section id="present-and-not-equal">
 <h3>present_and_not_equal<a class="headerlink" href="#present-and-not-equal" title="Permalink to this heading">¶</a></h3>
 <p>Checks that column A and column B are both present but are not equal.</p>
@@ -824,6 +885,54 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </ul>
 </li>
 </ul>
+</section>
+<section id="present-and-equal-categorical-in-universe">
+<h3>present_and_equal_categorical_in_universe<a class="headerlink" href="#present-and-equal-categorical-in-universe" title="Permalink to this heading">¶</a></h3>
+<p>Checks that column A and column B are both present, are not equal to the not-in-universe value NIU,
+and are equal to each other according to SQL’s <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span></code>. Evaluates to 0 if either column is missing or
+if either column is the NIU value. Otherwise, evaluates to 0 if the columns are distinct or 1 if
+the columns are equal.</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Required. The column to check.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NIU</span></code> – Type: same as the type of the input column. Required. The not-in-universe value to use in the check.</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
+<span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;mfbplmatch&quot;</span>
+<span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;nativity&quot;</span>
+<span class="n">comparison_type</span> <span class="o">=</span> <span class="s2">&quot;present_and_equal_categorical_in_universe&quot;</span>
+<span class="n">NIU</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">true</span>
+</pre></div>
+</div>
+</section>
+<section id="sql-condition">
+<h3>sql_condition<a class="headerlink" href="#sql-condition" title="Permalink to this heading">¶</a></h3>
+<p>This is a flexible comparison type that allows users to write their own SQL expressions to be
+evaluated. Favor using a different comparison type if that’s a reasonable option. If there are
+no other comparison types that work for a particular use case, this one is a good fallback.</p>
+<ul class="simple">
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_names</span></code> – Type: list of strings. Required. A list of all columns used in the SQL expression.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">condition</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The SQL expression to evaluate.</p></li>
+</ul>
+</li>
+</ul>
+<p>In this example, we make use of the hlink-defined <code class="docutils literal notranslate"><span class="pre">jw</span></code> function, which computes
+the Jaro-Winkler similarity of two strings. <code class="docutils literal notranslate"><span class="pre">nvl</span></code> is a Spark builtin function
+which returns its second argument if the first is null, and the first argument
+otherwise.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
+<span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;namelast_jw_max&quot;</span>
+<span class="n">comparison_type</span> <span class="o">=</span> <span class="s2">&quot;sql_condition&quot;</span>
+<span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;namelast1&quot;</span><span class="p">,</span> <span class="s2">&quot;namelast2&quot;</span><span class="p">,</span> <span class="s2">&quot;namelast3&quot;</span><span class="p">]</span>
+<span class="n">condition</span> <span class="o">=</span> <span class="s2">&quot;GREATEST(jw(nvl(a.namelast1, &#39;&#39;), nvl(b.namelast1, &#39;&#39;)), jw(nvl(a.namelast2, &#39;&#39;), nvl(b.namelast2, &#39;&#39;)), jw(nvl(a.namelast3, &#39;&#39;), nvl(b.namelast3, &#39;&#39;)))&quot;</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="feature-add-ons">

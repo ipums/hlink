@@ -190,6 +190,25 @@ column_names = ["namefrst_unstd", "namelast_clean"]
 comparison_type = "all_equals"
 ```
 
+### not_zero_and_not_equals
+
+Checks that both values are present (not null) and nonzero and that they are not equal to one another. Evaluates
+to a boolean. This is primarily useful when a value of 0 indicates some kind of incomparibility akin to the
+value being missing.
+
+See also [present_and_equal_categorical_in_universe](#present-and-equal-categorical-in-universe), which is a similar
+but more general comparison type.
+
+* Attributes:
+  * `column_name` -- Type: `string`. Required. Input column to compare.
+
+```
+[[comparison_features]]
+alias = "fbpl_nomatch"
+column_name = "fbpl"
+comparison_type = "not_zero_and_not_equals"
+```
+
 ### or
 Allows for the concatenation of up to four comparison features into one feature using a SQL `OR` between the generated clause for each sub-comparison.
 * Attributes:
@@ -270,10 +289,12 @@ comparison_type = "equals"
 ```
 
 ### caution_comp_3
-Generates an SQL expression in the form `(({expr_a}  OR {expr_b}) AND {expr_c})`.
+Generates an SQL expression in the form `(comparison A OR comparison B) AND comparison C`.
+
 * Attributes:
   * `column_names` -- Type: list of strings. Required. A list of all input columns used by sub-comparisons.
-  * `comp_a`, `comp_b`, `comp_c` -- Type: Object. Required.  Sub-comparison using any of the comparison feature types documented in this section.  `comp_a`, `comp_b`, and `comp_c` can also have sub-comparisons.
+  * `comp_a`, `comp_b`, `comp_c` -- Type: Object. Required.  Sub-comparisons using any of the comparison feature types documented in this section.
+
 ```
 [[comparison_features]]
 alias = "sp_caution"
@@ -293,11 +314,21 @@ comparison_type = "new_marr"
 upper_threshold = 7
 ```
 
-### caution_comp_4
-Generates an SQL expression in the form `(({expr_a}  OR {expr_b} OR {expr_c}) AND {expr_d})`.
+### caution_comp_3_012
+
+Similar to `caution_comp_3`, but first checks the value of comparison C. If comparison C evaluates to false,
+then `caution_comp_3_012` evaluates to 2. Otherwise, it evaluates to the result of `caution_comp_3`, so 0 or 1.
+
 * Attributes:
   * `column_names` -- Type: list of strings. Required. A list of all input columns used by sub-comparisons.
-  * `comp_a`, `comp_b`, `comp_c`, `comp_d` -- Type: Object. Required.  Sub-comparison using any of the comparison feature types documented in this section.  `comp_a`, `comp_b`, `comp_c`, and `comp_d` can also have sub-comparisons.
+  * `comp_a`, `comp_b`, `comp_c` -- Type: Object. Required. Sub-comparison using any of the comparison feature types documented in this section.
+
+### caution_comp_4
+Generates an SQL expression in the form `(comparison A OR comparison B OR comparison C) AND comparison D`.
+
+* Attributes:
+  * `column_names` -- Type: list of strings. Required. A list of all input columns used by sub-comparisons.
+  * `comp_a`, `comp_b`, `comp_c`, `comp_d` -- Type: Object. Required.  Sub-comparisons using any of the comparison feature types documented in this section.
 
 ```
 [[comparison_features]]
@@ -319,6 +350,15 @@ comparison_type = "parent_step_change"
 column_name = "momloc"
 comparison_type = "present_both_years"
 ```
+
+### caution_comp_4_012
+
+Similar to `caution_comp_4`, but first checks the value of comparison D. If comparison D evaluates to false,
+then `caution_comp_4_012` evaluates to 2. Otherwise, it evaluates to the result of `caution_comp_4`, so 0 or 1.
+
+* Attributes:
+  * `column_names` -- Type: list of strings. Required. A list of all input columns used by sub-comparisons.
+  * `comp_a`, `comp_b`, `comp_c`, `comp_d` -- Type: Object. Required. Sub-comparisons using any of the comparison feature types documented in this section.
 
 ### any_equals
 Used to compare middle initials and first names under specific circumstances.  
@@ -640,6 +680,18 @@ Checks that neither column A nor column B is null.
 * Attributes:
   * `column_name` -- Type: `string`. The column to check.
 
+### present_and_matching_categorical
+
+Checks that both column A and column B are present and that they match according to SQL's `IS DISTINCT FROM`. Evaluates to 0, 1, or 2:
+
+0 -> columns are both present and match
+
+1 -> columns are both present but are distinct
+
+2 -> one or both columns are missing
+
+* Attributes:
+  * `column_name` -- Type: `string`. Required. The column to check.
 
 ### present_and_not_equal
 
@@ -647,6 +699,49 @@ Checks that column A and column B are both present but are not equal.
 
 * Attributes:
   * `column_name` -- Type: `string`. The column to check.
+
+### present_and_equal_categorical_in_universe
+
+Checks that column A and column B are both present, are not equal to the not-in-universe value NIU,
+and are equal to each other according to SQL's `IS DISTINCT FROM`. Evaluates to 0 if either column is missing or
+if either column is the NIU value. Otherwise, evaluates to 0 if the columns are distinct or 1 if
+the columns are equal.
+
+* Attributes:
+  * `column_name` -- Type: `string`. Required. The column to check.
+  * `NIU` -- Type: same as the type of the input column. Required. The not-in-universe value to use in the check.
+
+```
+[[comparison_features]]
+alias = "mfbplmatch"
+column_name = "nativity"
+comparison_type = "present_and_equal_categorical_in_universe"
+NIU = "0"
+categorical = true
+```
+
+### sql_condition
+
+This is a flexible comparison type that allows users to write their own SQL expressions to be
+evaluated. Favor using a different comparison type if that's a reasonable option. If there are
+no other comparison types that work for a particular use case, this one is a good fallback.
+
+* Attributes:
+  * `column_names` -- Type: list of strings. Required. A list of all columns used in the SQL expression.
+  * `condition` -- Type: `string`. The SQL expression to evaluate.
+
+In this example, we make use of the hlink-defined `jw` function, which computes
+the Jaro-Winkler similarity of two strings. `nvl` is a Spark builtin function
+which returns its second argument if the first is null, and the first argument
+otherwise.
+
+```
+[[comparison_features]]
+alias = "namelast_jw_max"
+comparison_type = "sql_condition"
+column_names = ["namelast1", "namelast2", "namelast3"]
+condition = "GREATEST(jw(nvl(a.namelast1, ''), nvl(b.namelast1, '')), jw(nvl(a.namelast2, ''), nvl(b.namelast2, '')), jw(nvl(a.namelast3, ''), nvl(b.namelast3, '')))"
+```
 
 ## Feature add-ons
 These attributes can be added to most comparison feature types above to extend the type of output returned beyond the standard comparison feature.
