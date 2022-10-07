@@ -697,6 +697,29 @@ Checks that column A and column B are both present but are not equal.
 * Attributes:
   * `column_name` -- Type: `string`. The column to check.
 
+### sql_condition
+
+This is a flexible comparison type that allows users to write their own SQL expressions to be
+evaluated. Favor using a different comparison type if that's a reasonable option. If there are
+no other comparison types that work for a particular use case, this one is a good fallback.
+
+* Attributes:
+  * `column_names` -- Type: list of strings. Required. A list of all columns used in the SQL expression.
+  * `condition` -- Type: `string`. The SQL expression to evaluate.
+
+In this example, we make use of the hlink-defined `jw` function, which computes
+the Jaro-Winkler similarity of two strings. `nvl` is a Spark builtin function
+which returns its second argument if the first is null, and the first argument
+otherwise.
+
+```
+[[comparison_features]]
+alias = "namelast_jw_max"
+comparison_type = "sql_condition"
+column_names = ["namelast1", "namelast2", "namelast3"]
+condition = "GREATEST(jw(nvl(a.namelast1, ''), nvl(b.namelast1, '')), jw(nvl(a.namelast2, ''), nvl(b.namelast2, '')), jw(nvl(a.namelast3, ''), nvl(b.namelast3, '')))"
+```
+
 ## Feature add-ons
 These attributes can be added to most comparison feature types above to extend the type of output returned beyond the standard comparison feature.
 
