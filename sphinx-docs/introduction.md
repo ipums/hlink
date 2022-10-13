@@ -2,17 +2,20 @@
 
 ## Overview
 
-hlink is a library that links records between two datasets. This linking process identifies records in
-the datasets that share some characteristics and may correspond to the same real-world person or
-object. hlink can use either deterministic rules or probabilistic machine learning algorithms to match records
-between the two datasets. At [IPUMS](https://ipums.org), the primary use case for hlink has been to link United
-States censuses, which have a hierarchical structure of people nested within households. However,
-hlink can also be used to link generic datasets. Some of its functionality is tailored to the household-person
-hierarchical structure and may be ignored for datasets with a different structure.
+hlink is a Python library and command-line tool that links records between two datasets. This linking
+process identifies records in the datasets that share some characteristics and may correspond to the
+same real-world person or object. hlink can use either deterministic rules or probabilistic machine
+learning algorithms to match records between the two datasets. At [IPUMS](https://ipums.org), the primary
+use case for hlink has been to link United States censuses, which have a hierarchical structure of
+people nested within households. However, hlink can also be used to link generic datasets. Some of its
+functionality is tailored to the household-person hierarchical structure and may be ignored for datasets
+with a different structure.
 
 hlink provides functionality for the following common linking tasks. It is highly configurable via an input
 configuration file written in the [TOML](https://toml.io) configuration language. Each linking task is further
-broken down into several smaller steps which can be run in sequence with hlink's `LinkRun` API.
+broken down into several smaller steps which can be run in sequence with hlink's
+[`LinkRun` API](running_the_program.html#using-hlink-as-a-library) or from the command-line with the provided
+[`hlink` script](running_the_program.html#interactive-mode).
 
 1. [Preprocessing](link_tasks.html#preprocessing):
 Preprocess each dataset to clean and transform it in preparation for linking.
