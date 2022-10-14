@@ -33,14 +33,27 @@ sbt assembly
 
 Then move the scala jar over to the hlink directory with `mv target/scala-2.11/*.jar ../hlink/spark/jars`.
 
-## Creating Sphinx Docs
+## Working with the Sphinx Docs
 
-To write out the sphinx docs to the `docs` folder for the GitHub pages site, run
+We use Sphinx to generate the hlink documentation at [hlink.docs.ipums.org](hlink.docs.ipums.org).
+These docs live in the `sphinx-docs` directory as Markdown files, and Sphinx converts them to html
+files that live in the `docs` directory. To write out the Sphinx docs to the `docs` folder, run
 
 ```
 cd sphinx-docs
-make github
+make
 ```
+
+To test out your changes without having to push to the official site, Python's `http.server` module
+works nicely.
+
+```
+cd docs
+python -m http.server <port>
+```
+
+starts up an HTTP server running on port `<port>` on your local machine. Visit `127.0.0.1:<port>`
+in your browser to view the HTML.
 
 ## Creating a New Version and GitHub Release
 

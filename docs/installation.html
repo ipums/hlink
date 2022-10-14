@@ -38,22 +38,26 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
-<p>Make sure that you have each of these installed on your system.</p>
+<p>Make sure that you have each of these installed on your system before running hlink.</p>
 <ul class="simple">
-<li><p>Java 8 or Java 11</p></li>
 <li><p>Python 3.10</p></li>
+<li><p>Java 8 or Java 11, used for integration with <a class="reference external" href="https://spark.apache.org">Apache Spark</a> via the pyspark
+package</p></li>
 </ul>
 </section>
 <section id="installing-from-pypi">
-<h2>Installing from pypi<a class="headerlink" href="#installing-from-pypi" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">hlink</span></code></p>
+<h2>Installing from PyPI<a class="headerlink" href="#installing-from-pypi" title="Permalink to this heading">¶</a></h2>
+<p>hlink is available on the Python Package Index at <a class="reference external" href="https://pypi.org">pypi.org</a> as the hlink package.
+The latest version can be installed with pip by running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">hlink</span></code>.</p>
 </section>
 <section id="installing-from-source">
 <h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this heading">¶</a></h2>
-<p>In the root project directory, run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code></p>
-<p>To install hlink for development work, run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[dev]</span></code>. This will install additional
-development dependencies and install hlink in editable mode so that any changes made to the source
-code are automatically built.</p>
+<p>The easiest way to install hlink is through PyPI (see the instructions above). But hlink can also
+be installed from source. To install hlink from source, first clone the GitHub repository. Then
+in the root project directory, run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>.</p>
+<p>To install hlink for development work, instead run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[dev]</span></code>. This will install
+additional development dependencies and install hlink in editable mode so that any changes made
+to the source code are automatically built by the Python packaging tools.</p>
 </section>
 </section>
 
@@ -78,7 +82,7 @@ code are automatically built.</p>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installing-from-pypi">Installing from pypi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-from-pypi">Installing from PyPI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
 </ul>
 </li>
