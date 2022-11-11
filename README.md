@@ -68,7 +68,7 @@ matches_df = matches.df()
 
 An example configuration file:
 
-```
+```toml
 ### hlink config file ###
 # This is a sample config file for the hlink program in toml format.
 
