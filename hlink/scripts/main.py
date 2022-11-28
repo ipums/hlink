@@ -31,7 +31,7 @@ def load_conf(conf_name, user):
     """Load and return the hlink config dictionary.
 
     Add the following attributes to the config dictionary:
-    "derby_dir", "warehouse_dir", "spark_tmp_dir", "log_file", "python", "conf_path"
+    "derby_dir", "warehouse_dir", "spark_tmp_dir", "log_dir", "python", "conf_path"
     """
     if "HLINK_CONF" not in os.environ:
         global_conf = None
@@ -53,7 +53,7 @@ def load_conf(conf_name, user):
         conf["derby_dir"] = base_derby_dir / run_name
         conf["warehouse_dir"] = base_warehouse_dir / run_name
         conf["spark_tmp_dir"] = base_spark_tmp_dir / run_name
-        conf["log_file"] = hlink_dir / "run.log"
+        conf["log_dir"] = hlink_dir / "logs"
         conf["python"] = sys.executable
     else:
         user_dir = Path(global_conf["users_dir"]) / user
@@ -65,7 +65,7 @@ def load_conf(conf_name, user):
         conf["derby_dir"] = user_dir / "derby" / run_name
         conf["warehouse_dir"] = user_dir_fast / "warehouse" / run_name
         conf["spark_tmp_dir"] = user_dir_fast / "tmp" / run_name
-        conf["log_file"] = user_dir / "hlink.log"
+        conf["log_dir"] = user_dir / "logs"
         conf["python"] = global_conf["python"]
 
     print(f"*** Using config file {conf['conf_path']}")
@@ -251,8 +251,9 @@ def _reload_modules():
 
 
 def _setup_logging(conf):
-    log_file = Path(conf["log_file"])
-    log_file.parent.mkdir(exist_ok=True, parents=True)
+    log_dir = Path(conf["log_dir"])
+    log_dir.mkdir(exist_ok=True, parents=True)
+    log_file = log_dir / "hlink.log"
 
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
