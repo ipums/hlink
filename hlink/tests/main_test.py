@@ -159,7 +159,7 @@ def test_load_conf_keys_set_no_env(monkeypatch, tmp_path):
     assert "derby_dir" in conf
     assert "warehouse_dir" in conf
     assert "spark_tmp_dir" in conf
-    assert "log_file" in conf
+    assert "log_dir" in conf
     assert "python" in conf
 
 
@@ -308,5 +308,5 @@ def test_load_conf_keys_set_env(
     assert "derby_dir" in conf
     assert "warehouse_dir" in conf
     assert "spark_tmp_dir" in conf
-    assert "log_file" in conf
+    assert "log_dir" in conf
     assert "python" in conf
