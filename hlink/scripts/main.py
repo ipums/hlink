@@ -253,11 +253,13 @@ def _reload_modules():
 def _setup_logging(conf):
     log_dir = Path(conf["log_dir"])
     log_dir.mkdir(exist_ok=True, parents=True)
-    log_file = log_dir / "hlink.log"
 
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
+    conf_name = Path(conf["conf_path"]).stem
     hlink_version = pkg_resources.get_distribution("hlink").version
+
+    log_file = log_dir / f"{conf_name}-{session_id}.log"
 
     # format_string = f"%(levelname)s %(asctime)s {user} {session_id} %(message)s -- {conf['conf_path']}"
     format_string = "%(levelname)s %(asctime)s -- %(message)s"
@@ -265,14 +267,9 @@ def _setup_logging(conf):
 
     logging.basicConfig(filename=log_file, level=logging.INFO, format=format_string)
 
-    logging.info("")
+    logging.info(f"New session {session_id} by user {user}")
+    logging.info(f"Configured with {conf['conf_path']}")
+    logging.info(f"Using hlink version {hlink_version}")
     logging.info(
         "-------------------------------------------------------------------------------------"
     )
-    logging.info(f"   New session {session_id} by user {user}")
-    logging.info(f"   Configured with {conf['conf_path']}")
-    logging.info(f"   Using hlink version {hlink_version}")
-    logging.info(
-        "-------------------------------------------------------------------------------------"
-    )
-    logging.info("")
