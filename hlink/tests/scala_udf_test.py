@@ -21,3 +21,9 @@ def test_jw_matching_strings(spark, left: str, right: str):
 def test_jw_completely_different_strings(spark, left: str, right: str):
     [row] = spark.sql(f"SELECT jw('{left}', '{right}') AS jw_result").collect()
     assert row.jw_result < 0.0001
+
+
+@pytest.mark.parametrize("left,right", [("", "discombobulated"), ("GlyphidMenace", "")])
+def test_jw_one_empty_string(spark, left: str, right: str):
+    [row] = spark.sql(f"SELECT jw('{left}', '{right}') AS jw_result").collect()
+    assert row.jw_result < 0.0001
