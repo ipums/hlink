@@ -6,4 +6,12 @@
 package com.isrdi.udfs
 import org.apache.commons.text.similarity._
 
-class SerJaroWinklerSimilarity extends JaroWinklerSimilarity with Serializable { }
+class SerJaroWinklerSimilarity extends JaroWinklerSimilarity with Serializable {
+  override def apply(left: CharSequence, right: CharSequence): java.lang.Double = {
+    if (left == "" && right == "") {
+      0.0
+    } else {
+      super.apply(left, right)
+    }
+  }
+}
