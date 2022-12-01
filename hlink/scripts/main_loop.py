@@ -71,7 +71,9 @@ class Main(Cmd):
     def reload_auto_complete_cache(self):
         self.table_names = [t.name for t in self.spark.catalog.listTables()]
 
-    def precmd(self, line):
+    def precmd(self, line: str) -> str:
+        if line.strip() != "":
+            logging.info(f"[User Input] {line}")
         return line
 
     # These are meant to be flags / switches, not long options with arguments  following them
