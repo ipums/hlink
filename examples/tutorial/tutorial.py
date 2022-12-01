@@ -42,6 +42,9 @@ def main():
     print("=== Saving potential matches to potential_matches.csv")
     write_table_to_csv(link_run.spark, "potential_matches", "potential_matches.csv")
 
+    print("=== Potential matches")
+    link_run.get_table("potential_matches").df().show()
+
 
 if __name__ == "__main__":
     main()
