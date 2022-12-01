@@ -9,7 +9,17 @@ from hlink.scripts.lib.table_ops import drop_all_tables
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="""
+        This script links two very small example datasets that live in the data
+        subdirectory. It reads in the tutorial_config.toml configuration file
+        and runs hlink's preprocessing and matching steps to find some potential
+        matches between the two datasets.
+
+        For a detailed walkthrough of the tutorial, please see the README.md
+        file in the same directory as this script.
+        """
+    )
 
     parser.add_argument(
         "--clean", action="store_true", help="drop existing Spark tables on startup"
