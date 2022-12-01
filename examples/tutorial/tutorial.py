@@ -1,11 +1,26 @@
+import argparse
+
 from hlink.linking.link_run import LinkRun
 from hlink.spark.factory import SparkFactory
 from hlink.configs.load_config import load_conf_file
 from hlink.scripts.lib.io import write_table_to_csv
 from hlink.scripts.lib.conf_validations import analyze_conf
+from hlink.scripts.lib.table_ops import drop_all_tables
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--clean", action="store_true", help="drop existing Spark tables on startup"
+    )
+
+    return parser.parse_args()
 
 
 def main():
+    args = parse_args()
+
     # First let's create a LinkRun object. This will be the main way that we
     # interact with hlink. To create a LinkRun, we need to read in our config
     # file and set up spark.
@@ -17,6 +32,10 @@ def main():
 
     print("=== Creating the LinkRun")
     link_run = LinkRun(spark, config)
+
+    if args.clean:
+        print("=== Dropping all pre-existing Spark tables")
+        drop_all_tables(link_run)
 
     # Now we've got the LinkRun created. Let's analyze our config file to look
     # for errors that could cause hlink to fail.
