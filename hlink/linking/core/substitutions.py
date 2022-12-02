@@ -15,11 +15,11 @@ def generate_substitutions(spark, df_selected, substitution_columns):
                 "regex_word_replace" in substitution
                 and substitution["regex_word_replace"]
             ):
-                df_selected = __apply_regex_substitution(
+                df_selected = _apply_regex_substitution(
                     df_selected, column_name, substitution, spark.sparkContext
                 )
             elif "substitution_file" in substitution:
-                df_selected = __apply_substitution(
+                df_selected = _apply_substitution(
                     df_selected, column_name, substitution, spark.sparkContext
                 )
             else:
@@ -29,7 +29,7 @@ def generate_substitutions(spark, df_selected, substitution_columns):
     return df_selected
 
 
-def __load_substitutions(file_name):
+def _load_substitutions(file_name):
     """Reads in the substitution file and returns a 2-tuple representing it.
 
     Parameters
@@ -51,13 +51,13 @@ def __load_substitutions(file_name):
     return (sub_froms, sub_tos)
 
 
-def __apply_substitution(df, column_name, substitution, sc):
+def _apply_substitution(df, column_name, substitution, sc):
     """Returns a new df with the values in the column column_name replaced using substitutions defined in substitution_file."""
     substitution_file = substitution["substitution_file"]
     join_value = substitution["join_value"]
     join_column = substitution["join_column"]
     join_column_alias = join_column + "_sub"
-    sub_froms, sub_tos = __load_substitutions(substitution_file)
+    sub_froms, sub_tos = _load_substitutions(substitution_file)
     subs = list(zip(sub_froms, sub_tos))
     Sub = namedtuple("Sub", ["sub_from", "sub_to"])
     sub_df = (
@@ -81,11 +81,11 @@ def __apply_substitution(df, column_name, substitution, sc):
     return df_sub.select(df_sub_selects)
 
 
-def __apply_regex_substitution(df, column_name, substitution, sc):
+def _apply_regex_substitution(df, column_name, substitution, sc):
     """Returns a new df with the values in the column column_name replaced using substitutions defined in substitution_file."""
 
     substitution_file = substitution["substitution_file"]
-    sub_froms, sub_tos = __load_substitutions(substitution_file)
+    sub_froms, sub_tos = _load_substitutions(substitution_file)
     subs = dict(zip(sub_froms, sub_tos))
     col = column_name
     df.checkpoint()
