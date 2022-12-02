@@ -92,10 +92,10 @@ class SparkConnection(object):
             session.sql(f"CREATE DATABASE IF NOT EXISTS {self.db_name}")
         session.catalog.setCurrentDatabase(self.db_name)
         session.sparkContext.setCheckpointDir(str(self.tmp_dir))
-        self.__register_udfs(session)
+        self._register_udfs(session)
         return session
 
-    def __register_udfs(self, session):
+    def _register_udfs(self, session):
         session.udf.registerJavaFunction("jw", "com.isrdi.udfs.JWCompare", DoubleType())
         session.udf.registerJavaFunction(
             "jw_max", "com.isrdi.udfs.MaxJWCompare", DoubleType()

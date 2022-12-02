@@ -48,13 +48,13 @@ def register_dist_tables_and_create_sql(link_task, dist_features):
                 )
                 tables_loaded.append(st)
         if feature["key_count"] == 1:
-            join_clause = __key_count_1(
+            join_clause = _key_count_1(
                 dt, feature["column_name"], feature["loc_a"], feature["loc_b"]
             )
             if join_clause not in join_clauses:
                 join_clauses.append(join_clause)
         elif feature["key_count"] == 2:
-            join_clause = __key_count_2(
+            join_clause = _key_count_2(
                 dt,
                 feature["source_column_a"],
                 feature["source_column_b"],
@@ -68,7 +68,7 @@ def register_dist_tables_and_create_sql(link_task, dist_features):
                 join_clauses.append(join_clause)
         if st:
             if feature["secondary_key_count"] == 1:
-                join_clause = __key_count_1(
+                join_clause = _key_count_1(
                     st,
                     feature["secondary_source_column"],
                     feature["secondary_loc_a"],
@@ -92,7 +92,7 @@ def register_dist_tables_and_create_sql(link_task, dist_features):
     return join_clauses, tables_loaded
 
 
-def __key_count_1(table, column, loc_a, loc_b):
+def _key_count_1(table, column, loc_a, loc_b):
     join_clause = (
         f"LEFT JOIN {table} "
         f"ON a.{column} = {table}.{loc_a} "
@@ -101,7 +101,7 @@ def __key_count_1(table, column, loc_a, loc_b):
     return join_clause
 
 
-def __key_count_2(table, column_a, column_b, loc_a_0, loc_a_1, loc_b_0, loc_b_1):
+def _key_count_2(table, column_a, column_b, loc_a_0, loc_a_1, loc_b_0, loc_b_1):
     join_clause = (
         f"LEFT JOIN {table} "
         f"ON a.{column_a} = {table}.{loc_a_0} "

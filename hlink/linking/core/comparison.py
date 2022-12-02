@@ -9,25 +9,25 @@ import hlink.linking.core.comparison_feature as comparison_feature_core
 def get_comparison_leaves(comp):
     comp_leaves = []
 
-    def __get_comp_leaf(comp, comp_leaves):
+    def _get_comp_leaf(comp, comp_leaves):
 
         if "comp_a" in comp:
-            __get_comp_leaf(comp["comp_a"], comp_leaves)
-            __get_comp_leaf(comp["comp_b"], comp_leaves)
+            _get_comp_leaf(comp["comp_a"], comp_leaves)
+            _get_comp_leaf(comp["comp_b"], comp_leaves)
 
         else:
             comp_leaves.append(comp)
 
     if "comp_a" in comp:
-        __get_comp_leaf(comp["comp_a"], comp_leaves)
-        __get_comp_leaf(comp["comp_b"], comp_leaves)
+        _get_comp_leaf(comp["comp_a"], comp_leaves)
+        _get_comp_leaf(comp["comp_b"], comp_leaves)
 
     elif "secondary" in comp:
-        __get_comp_leaf(comp["threshold_a"], comp_leaves)
-        __get_comp_leaf(comp["threshold_b"], comp_leaves)
+        _get_comp_leaf(comp["threshold_a"], comp_leaves)
+        _get_comp_leaf(comp["threshold_b"], comp_leaves)
 
     else:
-        __get_comp_leaf(comp, comp_leaves)
+        _get_comp_leaf(comp, comp_leaves)
 
     return comp_leaves
 
