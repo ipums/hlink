@@ -24,9 +24,9 @@ class LinkStepCreateComparisonFeatures(LinkStep):
 
     def _run(self):
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
-        self.__create_training_features()
+        self._create_training_features()
 
-    def __create_training_features(self):
+    def _create_training_features(self):
         training_conf = str(self.task.training_conf)
         table_prefix = self.task.table_prefix
         config = self.task.link_run.config
