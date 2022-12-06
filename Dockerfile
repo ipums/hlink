@@ -1,4 +1,4 @@
-FROM python:3.10.4
+FROM python:3.10
 
 RUN apt-get update && apt-get install openjdk-11-jdk -y
 
