@@ -33,24 +33,24 @@ for package in packages_with_templates:
 package_data["hlink.linking"].append("table_definitions.csv")
 
 install_requires = [
-    "colorama==0.4.4",
-    "ipython==8.3.0",
-    "Jinja2==3.1.2",
-    "numpy==1.22.3",
-    "pandas==1.4.2",
-    "pyspark==3.3.0",
-    "scikit-learn==1.1.0",
-    "toml==0.10.2",
+    "colorama~=0.4.0",
+    "ipython~=8.3.0",
+    "Jinja2~=3.1.0",
+    "numpy~=1.22.0",
+    "pandas~=1.4.0",
+    "pyspark~=3.3.0",
+    "scikit-learn~=1.1.0",
+    "toml~=0.10.0",
 ]
 
 dev_requires = [
-    "pre-commit",
-    "black==22.3.0",
-    "flake8==4.0.1",
-    "sphinx",
-    "recommonmark",
-    "pytest==7.1.2",
-    "twine",
+    "pytest~=7.1.0",
+    "black~=22.0",
+    "flake8~=5.0",
+    "pre-commit~=2.0",
+    "twine~=4.0",
+    "sphinx==5.1.1",
+    "recommonmark==0.7.1",
 ]
 
 setup(
