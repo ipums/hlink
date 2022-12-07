@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hlink"
+version = "3.2.7"
+description = "Fast supervised pyspark record linkage software"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE.txt"}
+dependencies = [
+    "colorama~=0.4.0",
+    "ipython~=8.3.0",
+    "Jinja2~=3.1.0",
+    "numpy~=1.22.0",
+    "pandas~=1.4.0",
+    "pyspark~=3.3.0",
+    "scikit-learn~=1.1.0",
+    "toml~=0.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest~=7.1.0",
+    "black~=22.0",
+    "flake8~=5.0",
+    "pre-commit~=2.0",
+    "twine~=4.0",
+    "sphinx==5.1.1",
+    "recommonmark==0.7.1",
+]
+
+[project.scripts]
+hlink = "hlink.scripts.main:cli"
+
+[project.urls]
+homepage = "https://github.com/ipums/hlink"
+documentation = "https://hlink.docs.ipums.org"
+repository = "https://github.com/ipums/hlink"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hlink*"]
+exclude = ["hlink_config"]
