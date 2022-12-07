@@ -28,7 +28,7 @@ def load_conf_file(conf_name: str) -> dict[str, Any]:
         conf_name: the file to look for
 
     Returns:
-        dict: the contents of the config file
+        the contents of the config file
 
     Raises:
         FileNotFoundError: if none of the three checked files exist
