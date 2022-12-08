@@ -9,6 +9,10 @@ description = "Fast supervised pyspark record linkage software"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE.txt"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+]
 dependencies = [
     "colorama~=0.4.0",
     "ipython~=8.3.0",
