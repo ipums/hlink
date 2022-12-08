@@ -73,7 +73,7 @@ def load_conf(conf_name, user):
 
 
 def cli():
-    """Called by the hlink script. Referenced in setup.py."""
+    """Called by the hlink script."""
     if "--version" in sys.argv:
         version = pkg_resources.get_distribution("hlink").version
         print(f"Hlink version: {version}")

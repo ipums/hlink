@@ -31,6 +31,7 @@ dev = [
     "flake8~=5.0",
     "pre-commit~=2.0",
     "twine~=4.0",
+    "build>=0.6",
     "sphinx==5.1.1",
     "recommonmark==0.7.1",
 ]

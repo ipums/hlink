@@ -8,7 +8,7 @@ There are 4 modules of the program. See documentation in each specific class for
 3) `spark` -- This contains the code for the spark initialization and connection.
 4) `linking` -- This contains the code for all of the linking tasks. There is a separate README.md file in this module to further describe it.
 
-In addition to these 4 modules, the `setup.py` file at the top level of the repo contains the configurations for packaging up the program with pip.
+In addition to these 4 modules, the `pyproject.toml` file at the top level of the repo contains the configurations for packaging up the program with pip.
 
 ## Developing Code
 To set up a copy of this project for development,
@@ -74,7 +74,7 @@ A minor change would bump the version to 3.3.0, and a major change would bump it
 Here are the steps to follow when creating the new version.
 
 - Decide on the new version number A.B.C, following the scheme above.
-- Set the new version number in `setup.py`, in the call to `setup()`.
+- Set the new version number in `pyproject.toml`.
 - Reinstall hlink with `pip install -e .[dev]` to update the version. Confirm that this worked by running `hlink --version`.
 - Regenerate the Sphinx docs so that they show the correct hlink version number.
 - After committing your changes, create a git tag `vA.B.C` and push it to GitHub.
@@ -84,5 +84,5 @@ changes that are part of the release.
 ## Deploying a new version to pypi
 
 1) Make sure that the package is installed with dev dependencies: `pip install -e .[dev]`
-1) Run: `python setup.py sdist`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
+1) Run: `python -m build`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
 2) Run: `twine upload dist/hlink-x.x.x.tar.gz` where x.x.x is the version number of the software.
