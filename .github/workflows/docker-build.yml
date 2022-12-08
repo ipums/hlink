@@ -24,3 +24,6 @@ jobs:
       
     - name: Test
       run: docker run $HLINK_TAG pytest hlink/tests
+    
+    - name: Build sdist and wheel
+      run: docker run $HLINK_TAG python -m build
