@@ -14,7 +14,8 @@ In addition to these 4 modules, the `pyproject.toml` file at the top level of th
 To set up a copy of this project for development,
 
 1. Clone the repository.
-2. Run `pip install -e .[dev]` in the root project directory. This should install all dependencies.
+2. Run `pip install --upgrade pip` to ensure that you have a recent version of pip.
+3. Run `pip install -e .[dev]` in the root project directory. This should install all dependencies.
 
 ## Running Tests
 
@@ -83,6 +84,6 @@ changes that are part of the release.
 
 ## Deploying a new version to pypi
 
-1) Make sure that the package is installed with dev dependencies: `pip install -e .[dev]`
-1) Run: `python -m build`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
-2) Run: `twine upload dist/hlink-x.x.x.tar.gz` where x.x.x is the version number of the software.
+1) Make sure that the package is installed with dev dependencies: `pip install -e .[dev]`.
+2) Run: `python -m build`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
+3) Run: `twine upload dist/hlink-x.x.x.tar.gz` where x.x.x is the version number of the software.
