@@ -9,10 +9,14 @@ A paper on the creation and applications of this program on historical census da
 
 ## Installation
 
+hlink runs on Python 3.10.
 Java 8 or [Java 11](https://openjdk.org/install/) is required for the PySpark integration. 
 
 You can install the python package from pip:
-`pip install hlink`
+```
+pip install --upgrade pip
+pip install hlink
+```
 
 ## Docs
 
