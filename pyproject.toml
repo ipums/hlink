@@ -40,9 +40,10 @@ dev = [
 hlink = "hlink.scripts.main:cli"
 
 [project.urls]
-homepage = "https://github.com/ipums/hlink"
-documentation = "https://hlink.docs.ipums.org"
-repository = "https://github.com/ipums/hlink"
+Homepage = "https://github.com/ipums/hlink"
+Documentation = "https://hlink.docs.ipums.org"
+Repository = "https://github.com/ipums/hlink"
+Changelog = "https://github.com/ipums/hlink/releases"
 
 [tool.setuptools.packages.find]
 where = ["."]
