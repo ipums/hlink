@@ -255,7 +255,7 @@ def generate_comparison_feature(feature, id_col, include_as=False):
 
     elif comp_type == "all_equals":
         cols = feature["column_names"]
-        all_equals = " AND ".join([f"a.{col} = b.{col}" for col in cols])
+        all_equals = " AND ".join(f"a.{col} = b.{col}" for col in cols)
         expr = f"{all_equals}"
 
     elif comp_type == "not_zero_and_not_equals":

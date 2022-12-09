@@ -143,7 +143,7 @@ def test_step_2_param_grid(spark, main, training_conf, model_exploration, fake_s
     ]
 
     assert len(param_grid) == len(expected)
-    assert all([m in expected for m in param_grid])
+    assert all(m in expected for m in param_grid)
 
     main.do_drop_all("")
 
@@ -241,7 +241,7 @@ def test_step_1_OneHotEncoding(
         "features_vector",
     ]
     assert training_v.shape[0] == 9
-    assert all([c in training_v.columns for c in columns_expected])
+    assert all(c in training_v.columns for c in columns_expected)
     assert len(training_v["features_vector"][0]) == 5
 
 

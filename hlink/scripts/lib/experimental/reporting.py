@@ -67,7 +67,7 @@ def export_csv(all_matches_with_selections, output_path):
     output_tmp = output_path + ".tmp"
     all_matches_with_selections.write.csv(output_tmp, header=False)
     header = (
-        '"' + '","'.join([col.name for col in all_matches_with_selections.schema]) + '"'
+        '"' + '","'.join(col.name for col in all_matches_with_selections.schema) + '"'
     )
 
     commands = [
