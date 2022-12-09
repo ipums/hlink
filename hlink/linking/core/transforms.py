@@ -464,13 +464,13 @@ def apply_transform(column_select, transform, is_a):
                 "DEPRECATION WARNING: The 'mapping' transform no longer takes the 'values' parameter with a list of mappings in dictionaries; instead each mapping should be its own transform. Please change your config for future releases."
             )
             for mapping in transform["values"]:
-                from_regexp = "|".join("^" + str(f) + "$" for f in mapping["from"])
+                from_regexp = "|".join(f"^{from_val}$" for from_val in mapping["from"])
                 mapped_column = regexp_replace(
                     mapped_column, from_regexp, str(mapping["to"])
                 )
         else:
             for key, value in transform["mappings"].items():
-                from_regexp = "^" + str(key) + "$"
+                from_regexp = f"^{key}$"
                 mapped_column = regexp_replace(mapped_column, from_regexp, str(value))
         if transform.get("output_type", False) == "int":
             mapped_column = mapped_column.cast(LongType())

@@ -540,7 +540,7 @@ def generate_comparison_feature(feature, id_col, include_as=False):
         expr = f"CASE WHEN {datasource}.{addl_var} {check_val_expr} then {expr} else {else_val} END"
 
     if include_as:
-        full_expr = f"({expr})" + f" as {feature['alias']}"
+        full_expr = f"({expr}) as {feature['alias']}"
     else:
         full_expr = expr
 
