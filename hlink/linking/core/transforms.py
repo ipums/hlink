@@ -295,7 +295,7 @@ def generate_transforms(
             return df_selected
 
         else:
-            raise ValueError("Invalid transform type for {}".format(str(transform)))
+            raise ValueError(f"Invalid transform type for {transform}")
 
     for feature_selection in not_skipped_feature_selections:
         df_selected = parse_feature_selections(df_selected, feature_selection, is_a)
@@ -513,4 +513,4 @@ def apply_transform(column_select, transform, is_a):
     elif transform_type == "get_floor":
         return floor(column_select).cast("int")
     else:
-        raise ValueError("Invalid transform type for {}".format(str(transform)))
+        raise ValueError(f"Invalid transform type for {transform}")
