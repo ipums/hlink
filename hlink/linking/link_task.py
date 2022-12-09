@@ -85,7 +85,7 @@ class LinkTask:
 
         if step_num < 0 or step_num >= len(steps):
             steps_string = "\n\t".join(
-                [f"step {i}: {steps[i].desc}" for i in range(len(steps))]
+                [f"step {i}: {step.desc}" for (i, step) in enumerate(steps)]
             )
             print(
                 f"Error! Couldn't find step {step_num}. Valid steps are: \n\t{steps_string}"
