@@ -2,14 +2,15 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+import pyspark
 
 
 class Table:
-    """Represents a spark table which may or may not currently exist.
+    """Represents a Spark table which may or may not currently exist.
 
-    It's possible to pass table names that aren't valid spark table names to
+    It's possible to pass table names that aren't valid Spark table names to
     this class (for example, "@@@"). In this case, this class does not throw
-    errors; it just treats the tables like any other spark tables that don't
+    errors; it just treats the tables like any other Spark tables that don't
     exist.
     """
 
@@ -23,13 +24,13 @@ class Table:
         self.hide = hide
 
     def exists(self) -> bool:
-        """Check whether the table currently exists in spark."""
+        """Check whether the table currently exists in Spark."""
         return self._name_lower in [
             table.name for table in self.spark.catalog.listTables()
         ]
 
-    def drop(self):
-        """Drop the table if it `exists()`.
+    def drop(self) -> None:
+        """Drop the table if it exists.
 
         If the table doesn't exist, then don't do anything.
         """
@@ -39,15 +40,15 @@ class Table:
             not self.exists()
         ), f"table '{self.name}' has been dropped but still exists"
 
-    def df(self):
+    def df(self) -> pyspark.sql.dataframe.DataFrame | None:
         """Get the DataFrame of the table from spark.
 
         Returns:
-            Option[DataFrame]: the DataFrame of the table, or None if the table doesn't exist
+            the Spark DataFrame of the table, or None if the table doesn't exist
         """
         if self.exists():
             return self.spark.table(self._name_lower)
         return None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Table '{self.name}' <- {self.desc}"

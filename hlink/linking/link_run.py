@@ -6,6 +6,7 @@
 from pathlib import Path
 import pandas as pd
 
+from hlink.linking.link_task import LinkTask
 from hlink.linking.preprocessing import Preprocessing
 from hlink.linking.model_exploration import ModelExploration
 from hlink.linking.training import Training
@@ -31,7 +32,7 @@ link_task_choices = {
 
 
 class LinkRun:
-    """A link run, which manages link tasks, spark tables, and related settings.
+    """A link run, which manages link tasks, Spark tables, and related settings.
 
     A link run has attributes for each link task in `link_task_choices`. These can
     be accessed like normal attributes with dot notation or with the `get_task()`
@@ -46,7 +47,13 @@ class LinkRun:
     tasks.
     """
 
-    def __init__(self, spark, config, use_preexisting_tables=True, print_sql=False):
+    def __init__(
+        self,
+        spark,
+        config,
+        use_preexisting_tables: bool = True,
+        print_sql: bool = False,
+    ):
         self.spark = spark
         self.config = config
         self.use_preexisting_tables = use_preexisting_tables
@@ -60,7 +67,7 @@ class LinkRun:
 
         self._init_tables()
 
-    def _init_tables(self):
+    def _init_tables(self) -> None:
         """Initialize `self.known_tables` from the contents of `table_definitions_file`."""
         table_defs = pd.read_csv(table_definitions_file)
         tables = []
@@ -71,45 +78,45 @@ class LinkRun:
 
         self.known_tables = {table.name: table for table in tables}
 
-    def get_task(self, task_name: str):
+    def get_task(self, task_name: str) -> LinkTask:
         """Get a link task attribute of the link run by name.
 
         If you have the string name of a link task and want the task itself,
         use this method instead of something like `getattr()`.
 
         Args:
-            task_name (str): the name of the link task
+            task_name: the name of the link task
 
         Raises:
             AttributeError: if `task_name` is not the name of a link task on the link run
 
         Returns:
-            LinkTask: the requested link task
+            the requested link task
         """
         if task_name in link_task_choices:
             return getattr(self, task_name)
         else:
             raise AttributeError(f"LinkRun has no task named '{task_name}'")
 
-    def get_table(self, table_name: str):
+    def get_table(self, table_name: str) -> Table:
         """Get a `Table` by name.
 
         If the table is in `self.known_tables`, return it. Otherwise, return a new
         table. This method is infallible, so it will always return a table. The
-        returned table may or may not exist in spark.
+        returned table may or may not exist in Spark.
 
         Args:
-            table_name (str): the name of the table to retrieve
+            table_name: the name of the table to retrieve
 
         Returns:
-            Table: the requested table
+            the requested table
         """
         if table_name in self.known_tables:
             return self.known_tables[table_name]
         return Table(self.spark, table_name, "Unknown table", hide=True)
 
-    def drop_temp_tables(self):
-        """Delete all temporary spark tables."""
+    def drop_temp_tables(self) -> None:
+        """Delete all temporary Spark tables."""
         all_tables = self.spark.catalog.listTables()
         temp_tables = filter((lambda table: table.tableType == "TEMPORARY"), all_tables)
 

@@ -3,11 +3,14 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from jinja2 import Environment, PackageLoader, ChoiceLoader
-from hlink.errors import SparkError
-from timeit import default_timer as timer
 import logging
-from typing import Optional
+from typing import Iterable, Callable, Any
+from timeit import default_timer as timer
+from jinja2 import Environment, PackageLoader, ChoiceLoader
+import pyspark
+
+from hlink.errors import SparkError
+from hlink.linking.link_step import LinkStep
 
 
 class LinkTask(object):
@@ -24,7 +27,7 @@ class LinkTask(object):
     concrete subclasses for creating spark tables and performing step work.
     """
 
-    def __init__(self, link_run, display_name: Optional[str] = None):
+    def __init__(self, link_run, display_name: str | None = None):
         self.link_run = link_run
         loader = ChoiceLoader(
             [
@@ -43,20 +46,20 @@ class LinkTask(object):
     def spark(self):
         return self.link_run.spark
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.display_name
 
-    def get_steps(self):
+    def get_steps(self) -> list[LinkStep]:
         """Get a list of the steps that make up the link task.
 
         This abstract method must be implemented by concrete subclasses.
 
         Returns:
-            List[LinkStep]: the link steps making up the link task
+            a list of the link steps making up the link task
         """
         raise NotImplementedError()
 
-    def run_all_steps(self):
+    def run_all_steps(self) -> None:
         """Run all steps in order."""
         logging.info(f"Running all steps for task {self.display_name}")
         start_all = timer()
@@ -69,7 +72,7 @@ class LinkTask(object):
         print(f"Finished all in {elapsed_time_all}s")
         logging.info(f"Finished all steps in {elapsed_time_all}s")
 
-    def run_step(self, step_num: int):
+    def run_step(self, step_num: int) -> None:
         """Run a particular step.
 
         Note that running steps out of order may cause errors when later steps
@@ -107,12 +110,12 @@ class LinkTask(object):
     def run_register_python(
         self,
         name: str,
-        func,
-        args=[],
-        persist=False,
-        overwrite_preexisting_tables=False,
-    ):
-        """Run the given python function `func` and register the returned data
+        func: Callable[..., pyspark.sql.dataframe.DataFrame],
+        args: Iterable[Any] = [],
+        persist: bool = False,
+        overwrite_preexisting_tables: bool = False,
+    ) -> pyspark.sql.dataframe.DataFrame:
+        """Run the given Python function `func` on `args` and register the returned data
         frame with the given table `name`.
         """
         if name is not None:
@@ -138,12 +141,12 @@ class LinkTask(object):
     def run_register_sql(
         self,
         name: str,
-        sql=None,
-        template=None,
-        t_ctx={},
-        persist=False,
-        overwrite_preexisting_tables=False,
-    ):
+        sql: str | None = None,
+        template: str | None = None,
+        t_ctx: dict[str, Any] = {},
+        persist: bool = False,
+        overwrite_preexisting_tables: bool = False,
+    ) -> pyspark.sql.dataframe.DataFrame:
         """Run the given sql or template (with context) and register the returned
         data frame with the given table `name`.
 
@@ -153,7 +156,7 @@ class LinkTask(object):
         Persist the created table if `persist` is True.
         """
 
-        def run_sql():
+        def run_sql() -> pyspark.sql.dataframe.DataFrame:
             sql_to_run = self._get_sql(name, sql, template, t_ctx)
             if self.link_run.print_sql:
                 print(sql_to_run)
@@ -172,14 +175,18 @@ class LinkTask(object):
             overwrite_preexisting_tables=overwrite_preexisting_tables,
         )
 
-    def _check_preexisting_table(self, name: str):
+    def _check_preexisting_table(
+        self, name: str
+    ) -> pyspark.sql.dataframe.DataFrame | None:
         table = self.link_run.get_table(name)
         if self.link_run.use_preexisting_tables and table.exists():
             print(f"Preexisting table: {name}")
             return table.df()
         return None
 
-    def _get_sql(self, name: str, sql, template, t_ctx):
+    def _get_sql(
+        self, name: str, sql: str | None, template: str | None, t_ctx: dict[str, Any]
+    ) -> str:
         if sql is None:
             template_file_name = template if template is not None else name
             template_path = f"{template_file_name}.sql"

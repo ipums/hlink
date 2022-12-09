@@ -4,13 +4,14 @@
 #   https://github.com/ipums/hlink
 
 from pathlib import Path
+from typing import Any
 import json
 import toml
 
 from hlink.errors import UsageError
 
 
-def load_conf_file(conf_name):
+def load_conf_file(conf_name: str) -> dict[str, Any]:
     """Flexibly load a config file.
 
     Given a path `conf_name`, look for a file at that path. If that file
@@ -24,10 +25,10 @@ def load_conf_file(conf_name):
     config dictionary.
 
     Args:
-        conf_name (str): the file to look for
+        conf_name: the file to look for
 
     Returns:
-        dict: the contents of the config file
+        the contents of the config file
 
     Raises:
         FileNotFoundError: if none of the three checked files exist

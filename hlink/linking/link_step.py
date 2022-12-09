@@ -2,7 +2,6 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
-from typing import List
 
 
 class LinkStep:
@@ -11,10 +10,10 @@ class LinkStep:
         task,
         desc: str,
         *,
-        input_table_names: List[str] = [],
-        output_table_names: List[str] = [],
-        input_model_names: List[str] = [],
-        output_model_names: List[str] = [],
+        input_table_names: list[str] = [],
+        output_table_names: list[str] = [],
+        input_model_names: list[str] = [],
+        output_model_names: list[str] = [],
     ):
         self.task = task
         self.desc = desc
@@ -23,12 +22,12 @@ class LinkStep:
         self.input_model_names = input_model_names
         self.output_model_names = output_model_names
 
-    def find_missing_input_table_names(self):
+    def find_missing_input_table_names(self) -> list[str]:
         tables = map(self.task.link_run.get_table, self.input_table_names)
         missing_tables = filter((lambda table: not table.exists()), tables)
         return [table.name for table in missing_tables]
 
-    def run(self):
+    def run(self) -> None:
         missing_table_names = self.find_missing_input_table_names()
         if len(missing_table_names) > 0:
             missing_names_str = ", ".join(missing_table_names)
@@ -38,7 +37,7 @@ class LinkStep:
 
         self._run()
 
-    def _run(self):
+    def _run(self) -> None:
         """Run the link step.
 
         This abstract method must be implemented by concrete subclasses. It is
@@ -46,5 +45,5 @@ class LinkStep:
         """
         raise NotImplementedError()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.desc

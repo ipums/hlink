@@ -5,7 +5,7 @@ MIN_PARTITIONS = 200
 MAX_PARTITIONS = 10000
 
 
-def spark_shuffle_partitions_heuristic(dataset_size):
+def spark_shuffle_partitions_heuristic(dataset_size: int) -> int:
     """Calculate how many partitions to request from Spark based on dataset size.
 
     This is a heuristic / approximation of how many partitions should be requested
