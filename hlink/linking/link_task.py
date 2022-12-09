@@ -13,7 +13,7 @@ from hlink.errors import SparkError
 from hlink.linking.link_step import LinkStep
 
 
-class LinkTask(object):
+class LinkTask:
     """Base class for link tasks.
 
     A link task consists of one or more `LinkStep`s and belongs to one `LinkRun`.
