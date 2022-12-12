@@ -43,9 +43,9 @@ class LinkStepExportCrosswalk(LinkStep):
         raw_cols = ["histid", "serialp", "pernum", "age", "sex", "statefip", "bpl"]
 
         raw_cols_sql = "select "
-        raw_cols_sql += ", ".join([f"raw_a.{col} as {col}_a" for col in raw_cols])
+        raw_cols_sql += ", ".join(f"raw_a.{col} as {col}_a" for col in raw_cols)
         raw_cols_sql += ", "
-        raw_cols_sql += ", ".join([f"raw_b.{col} as {col}_b" for col in raw_cols])
+        raw_cols_sql += ", ".join(f"raw_b.{col} as {col}_b" for col in raw_cols)
         raw_cols_sql += "from all_predicted_matches left join raw_df_a raw_a on histid_a left join raw_df_b raw_b on histid_b"
 
         joined_predictions_with_demog = self.task.spark.sql(raw_cols_sql)

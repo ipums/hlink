@@ -27,7 +27,7 @@ class LinkStepTrainAndSaveModel(LinkStep):
         table_prefix = self.task.table_prefix
         config = self.task.link_run.config
 
-        if not (config[training_conf].get("score_with_model", False)):
+        if not config[training_conf].get("score_with_model", False):
             raise ValueError(
                 f"'score_with_model' not included or set to true in '{training_conf}' section of config!  Initiation of a model and scoring not completed!"
             )

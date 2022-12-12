@@ -14,10 +14,10 @@ from hlink.linking.link_run import link_task_choices
 
 import hlink.scripts.lib.experimental.tfam as x_tfam
 import hlink.scripts.lib.experimental.reporting as x_reporting
-import hlink.scripts.lib.table_ops as table_ops
-import hlink.scripts.lib.io as io
-import hlink.scripts.lib.linking_ops as linking_ops
-import hlink.scripts.lib.conf_validations as conf_validations
+from hlink.scripts.lib import table_ops
+from hlink.scripts.lib import io
+from hlink.scripts.lib import linking_ops
+from hlink.scripts.lib import conf_validations
 
 
 def split_and_check_args(expected_count):
@@ -36,7 +36,7 @@ def split_and_check_args(expected_count):
         def wrapper(self, args):
             split_args = args.split()
             if self.check_arg_count(split_args, expected_count, f.__doc__):
-                return
+                return None
             return f(self, split_args)
 
         return wrapper
@@ -470,7 +470,7 @@ class Main(Cmd):
             return
 
         output_path, variables_string = split_args
-        variables = list([v.lower() for v in variables_string.split(",")])
+        variables = [v.lower() for v in variables_string.split(",")]
 
         if include_round:
             print("Including round numbers in exported data")

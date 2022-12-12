@@ -18,7 +18,7 @@ from pyspark.sql.types import (
 )
 
 
-class SparkConnection(object):
+class SparkConnection:
     """Handles initialization of spark session and connection to local cluster."""
 
     def __init__(self, derby_dir, warehouse_dir, tmp_dir, python, db_name):

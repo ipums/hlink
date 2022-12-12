@@ -199,7 +199,7 @@ def _get_spark(run_conf, args):
 
 
 def _read_history_file(history_file):
-    if not (os.path.exists(history_file)):
+    if not os.path.exists(history_file):
         with open(history_file, "a"):
             os.utime(history_file, (1330712280, 1330712292))
     readline.read_history_file(history_file)

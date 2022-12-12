@@ -43,8 +43,8 @@ class LinkStepReportRepresentivity(LinkStep):
             "durmarr",
             "sei",
         }
-        raw_a_cols_present = set([x.lower() for x in spark.table("raw_df_a").columns])
-        raw_b_cols_present = set([x.lower() for x in spark.table("raw_df_b").columns])
+        raw_a_cols_present = {x.lower() for x in spark.table("raw_df_a").columns}
+        raw_b_cols_present = {x.lower() for x in spark.table("raw_df_b").columns}
         raw_cols = list(raw_cols_wishlist & raw_a_cols_present & raw_b_cols_present)
 
         prepped_cols_wishlist = {
@@ -58,12 +58,8 @@ class LinkStepReportRepresentivity(LinkStep):
             "namelast_clean",
             "statefip",
         }
-        pdfa_cols_present = set(
-            [x.lower() for x in spark.table("prepped_df_a").columns]
-        )
-        pdfb_cols_present = set(
-            [x.lower() for x in spark.table("prepped_df_b").columns]
-        )
+        pdfa_cols_present = {x.lower() for x in spark.table("prepped_df_a").columns}
+        pdfb_cols_present = {x.lower() for x in spark.table("prepped_df_b").columns}
         prepped_cols = list(
             prepped_cols_wishlist & pdfa_cols_present & pdfb_cols_present
         )

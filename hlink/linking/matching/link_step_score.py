@@ -111,7 +111,7 @@ class LinkStepScore(LinkStep):
 
     def _save_feature_importances(self, spark, score_tmp):
         config = self.task.link_run.config
-        if not (config[f"{self.task.training_conf}"].get("feature_importances", False)):
+        if not config[f"{self.task.training_conf}"].get("feature_importances", False):
             return
         cols = (
             score_tmp.select("*").schema["features_vector"].metadata["ml_attr"]["attrs"]

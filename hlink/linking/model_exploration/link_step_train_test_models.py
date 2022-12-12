@@ -110,7 +110,7 @@ class LinkStepTrainTestModels(LinkStep):
                 )
 
                 thresholds_plus_1 = np.append(thresholds_raw, [np.nan])
-                param_text = np.full(precision.shape, model_type + "_" + str(params))
+                param_text = np.full(precision.shape, f"{model_type}_{params}")
 
                 pr_auc = auc(recall, precision)
                 print(f"Area under PR curve: {pr_auc}")
@@ -128,7 +128,7 @@ class LinkStepTrainTestModels(LinkStep):
                         "overwrite"
                     ).saveAsTable(
                         f"{self.task.table_prefix}precision_recall_curve_"
-                        + re.sub("[^A-Za-z0-9]", "_", model_type + str(params))
+                        + re.sub("[^A-Za-z0-9]", "_", f"{model_type}{params}")
                     )
 
                     first = False
