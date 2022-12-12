@@ -23,7 +23,7 @@ jobs:
       run: docker run $HLINK_TAG flake8 --count .
       
     - name: Test
-      run: docker run $HLINK_TAG pytest hlink/tests
+      run: docker run $HLINK_TAG pytest
     
     - name: Build sdist and wheel
       run: docker run $HLINK_TAG python -m build
