@@ -23,12 +23,6 @@ import sys
 from types import SimpleNamespace
 
 
-pytest_plugins = (
-    "hlink.tests.plugins.datasources",
-    "hlink.tests.plugins.external_data_paths",
-)
-
-
 def load_table_from_csv(link_task, path, table_name):
     link_task.spark.read.csv(path, header=True, inferSchema=True).write.mode(
         "overwrite"
