@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hlink"
-version = "3.2.7"
+version = "3.3.0"
 description = "Fast supervised pyspark record linkage software"
 readme = "README.md"
 requires-python = ">=3.10"
