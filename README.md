@@ -7,6 +7,9 @@ hlink is a Python package that provides a flexible, configuration-driven solutio
 It is used at [IPUMS](https://www.ipums.org/) to link U.S. historical census data, but can be applied to any record linkage job. 
 A paper on the creation and applications of this program on historical census data can be found at <https://www.tandfonline.com/doi/full/10.1080/01615440.2021.1985027>.
 
+### Suggested Citation
+Wellington, J., R. Harper, and K.J. Thompson. 2022. "hlink." https://github.com/ipums/hlink: Institute for Social Research and Data Innovation, University of Minnesota.
+
 ## Installation
 
 hlink runs on Python 3.10.
