@@ -19,7 +19,7 @@ with `type`, there may be additional attributes used by the transform.
 These vary by type, and additional information is given for each type of transform
 below. Often an additional attribute is just named `value` or `values`.
 
-## `add_to_a`
+## add_to_a
 
 Add the given `value` to a column from dataset A.
 
@@ -29,7 +29,7 @@ Maps numerical → numerical.
 transforms = [ { type = "add_to_a", value = 11 } ]
 ```
 
-## `concat_to_a`
+## concat_to_a
 
 Concatenate the string `value` to the end of a column in dataset A.
 
@@ -40,7 +40,7 @@ transforms = [ { type = "concat_to_a", value = " "} ]
 ```
 
 
-## `concat_to_b`
+## concat_to_b
 
 Concatenate the string `value` to the end of a column in dataset B.
 
@@ -51,7 +51,7 @@ transforms = [ { type = "concat_to_b", value = " "} ]
 ```
 
 
-## `lowercase_strip`
+## lowercase_strip
 
 Used in name cleaning. Convert alphabetical characters to lower-case and strip white
 space characters from the start and end of the strings in the column.
@@ -62,7 +62,7 @@ Maps string → string.
 transforms = [ { type = "lowercase_strip"} ]
 ```
 
-## `rationalize_name_words`
+## rationalize_name_words
 
 Used in name cleaning. Replace the characters `?`, `*`, and `-` with spaces. Since
 people's names in raw census data can contain these characters, replacing these characters
@@ -75,7 +75,7 @@ transforms = [ { type = "rationalize_name_words"} ]
 ```
 
 
-## `remove_qmark_hyphen`
+## remove_qmark_hyphen
 
 Used in name cleaning. Remove the characters `?` and `-` from strings in the column.
 
@@ -85,7 +85,7 @@ Maps string → string.
 transforms = [ { type = "remove_qmark_hyphen"} ]
 ```
 
-## `remove_punctuation`
+## remove_punctuation
 
 Remove most punctuation from strings in the column. This transform removes these characters:
 `? - \ / " ' : , . [ ] { }`.
@@ -96,7 +96,7 @@ Maps string → string.
 transforms = [ { type = "remove_punctuation"} ]
 ```
 
-## `replace_apostrophe`
+## replace_apostrophe
 
 Used in name cleaning. Replace each apostrophe `'` with a space.
 
@@ -107,7 +107,7 @@ transforms = [ { type = "replace_apostrophe"} ]
 
 ```
 
-##  `remove_alternate_names`
+## remove_alternate_names
 
 Used in name cleaning. If a string in the column contains the string ` or ` ("or" surrounded by spaces),
 then remove the ` or ` and all following characters.
@@ -118,7 +118,7 @@ Maps string → string.
 transforms = [ { type = "remove_alternate_names"} ]
 ```
 
-## `remove_suffixes`
+## remove_suffixes
 
 Used in name cleaning. Given a list of suffixes, remove them from the strings in the column.
 
@@ -128,7 +128,7 @@ Maps string → string.
 transforms=[{ type = "remove_suffixes",  values = ["jr", "sr", "ii", "iii"] }]
 ```
 
-## `remove_stop_words`
+## remove_stop_words
 
 Used in name cleaning. Remove last words from names such as street names.
 
@@ -140,7 +140,7 @@ transforms=[
 ]
 ```
 
-## `remove_prefixes`
+## remove_prefixes
 
 Used in name cleaning. Remove prefixes like "Ms.", "Mr.", or "Mrs." from names.
 
@@ -151,7 +151,7 @@ Maps string → string.
 transforms=[{ type = "remove_prefixes", values = ["ah"]}]
 ```
 
-## `condense_strip_whitespace`
+## condense_strip_whitespace
 
 Used in name cleaning. Take white space that may be more than one character or contain
 non-space characters and replace it with a single space.
@@ -162,7 +162,7 @@ Maps string → string.
 transforms=[{ type = "condense_strip_whitespace"}]
 ```
 
-## `remove_one_letter_names`
+## remove_one_letter_names
 
 Used in name cleaning. If a name is a single character, remove it and leave the white space behind.
 
@@ -172,7 +172,7 @@ Maps string → string.
 transforms=[{ type = "remove_one_letter_names"}]
 ```
 
-## `split`
+## split
 
 Split the column value on space characters.
 
@@ -185,7 +185,7 @@ column_name = "namefrst_clean"
 transforms = [ { type = "split" } ]
 ```
 
-## `array_index`
+## array_index
 
 If the column contains an array, select the element at the given position.
 
@@ -203,7 +203,7 @@ transforms = [
 ]
 ```
 
-## `mapping`
+## mapping
 
 Map single or multiple values to a single output value, otherwise known as a "recoding."
 
@@ -224,7 +224,7 @@ transforms=[
 ]
 ```
 
-## `substring`
+## substring
 
 Replace a column with a substring of the data in the column.
 
@@ -236,7 +236,7 @@ transforms = [
 ]
  ```
 
-## `divide_by_int`
+## divide_by_int
 
 Divide data in a column by an integer value. It may leave a non-integer result.
 
@@ -258,7 +258,7 @@ transforms = [
 ```
 
 
-## `when_value`
+## when_value
 
 Apply conditional logic to replacement of values in a column. Works like the SQL `if()` or `case()` expressions in the SQL `select` clause.
 When the value of a column is `value` replace it with `if_value`. Otherwise replace it with `else_value`.
@@ -275,7 +275,7 @@ transforms = [
 ```
 
 
-## `get_floor`
+## get_floor
 
 Round down to the nearest whole number.
 
