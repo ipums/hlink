@@ -2,8 +2,6 @@
 
 Each header below represents a column mapping transform type. Transforms are used in the context of the `column_mappings` list.
 Each transform operates on a single input column and outputs a single output column.
-Input and output column types are listed in the format "Maps input column type → output column type".
-The letters T and U represent arbitrary column types.
 
 Some transforms are suffixed by "a" or "b". These suffixes mean that the transforms apply
 to columns from only one of the two datasets to be linked (dataset A or dataset B).
@@ -11,13 +9,26 @@ Most transforms operate on both dataset A and dataset B independently.
 
 More than one transform can be applied to a column. Transforms apply in the order that
 they're listed in the configuration file, so the output of one transform may be the input of another.
+Input and output column types are listed in the format "Maps input column type → output column type".
+The letters T and U represent arbitrary column types.
 
-Each transform applies to the column specified by the `column_name` attribute in
-the configuration file under its `[[column_mappings]]` section. The `transforms` attribute
-indicates the type of the transform, which is one of the names listed below. Along
-with `type`, there may be additional attributes used by the transform.
-These vary by type, and additional information is given for each type of transform
-below. Often an additional attribute is just named `value` or `values`.
+Each column mapping applies to the column specified by the `column_name` attribute in
+the configuration file under its `[[column_mappings]]` section. The output column
+name is specified by the `alias` attribute, and the `transforms` attribute lists the transforms to apply. Along
+with `type`, which must be one of the names listed below, there may be additional attributes used by a transform.
+These vary by type, and additional information is given for each type of transform in its section
+below. Often attributes are just named `value` or `values` if there is only one attribute expected.
+
+```
+# An example column mappings section
+[[column_mappings]]
+# Name of the output column
+alias = "namefrst_split"
+# Name of the input column
+column_name = "namefrst_clean"
+# List of transforms to apply
+transforms = [{ type = "split" }]
+```
 
 ## add_to_a
 
