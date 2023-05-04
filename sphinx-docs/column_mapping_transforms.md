@@ -2,7 +2,7 @@
 
 Each header below represents a column mapping transform type. Transforms are used in the context of the `column_mappings` list.
 Each transform operates on a single input column and outputs a single output column.
-Input and output column types are listed in the format (input column type -> output column type).
+Input and output column types are listed in the format "Maps input column type → output column type".
 The letters T and U represent arbitrary column types.
 
 Some transforms are suffixed by "a" or "b". These suffixes mean that the transforms apply
@@ -19,156 +19,164 @@ with `type`, there may be additional attributes used by the transform.
 These vary by type, and additional information is given for each type of transform
 below. Often an additional attribute is just named `value` or `values`.
 
-## `add_to_a` (numerical -> numerical)
+## `add_to_a`
 
 Add the given `value` to a column from dataset A.
+
+Maps numerical → numerical.
 
 ```
 transforms = [ { type = "add_to_a", value = 11 } ]
 ```
 
-## `concat_to_a` (string -> string)
+## `concat_to_a`
 
 Concatenate the string `value` to the end of a column in dataset A.
+
+Maps string → string.
 
 ```
 transforms = [ { type = "concat_to_a", value = " "} ]
 ```
 
-## `concat_to_b` (string -> string)
+
+## `concat_to_b`
 
 Concatenate the string `value` to the end of a column in dataset B.
+
+Maps string → string.
 
 ```
 transforms = [ { type = "concat_to_b", value = " "} ]
 ```
 
-## `lowercase_strip` (string -> string)
 
-Used in name cleaning. 
+## `lowercase_strip`
 
-Convert alphabetical characters to lower-case and strip white space characters from the start and end of the strings in the column.
+Used in name cleaning. Convert alphabetical characters to lower-case and strip white
+space characters from the start and end of the strings in the column.
+
+Maps string → string.
 
 ```
 transforms = [ { type = "lowercase_strip"} ]
 ```
 
-## `rationalize_name_words` (string -> string)
+## `rationalize_name_words`
 
-Used in name cleaning.
+Used in name cleaning. Replace the characters `?`, `*`, and `-` with spaces. Since
+people's names in raw census data can contain these characters, replacing these characters
+can lead to better matching.
 
-Replace the characters `?`, `*`, and `-` with spaces. Since people's names in raw census data can contain these
-characters, replacing these characters can lead to better matching.
+Maps string → string.
 
 ```
 transforms = [ { type = "rationalize_name_words"} ]
 ```
 
 
-## `remove_qmark_hyphen` (string -> string)
+## `remove_qmark_hyphen`
 
-Used in name cleaning.
+Used in name cleaning. Remove the characters `?` and `-` from strings in the column.
 
-Remove the characters `?` and `-` from strings in the column.
+Maps string → string.
 
 ```
 transforms = [ { type = "remove_qmark_hyphen"} ]
 ```
 
-## `remove_punctuation` (string -> string)
+## `remove_punctuation`
 
-Remove most punctuation from strings in the column.
+Remove most punctuation from strings in the column. This transform removes these characters:
+`? - \ / " ' : , . [ ] { }`.
 
-This transform removes these characters:
-```
-? - \ / " ' : , . [ ] { }
-```
+Maps string → string.
 
 ```
 transforms = [ { type = "remove_punctuation"} ]
 ```
 
-## `replace_apostrophe` (string -> string)
+## `replace_apostrophe`
 
-Used in name cleaning.
+Used in name cleaning. Replace each apostrophe `'` with a space.
 
-Replace each apostrophe `'` with a space.
+Maps string → string.
 
 ```
 transforms = [ { type = "replace_apostrophe"} ]
 
 ```
 
+##  `remove_alternate_names`
 
-##  `remove_alternate_names` (string -> string)
-
-Used in name cleaning.
-
-If a string in the column contains the string ` or ` ("or" surrounded by spaces),
+Used in name cleaning. If a string in the column contains the string ` or ` ("or" surrounded by spaces),
 then remove the ` or ` and all following characters.
+
+Maps string → string.
 
 ```
 transforms = [ { type = "remove_alternate_names"} ]
 ```
 
+## `remove_suffixes`
 
-## `remove_suffixes` (string -> string)
+Used in name cleaning. Given a list of suffixes, remove them from the strings in the column.
 
-Used in name cleaning.
-
-Given a list of suffixes, remove them from the strings in the column.
+Maps string → string.
 
 ```
 transforms=[{ type = "remove_suffixes",  values = ["jr", "sr", "ii", "iii"] }]
 ```
 
-## `remove_stop_words` (string -> string)
+## `remove_stop_words`
 
-Used in name cleaning.
+Used in name cleaning. Remove last words from names such as street names.
 
-Remove last words from names such as street names.
+Maps string → string.
 
 ```
 transforms=[
 {type = "remove_stop_words", values = ['avenue', 'blvd', 'circle', 'court', 'road', 'street']}
-]  
+]
 ```
 
-## `remove_prefixes` (string -> string)
+## `remove_prefixes`
 
-Used in name cleaning.
+Used in name cleaning. Remove prefixes like "Ms.", "Mr.", or "Mrs." from names.
 
-Remove prefixes like "Ms.", "Mr.", or "Mrs." from names. In some census data, "ah" is such a prefix from Chinese names.
+Maps string → string.
 
 ```
+# In some census data, "ah" is a prefix from Chinese names.
 transforms=[{ type = "remove_prefixes", values = ["ah"]}]
 ```
 
-## `condense_strip_whitespace` (string -> string)
+## `condense_strip_whitespace`
 
-Used in name cleaning.
+Used in name cleaning. Take white space that may be more than one character or contain
+non-space characters and replace it with a single space.
 
-Take white space that may be more than one character or contain non-space characters and replace it with a single space.
+Maps string → string.
 
 ```
 transforms=[{ type = "condense_strip_whitespace"}]
 ```
 
-## `remove_one_letter_names` (string -> string)
+## `remove_one_letter_names`
 
-Used in name cleaning.
+Used in name cleaning. If a name is a single character, remove it and leave the white space behind.
 
-If a name is a single character, remove it and leave the white space behind.
+Maps string → string.
 
 ```
 transforms=[{ type = "remove_one_letter_names"}]
 ```
 
-
-## `split` (string -> array of string)
-
+## `split`
 
 Split the column value on space characters.
+
+Maps string → array of string.
 
 ```
 [[column_mappings]]
@@ -176,15 +184,14 @@ alias = "namefrst_split"
 column_name = "namefrst_clean"
 transforms = [ { type = "split" } ]
 ```
- 
- 
- 
 
-## `array_index` (array of T -> T)
+## `array_index`
 
 If the column contains an array, select the element at the given position.
 
 This can be used as the input to another transform. In the example below, the first transform selects the second (index 1) item from  the "namefrst_split" column that contains a set of names split on white space. Then the substring 0,1 is selected, which gives the first initial of the person's probable middle name.
+
+Maps array of T → T.
 
 ```
 [[column_mappings]]
@@ -196,9 +203,11 @@ transforms = [
 ]
 ```
 
-## `mapping` (T -> U)
+## `mapping`
 
 Map single or multiple values to a single output value, otherwise known as a "recoding."
+
+Maps T → U.
 
 ```
 [[column_mappings]]
@@ -215,9 +224,11 @@ transforms=[
 ]
 ```
 
-## `substring` (string -> string)
+## `substring`
 
 Replace a column with a substring of the data in the column.
+
+Maps string → string.
 
 ```
 transforms = [
@@ -225,14 +236,16 @@ transforms = [
 ]
  ```
 
-## `divide_by_int` (numerical -> numerical)
+## `divide_by_int`
 
-Divide data in a column by an integer value. It may leave a non-integer result. 
+Divide data in a column by an integer value. It may leave a non-integer result.
 
 For instance, the following example takes the birthplace variable and converts it
 from the detailed version to the general version. The two least significant digits
 are detailed birthplace information; to make the more general version, we simply drop
 them by dividing by 100 and rounding to the lowest whole number (floor function).
+
+Maps numerical → numerical.
 
 ```
 [[column_mappings]]
@@ -245,14 +258,14 @@ transforms = [
 ```
 
 
-## `when_value` (T -> U)
-
+## `when_value`
 
 Apply conditional logic to replacement of values in a column. Works like the SQL `if()` or `case()` expressions in the SQL `select` clause.
-
 When the value of a column is `value` replace it with `if_value`. Otherwise replace it with `else_value`.
 
-This example replaces all "race" IPUMS codes with 0 (white) or 1 (non-white). An IPUMS code of 100 is the "white" race category.
+The following example replaces all "race" IPUMS codes with 0 (white) or 1 (non-white). An IPUMS code of 100 is the "white" race category.
+
+Maps T → U.
 
 ```
 column_name = "race"
@@ -262,15 +275,17 @@ transforms = [
 ```
 
 
-## `get_floor` (numerical -> numerical)
+## `get_floor`
 
-Round down to the nearest whole number. 
+Round down to the nearest whole number.
 
 This example produces the general version of the IPUMS "relate" variable. The variable
 is coded such that detailed categories are between the hundreds (300 is child of household
 head, 301 is simply 'child', 302 is adopted child, 303 is step-child for instance).
 The general categories are usually all that's needed (1 == household head, 2 == spouse,
 3 == child, 4 == child-in-law, 5 == parent, 6 == parent-in-law, 7== sibling, 12 == not related to head).
+
+Maps numerical → numerical.
 
 ```
 [[column_mappings]]
@@ -281,4 +296,3 @@ transforms = [
   { type = "get_floor" }
 ]
 ```
-
