@@ -51,26 +51,26 @@
 </div>
 </li>
 <li><p>Run the preprocessing and training link tasks:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink $ run_all_steps preprocessing training
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink<span class="w"> </span>$<span class="w"> </span>run_all_steps<span class="w"> </span>preprocessing<span class="w"> </span>training
 </pre></div>
 </div>
 </li>
 <li><p>Ask the program what the arguments for the <code class="docutils literal notranslate"><span class="pre">csv</span></code> command are:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink $ ? csv
-Writes a dataframe out to csv.
-     Arg <span class="m">1</span>: dataframe
-     Arg <span class="m">2</span>: path
-     Arg <span class="m">3</span> <span class="o">(</span>optional<span class="o">)</span>: <span class="c1"># of partitions</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink<span class="w"> </span>$<span class="w"> </span>?<span class="w"> </span>csv
+Writes<span class="w"> </span>a<span class="w"> </span>dataframe<span class="w"> </span>out<span class="w"> </span>to<span class="w"> </span>csv.
+<span class="w">     </span>Arg<span class="w"> </span><span class="m">1</span>:<span class="w"> </span>dataframe
+<span class="w">     </span>Arg<span class="w"> </span><span class="m">2</span>:<span class="w"> </span>path
+<span class="w">     </span>Arg<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="o">(</span>optional<span class="o">)</span>:<span class="w"> </span><span class="c1"># of partitions</span>
 </pre></div>
 </div>
 </li>
 <li><p>Export the results using the <code class="docutils literal notranslate"><span class="pre">csv</span></code> command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink $ csv training_features /my/output/training_data_1900_1910_HLINK_FEATURES.csv
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink<span class="w"> </span>$<span class="w"> </span>csv<span class="w"> </span>training_features<span class="w"> </span>/my/output/training_data_1900_1910_HLINK_FEATURES.csv
 </pre></div>
 </div>
 </li>
 <li><p>Continue with other linking work you might need to do with this year pair, otherwise shut down the hlink framework for this pair of linking years:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink $ q
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink<span class="w"> </span>$<span class="w"> </span>q
 </pre></div>
 </div>
 </li>
@@ -137,7 +137,7 @@ Writes a dataframe out to csv.
 </div>
 </li>
 <li><p>Launch the hlink program in interactive mode:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink --conf<span class="o">=</span>full_count_1900_1910 --cores <span class="m">50</span> --executor_memory 50G
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hlink<span class="w"> </span>--conf<span class="o">=</span>full_count_1900_1910<span class="w"> </span>--cores<span class="w"> </span><span class="m">50</span><span class="w"> </span>--executor_memory<span class="w"> </span>50G
 </pre></div>
 </div>
 </li>
@@ -238,7 +238,7 @@ hlink $ csv repeat_FNs /my/output/1900_1910_potential_FNs.csv
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
       <a href="_sources/use_examples.md.txt"
