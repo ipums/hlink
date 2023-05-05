@@ -27,7 +27,7 @@ alias = "namefrst_split"
 # Name of the input column
 column_name = "namefrst_clean"
 # List of transforms to apply
-transforms = [{ type = "split" }]
+transforms = [{type = "split"}]
 ```
 
 ## add_to_a
@@ -37,7 +37,7 @@ Add the given `value` to a column from dataset A.
 Maps numerical → numerical.
 
 ```
-transforms = [ { type = "add_to_a", value = 11 } ]
+transforms = [{type = "add_to_a", value = 11}]
 ```
 
 ## concat_to_a
@@ -47,7 +47,7 @@ Concatenate the string `value` to the end of a column in dataset A.
 Maps string → string.
 
 ```
-transforms = [ { type = "concat_to_a", value = " "} ]
+transforms = [{type = "concat_to_a", value = " "}]
 ```
 
 
@@ -58,7 +58,7 @@ Concatenate the string `value` to the end of a column in dataset B.
 Maps string → string.
 
 ```
-transforms = [ { type = "concat_to_b", value = " "} ]
+transforms = [{type = "concat_to_b", value = " "}]
 ```
 
 
@@ -70,7 +70,7 @@ space characters from the start and end of the strings in the column.
 Maps string → string.
 
 ```
-transforms = [ { type = "lowercase_strip"} ]
+transforms = [{type = "lowercase_strip"}]
 ```
 
 ## rationalize_name_words
@@ -82,7 +82,7 @@ can lead to better matching.
 Maps string → string.
 
 ```
-transforms = [ { type = "rationalize_name_words"} ]
+transforms = [{type = "rationalize_name_words"}]
 ```
 
 
@@ -93,7 +93,7 @@ Used in name cleaning. Remove the characters `?` and `-` from strings in the col
 Maps string → string.
 
 ```
-transforms = [ { type = "remove_qmark_hyphen"} ]
+transforms = [{type = "remove_qmark_hyphen"}]
 ```
 
 ## remove_punctuation
@@ -104,7 +104,7 @@ Remove most punctuation from strings in the column. This transform removes these
 Maps string → string.
 
 ```
-transforms = [ { type = "remove_punctuation"} ]
+transforms = [{type = "remove_punctuation"}]
 ```
 
 ## replace_apostrophe
@@ -114,7 +114,7 @@ Used in name cleaning. Replace each apostrophe `'` with a space.
 Maps string → string.
 
 ```
-transforms = [ { type = "replace_apostrophe"} ]
+transforms = [{type = "replace_apostrophe"}]
 
 ```
 
@@ -126,7 +126,7 @@ then remove the ` or ` and all following characters.
 Maps string → string.
 
 ```
-transforms = [ { type = "remove_alternate_names"} ]
+transforms = [{type = "remove_alternate_names"}]
 ```
 
 ## remove_suffixes
@@ -136,7 +136,12 @@ Used in name cleaning. Given a list of suffixes, remove them from the strings in
 Maps string → string.
 
 ```
-transforms=[{ type = "remove_suffixes",  values = ["jr", "sr", "ii", "iii"] }]
+transforms = [
+    {
+        type = "remove_suffixes",
+        values = ["jr", "sr", "ii", "iii"]
+    }
+]
 ```
 
 ## remove_stop_words
@@ -146,8 +151,11 @@ Used in name cleaning. Remove last words from names such as street names.
 Maps string → string.
 
 ```
-transforms=[
-{type = "remove_stop_words", values = ['avenue', 'blvd', 'circle', 'court', 'road', 'street']}
+transforms = [
+    {
+        type = "remove_stop_words",
+        values = ['avenue', 'blvd', 'circle', 'court', 'road', 'street']
+    }
 ]
 ```
 
@@ -159,7 +167,7 @@ Maps string → string.
 
 ```
 # In some census data, "ah" is a prefix from Chinese names.
-transforms=[{ type = "remove_prefixes", values = ["ah"]}]
+transforms = [{type = "remove_prefixes", values = ["ah"]}]
 ```
 
 ## condense_strip_whitespace
@@ -170,7 +178,7 @@ non-space characters and replace it with a single space.
 Maps string → string.
 
 ```
-transforms=[{ type = "condense_strip_whitespace"}]
+transforms = [{type = "condense_strip_whitespace"}]
 ```
 
 ## remove_one_letter_names
@@ -180,7 +188,7 @@ Used in name cleaning. If a name is a single character, remove it and leave the 
 Maps string → string.
 
 ```
-transforms=[{ type = "remove_one_letter_names"}]
+transforms = [{type = "remove_one_letter_names"}]
 ```
 
 ## split
@@ -193,7 +201,7 @@ Maps string → array of string.
 [[column_mappings]]
 alias = "namefrst_split"
 column_name = "namefrst_clean"
-transforms = [ { type = "split" } ]
+transforms = [{type = "split"}]
 ```
 
 ## array_index
@@ -209,8 +217,8 @@ Maps array of T → T.
 alias = "namefrst_mid_init"
 column_name = "namefrst_split"
 transforms = [
- { type = "array_index", value = 1},
- { type = "substring", values = [0, 1]}
+    {type = "array_index", value = 1},
+    {type = "substring", values = [0, 1]}
 ]
 ```
 
@@ -224,14 +232,14 @@ Maps T → U.
 [[column_mappings]]
 column_name = "birthyr"
 alias = "clean_birthyr"
-transforms=[
-  {
-    type = "mapping",
-    values = [
-               {"from"=[9999,1999], "to" = ""},
-               {"from" = -9998, "to" = 9999}
-    ]
-  }
+transforms = [
+    {
+        type = "mapping",
+        values = [
+            {"from"=[9999,1999], "to" = ""},
+            {"from" = -9998, "to" = 9999}
+        ]
+    }
 ]
 ```
 
@@ -243,7 +251,7 @@ Maps string → string.
 
 ```
 transforms = [
-  { type = "substring", values = [0, 1]}
+    {type = "substring", values = [0, 1]}
 ]
  ```
 
@@ -263,8 +271,8 @@ Maps numerical → numerical.
 column_name = "bpl"
 alias = "bpl_root"
 transforms = [
-  { type = "divide_by_int", value = 100 },
-  { type = "get_floor" }
+    {type = "divide_by_int", value = 100},
+    {type = "get_floor"}
 ]
 ```
 
@@ -281,7 +289,7 @@ Maps T → U.
 ```
 column_name = "race"
 transforms = [
-  { type = "when_value", value = 100, if_value = 0, else_value = 1}
+    {type = "when_value", value = 100, if_value = 0, else_value = 1}
 ]
 ```
 
@@ -303,7 +311,7 @@ Maps numerical → numerical.
 alias = "relate_div_100"
 column_name = "relate"
 transforms = [
-  { type = "divide_by_int", value = 100 },
-  { type = "get_floor" }
+    {type = "divide_by_int", value = 100},
+    {type = "get_floor"}
 ]
 ```

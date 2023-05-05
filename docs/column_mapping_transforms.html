@@ -58,14 +58,14 @@ below. Often attributes are just named <code class="docutils literal notranslate
 <span class="c1"># Name of the input column</span>
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;namefrst_clean&quot;</span>
 <span class="c1"># List of transforms to apply</span>
-<span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span> <span class="p">}]</span>
+<span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 <section id="add-to-a">
 <h2>add_to_a<a class="headerlink" href="#add-to-a" title="Permalink to this heading">¶</a></h2>
 <p>Add the given <code class="docutils literal notranslate"><span class="pre">value</span></code> to a column from dataset A.</p>
 <p>Maps numerical → numerical.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;add_to_a&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">11</span> <span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;add_to_a&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">11</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -73,7 +73,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 <h2>concat_to_a<a class="headerlink" href="#concat-to-a" title="Permalink to this heading">¶</a></h2>
 <p>Concatenate the string <code class="docutils literal notranslate"><span class="pre">value</span></code> to the end of a column in dataset A.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;concat_to_a&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;concat_to_a&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -81,7 +81,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 <h2>concat_to_b<a class="headerlink" href="#concat-to-b" title="Permalink to this heading">¶</a></h2>
 <p>Concatenate the string <code class="docutils literal notranslate"><span class="pre">value</span></code> to the end of a column in dataset B.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;concat_to_b&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;concat_to_b&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -90,7 +90,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 <p>Used in name cleaning. Convert alphabetical characters to lower-case and strip white
 space characters from the start and end of the strings in the column.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;lowercase_strip&quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;lowercase_strip&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -100,7 +100,7 @@ space characters from the start and end of the strings in the column.</p>
 people’s names in raw census data can contain these characters, replacing these characters
 can lead to better matching.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;rationalize_name_words&quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;rationalize_name_words&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -108,7 +108,7 @@ can lead to better matching.</p>
 <h2>remove_qmark_hyphen<a class="headerlink" href="#remove-qmark-hyphen" title="Permalink to this heading">¶</a></h2>
 <p>Used in name cleaning. Remove the characters <code class="docutils literal notranslate"><span class="pre">?</span></code> and <code class="docutils literal notranslate"><span class="pre">-</span></code> from strings in the column.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_qmark_hyphen&quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_qmark_hyphen&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -117,7 +117,7 @@ can lead to better matching.</p>
 <p>Remove most punctuation from strings in the column. This transform removes these characters:
 <code class="docutils literal notranslate"><span class="pre">?</span> <span class="pre">-</span> <span class="pre">\</span> <span class="pre">/</span> <span class="pre">&quot;</span> <span class="pre">'</span> <span class="pre">:</span> <span class="pre">,</span> <span class="pre">.</span> <span class="pre">[</span> <span class="pre">]</span> <span class="pre">{</span> <span class="pre">}</span></code>.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_punctuation&quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_punctuation&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -125,7 +125,7 @@ can lead to better matching.</p>
 <h2>replace_apostrophe<a class="headerlink" href="#replace-apostrophe" title="Permalink to this heading">¶</a></h2>
 <p>Used in name cleaning. Replace each apostrophe <code class="docutils literal notranslate"><span class="pre">'</span></code> with a space.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;replace_apostrophe&quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;replace_apostrophe&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -134,7 +134,7 @@ can lead to better matching.</p>
 <p>Used in name cleaning. If a string in the column contains the string <code class="docutils literal notranslate"><span class="pre">or</span></code> (”or” surrounded by spaces),
 then remove the <code class="docutils literal notranslate"><span class="pre">or</span></code> and all following characters.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_alternate_names&quot;</span><span class="p">}</span> <span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_alternate_names&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -142,7 +142,12 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 <h2>remove_suffixes<a class="headerlink" href="#remove-suffixes" title="Permalink to this heading">¶</a></h2>
 <p>Used in name cleaning. Given a list of suffixes, remove them from the strings in the column.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span><span class="o">=</span><span class="p">[{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_suffixes&quot;</span><span class="p">,</span>  <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;jr&quot;</span><span class="p">,</span> <span class="s2">&quot;sr&quot;</span><span class="p">,</span> <span class="s2">&quot;ii&quot;</span><span class="p">,</span> <span class="s2">&quot;iii&quot;</span><span class="p">]</span> <span class="p">}]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_suffixes&quot;</span><span class="p">,</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;jr&quot;</span><span class="p">,</span> <span class="s2">&quot;sr&quot;</span><span class="p">,</span> <span class="s2">&quot;ii&quot;</span><span class="p">,</span> <span class="s2">&quot;iii&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -150,8 +155,11 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 <h2>remove_stop_words<a class="headerlink" href="#remove-stop-words" title="Permalink to this heading">¶</a></h2>
 <p>Used in name cleaning. Remove last words from names such as street names.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span><span class="o">=</span><span class="p">[</span>
-<span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_stop_words&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;avenue&#39;</span><span class="p">,</span> <span class="s1">&#39;blvd&#39;</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="s1">&#39;court&#39;</span><span class="p">,</span> <span class="s1">&#39;road&#39;</span><span class="p">,</span> <span class="s1">&#39;street&#39;</span><span class="p">]}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_stop_words&quot;</span><span class="p">,</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;avenue&#39;</span><span class="p">,</span> <span class="s1">&#39;blvd&#39;</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="s1">&#39;court&#39;</span><span class="p">,</span> <span class="s1">&#39;road&#39;</span><span class="p">,</span> <span class="s1">&#39;street&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -161,7 +169,7 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 <p>Used in name cleaning. Remove prefixes like “Ms.”, “Mr.”, or “Mrs.” from names.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In some census data, &quot;ah&quot; is a prefix from Chinese names.</span>
-<span class="n">transforms</span><span class="o">=</span><span class="p">[{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_prefixes&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ah&quot;</span><span class="p">]}]</span>
+<span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_prefixes&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ah&quot;</span><span class="p">]}]</span>
 </pre></div>
 </div>
 </section>
@@ -170,7 +178,7 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 <p>Used in name cleaning. Take white space that may be more than one character or contain
 non-space characters and replace it with a single space.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span><span class="o">=</span><span class="p">[{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;condense_strip_whitespace&quot;</span><span class="p">}]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;condense_strip_whitespace&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -178,7 +186,7 @@ non-space characters and replace it with a single space.</p>
 <h2>remove_one_letter_names<a class="headerlink" href="#remove-one-letter-names" title="Permalink to this heading">¶</a></h2>
 <p>Used in name cleaning. If a name is a single character, remove it and leave the white space behind.</p>
 <p>Maps string → string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span><span class="o">=</span><span class="p">[{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_one_letter_names&quot;</span><span class="p">}]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_one_letter_names&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -189,7 +197,7 @@ non-space characters and replace it with a single space.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">column_mappings</span><span class="p">]]</span>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;namefrst_split&quot;</span>
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;namefrst_clean&quot;</span>
-<span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span> <span class="p">}</span> <span class="p">]</span>
+<span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -202,8 +210,8 @@ non-space characters and replace it with a single space.</p>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;namefrst_mid_init&quot;</span>
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;namefrst_split&quot;</span>
 <span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
- <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;array_index&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">},</span>
- <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;substring&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;array_index&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;substring&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -215,14 +223,14 @@ non-space characters and replace it with a single space.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">column_mappings</span><span class="p">]]</span>
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;birthyr&quot;</span>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;clean_birthyr&quot;</span>
-<span class="n">transforms</span><span class="o">=</span><span class="p">[</span>
-  <span class="p">{</span>
-    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;mapping&quot;</span><span class="p">,</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
-               <span class="p">{</span><span class="s2">&quot;from&quot;</span><span class="o">=</span><span class="p">[</span><span class="mi">9999</span><span class="p">,</span><span class="mi">1999</span><span class="p">],</span> <span class="s2">&quot;to&quot;</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
-               <span class="p">{</span><span class="s2">&quot;from&quot;</span> <span class="o">=</span> <span class="o">-</span><span class="mi">9998</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">}</span>
-    <span class="p">]</span>
-  <span class="p">}</span>
+<span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;mapping&quot;</span><span class="p">,</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;from&quot;</span><span class="o">=</span><span class="p">[</span><span class="mi">9999</span><span class="p">,</span><span class="mi">1999</span><span class="p">],</span> <span class="s2">&quot;to&quot;</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;from&quot;</span> <span class="o">=</span> <span class="o">-</span><span class="mi">9998</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span> <span class="o">=</span> <span class="mi">9999</span><span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -232,7 +240,7 @@ non-space characters and replace it with a single space.</p>
 <p>Replace a column with a substring of the data in the column.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;substring&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;substring&quot;</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -249,8 +257,8 @@ them by dividing by 100 and rounding to the lowest whole number (floor function)
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;bpl&quot;</span>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;bpl_root&quot;</span>
 <span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;divide_by_int&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">100</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;get_floor&quot;</span> <span class="p">}</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;divide_by_int&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">},</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;get_floor&quot;</span><span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -263,7 +271,7 @@ When the value of a column is <code class="docutils literal notranslate"><span c
 <p>Maps T → U.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;race&quot;</span>
 <span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;when_value&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">if_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">else_value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;when_value&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">if_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">else_value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -281,8 +289,8 @@ The general categories are usually all that’s needed (1 == household head, 2 =
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;relate_div_100&quot;</span>
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;relate&quot;</span>
 <span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;divide_by_int&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">100</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;get_floor&quot;</span> <span class="p">}</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;divide_by_int&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">},</span>
+    <span class="p">{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;get_floor&quot;</span><span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
 </div>
