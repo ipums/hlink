@@ -224,6 +224,7 @@ def _cli_loop(spark, args, run_conf):
         try:
             main.cmdloop()
             if main.lastcmd == "reload":
+                logging.info("Reloading config file")
                 run_conf = load_conf(args.conf, args.user)
             else:
                 break
