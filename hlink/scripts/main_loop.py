@@ -139,7 +139,7 @@ class Main(Cmd):
 
     @split_and_check_args(0)
     def do_reload(self, split_args):
-        """Hot reload modules.
+        """Reload the config file.
         Usage: reload"""
         return "reload"
 
