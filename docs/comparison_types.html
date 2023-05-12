@@ -820,11 +820,12 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </section>
 <section id="present-both-years">
 <h3>present_both_years<a class="headerlink" href="#present-both-years" title="Permalink to this heading">¶</a></h3>
-<p>Checks whether both column A and column B are present.</p>
+<p>Checks whether column A and column B are both present and both positive (&gt; 0).
+Evaluates to 1 if both are present and positive and 0 otherwise.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The column to check.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The column to check. Must be a column with a numerical type.</p></li>
 </ul>
 </li>
 </ul>
@@ -852,21 +853,29 @@ OR if first name A is not empty/null and is the same as middle initial B.</p>
 </section>
 <section id="neither-are-null">
 <h3>neither_are_null<a class="headerlink" href="#neither-are-null" title="Permalink to this heading">¶</a></h3>
-<p>Checks that neither column A nor column B is null.</p>
+<p>Checks that neither column A nor column B is null or the empty string <code class="docutils literal notranslate"><span class="pre">''</span></code>.
+Evaluates to 1 if neither column is null or <code class="docutils literal notranslate"><span class="pre">''</span></code> and evaluates to 0 otherwise.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The column to check.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The column of type string to check.</p></li>
 </ul>
 </li>
 </ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">comparison_features</span><span class="p">]]</span>
+<span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;mpres&quot;</span>
+<span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;m_namefrst&quot;</span>
+<span class="n">comparison_type</span> <span class="o">=</span> <span class="s2">&quot;neither_are_null&quot;</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">true</span>
+</pre></div>
+</div>
 </section>
 <section id="present-and-matching-categorical">
 <h3>present_and_matching_categorical<a class="headerlink" href="#present-and-matching-categorical" title="Permalink to this heading">¶</a></h3>
 <p>Checks that both column A and column B are present and that they match according to SQL’s <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">DISTINCT</span> <span class="pre">FROM</span></code>. Evaluates to 0, 1, or 2:</p>
-<p>0 -&gt; columns are both present and match</p>
-<p>1 -&gt; columns are both present but are distinct</p>
-<p>2 -&gt; one or both columns are missing</p>
+<p>0 → columns are both present and match</p>
+<p>1 → columns are both present but are distinct</p>
+<p>2 → one or both columns are missing</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>
