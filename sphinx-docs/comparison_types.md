@@ -646,10 +646,11 @@ categorical = true
 
 ### present_both_years
 
-Checks whether both column A and column B are present.
+Checks whether column A and column B are both present and both positive (> 0).
+Evaluates to 1 if both are present and positive and 0 otherwise.
 
 * Attributes:
-  * `column_name` -- Type: `string`. The column to check.
+  * `column_name` -- Type: `string`. The column to check. Must be a column with a numerical type.
 
 ```
 [[comparison_features]]
@@ -675,20 +676,29 @@ comparison_type = "present_both_years"
 
 ### neither_are_null
 
-Checks that neither column A nor column B is null.
+Checks that neither column A nor column B is null or the empty string `''`.
+Evaluates to 1 if neither column is null or `''` and evaluates to 0 otherwise.
 
 * Attributes:
-  * `column_name` -- Type: `string`. The column to check.
+  * `column_name` -- Type: `string`. The column of type string to check.
+
+```
+[[comparison_features]]
+alias = "mpres"
+column_name = "m_namefrst"
+comparison_type = "neither_are_null"
+categorical = true
+```
 
 ### present_and_matching_categorical
 
 Checks that both column A and column B are present and that they match according to SQL's `IS DISTINCT FROM`. Evaluates to 0, 1, or 2:
 
-0 -> columns are both present and match
+0 → columns are both present and match
 
-1 -> columns are both present but are distinct
+1 → columns are both present but are distinct
 
-2 -> one or both columns are missing
+2 → one or both columns are missing
 
 * Attributes:
   * `column_name` -- Type: `string`. Required. The column to check.
