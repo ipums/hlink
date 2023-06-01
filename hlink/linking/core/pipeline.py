@@ -14,6 +14,7 @@ import hlink.linking.transformers.interaction_transformer
 import hlink.linking.transformers.float_cast_transformer
 import logging
 
+
 def generate_pipeline_stages(conf, ind_vars, tf, tconf):
     """Creates a Spark ML pipeline from the pipeline features.
     Parameters
@@ -179,8 +180,10 @@ def _calc_categorical_features(
 
     # Check for categorical features in all comparison features
     for comparison_feature in comparison_features:
-        if comparison_feature["alias"] in cols and comparison_feature.get("categorical", False):
-                categorical_comparison_features.append(comparison_feature["alias"])
+        if comparison_feature["alias"] in cols and comparison_feature.get(
+            "categorical", False
+        ):
+            categorical_comparison_features.append(comparison_feature["alias"])
 
     # Check for categorical features in the pipeline-generated features (if exist)
 
@@ -192,7 +195,7 @@ def _calc_categorical_features(
                 categorical_pipeline_features.append(pipeline_feature["output_column"])
     logging.info(f"Categorical Comparison features: {categorical_pipeline_features}")
     logging.info(f"Categorical Pipeline features: {categorical_pipeline_features}")
-    
+
     return categorical_comparison_features, categorical_pipeline_features
 
 
