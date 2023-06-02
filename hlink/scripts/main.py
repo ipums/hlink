@@ -5,7 +5,6 @@
 
 import argparse
 import getpass
-from importlib import reload
 import logging
 import os
 from pathlib import Path
@@ -225,29 +224,12 @@ def _cli_loop(spark, args, run_conf):
         try:
             main.cmdloop()
             if main.lastcmd == "reload":
-                _reload_modules()
-                # Reload modules twice in order to fix import problem
-                # with the _*.py files in the linking modules
-                _reload_modules()
+                logging.info("Reloading config file")
                 run_conf = load_conf(args.conf, args.user)
             else:
                 break
         except Exception as err:
             report_and_log_error("", err)
-
-
-def _reload_modules():
-    no_reloads = []
-    mods_to_reload_raw = [name for name, mod in sys.modules.items()]
-    # We need to order the modules to reload the _*.py files in the
-    # linking modules before loading the __init__.py files.
-    mods_to_reload_ordered = sorted(mods_to_reload_raw)[::-1]
-    for name in mods_to_reload_ordered:
-        if name.startswith("hlink") and name not in no_reloads:
-            reload(sys.modules[name])
-
-    # Here we should reset the classes in link_run.link_task_choices with
-    # the newly reloaded classes.
 
 
 def _setup_logging(conf):
