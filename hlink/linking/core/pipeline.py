@@ -12,6 +12,7 @@ from pyspark.ml.feature import (
 )
 import hlink.linking.transformers.interaction_transformer
 import hlink.linking.transformers.float_cast_transformer
+import logging
 
 
 def generate_pipeline_stages(conf, ind_vars, tf, tconf):
@@ -178,12 +179,11 @@ def _calc_categorical_features(
     cols = set(cols_to_pass + ind_vars)
 
     # Check for categorical features in all comparison features
-    for x in comparison_features:
-        if x["alias"] in cols:
-            if "categorical" in x.keys():
-                categorical_comparison_features.append(x["alias"])
-        else:
-            continue
+    for comparison_feature in comparison_features:
+        if comparison_feature["alias"] in cols and comparison_feature.get(
+            "categorical", False
+        ):
+            categorical_comparison_features.append(comparison_feature["alias"])
 
     # Check for categorical features in the pipeline-generated features (if exist)
 
@@ -193,6 +193,8 @@ def _calc_categorical_features(
                 "categorical", False
             ):
                 categorical_pipeline_features.append(pipeline_feature["output_column"])
+    logging.info(f"Categorical Comparison features: {categorical_comparison_features}")
+    logging.info(f"Categorical Pipeline features: {categorical_pipeline_features}")
 
     return categorical_comparison_features, categorical_pipeline_features
 
