@@ -193,7 +193,7 @@ def _calc_categorical_features(
                 "categorical", False
             ):
                 categorical_pipeline_features.append(pipeline_feature["output_column"])
-    logging.info(f"Categorical Comparison features: {categorical_pipeline_features}")
+    logging.info(f"Categorical Comparison features: {categorical_comparison_features}")
     logging.info(f"Categorical Pipeline features: {categorical_pipeline_features}")
 
     return categorical_comparison_features, categorical_pipeline_features
