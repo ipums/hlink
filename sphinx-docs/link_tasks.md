@@ -4,12 +4,23 @@
 
 ### Overview
 
-Read in raw data and prepare it for linking.
+Read in raw data and prepare it for linking. This task may include a variety of
+transformations on the data, such as stripping out whitespace and normalizing strings
+that have common abbreviations. The same transformations are applied to both input
+datasets.
 
 ### Task steps
 
-* Step 0: Register raw dataframes with the program. Read raw data in from .parquet or .csv files.
+* Step 0: Read raw data in from Parquet or CSV Files. Register the raw dataframes with the program. 
 * Step 1: Prepare the dataframes for linking. Perform substitutions, transformations, and column mappings as requested.
+
+### Related Configuration Sections
+
+* The [`datasource_a` and `datasource_b`](config.html#data-sources) sections specify where to find the input data.
+* [`column_mappings`](column_mapping_transforms.html), [`feature_selections`](feature_selection_transforms.html),
+and [`substitution_columns`](substitutions.html) may all be used to define transformations on the input data.
+* The [`filter`](config.html#filter) section may be used to filter some records out of the input data
+as they are read in.
 
 ## Training and Household Training
 
@@ -29,12 +40,24 @@ The steps in each of these tasks are the same:
 ### Overview
 
 Run the linking algorithm, generating a table with potential matches between individuals in the two datasets.
+This is the core of hlink's work and may take the longest of all of the tasks. To reduce
+the total number of comparisons needed during matching, blocking may be performed
+to separate records into buckets before matching.
 
 ### Task steps
 
-* Step 0: Perform blocking, exploding any columns that need it.
-* Step 1: Run the matching algorithm, outputting potential matches to a `potential_matches` table.
+* Step 0: Perform blocking, separating records into different buckets to reduce the total number
+of comparisons needed during matching. Some columns may be "exploded" here if needed.
+* Step 1: Run the matching algorithm, outputting potential matches to the `potential_matches` table.
 * Step 2: Score the potential matches with the trained model. This step will be automatically skipped if machine learning is not being used.
+
+### Related Configuration Sections
+
+* The [`potential_matches_universe`](config.html#potential-matches-universe) section may be used to
+provide a universe for matches in the form of a SQL condition. Only records that satisfy the
+condition are eligible for matching.
+* [`blocking`](config.html#blocking) specifies how to block the input records into separate buckets
+before matching.
 
 ## Household Matching
 
