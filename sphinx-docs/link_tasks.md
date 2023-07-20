@@ -39,10 +39,10 @@ The steps in each of these tasks are the same:
 
 ### Overview
 
-Run the linking algorithm, generating a table with potential matches between individuals in the two datasets.
-This is the core of hlink's work and may take the longest of all of the tasks. To reduce
-the total number of comparisons needed during matching, blocking may be performed
-to separate records into buckets before matching.
+Run the linking algorithm, generating a table with potential matches between records in the two datasets.
+This is the core of hlink's work and may take the longest of all of the tasks. Universe
+definition and blocking reduce the number of comparisons needed when
+determining potential matches, which can drastically improve the runtime of Matching.
 
 ### Task steps
 
@@ -57,7 +57,17 @@ of comparisons needed during matching. Some columns may be "exploded" here if ne
 provide a universe for matches in the form of a SQL condition. Only records that satisfy the
 condition are eligible for matching.
 * [`blocking`](config.html#blocking) specifies how to block the input records into separate buckets
-before matching.
+before matching. Two records are eligible to match with one another only if they
+are grouped into the same blocking bucket.
+* [`comparison_features`](config.html#comparison-features) support computing features
+on each record. These features may be passed to a machine learning model through the
+[`training`](config.html#training-and-models) section and/or passed to deterministic
+rules with the [`comparisons`](config.html#comparisons) section. There are many
+different [comparison types](comparison_types.html) available for use with
+`comparison_features`.
+* [`pipeline_features`](pipeline_features.html) are machine learning transformations
+useful for reshaping and interacting data before they are fed to the machine learning
+model.
 
 ## Household Matching
 
