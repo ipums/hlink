@@ -17,8 +17,9 @@ datasets.
 ### Related Configuration Sections
 
 * The [`datasource_a` and `datasource_b`](config.html#data-sources) sections specify where to find the input data.
-* [`column_mappings`](column_mapping_transforms), [`feature_selections`](feature_selection_transforms),
-and [`substitution_columns`](substitutions) may all be used to define transformations on the input data.
+* [```column_mappings```](column_mapping_transforms.html#column-mapping-transforms),
+[`feature_selections`](feature_selection_transforms.html#feature-selection-transforms),
+and [`substitution_columns`](substitutions.html#substitutions) may all be used to define transformations on the input data.
 * The [`filter`](config.html#filter) section may be used to filter some records out of the input data
 as they are read in.
 
@@ -70,7 +71,7 @@ on each record. These features may be passed to a machine learning model through
 rules with the [`comparisons`](config.html#comparisons) section. There are many
 different [comparison types](comparison_types) available for use with
 `comparison_features`.
-* [`pipeline_features`](pipeline_features) are machine learning transformations
+* [`pipeline_features`](pipeline_features.html#pipeline-generated-features) are machine learning transformations
 useful for reshaping and interacting data before they are fed to the machine learning
 model.
 
