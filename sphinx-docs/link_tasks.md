@@ -41,6 +41,15 @@ The steps in each of these tasks are the same:
 
 ### Related Configuration Sections
 
+* The [`training`](config.html#training-and-models) section is the most important
+for Training and provides configuration attributes for many aspects of the task.
+For Household Training, use the [`hh_training`](config.html#household-training-and-models)
+section instead.
+* [`comparison_features`](config.html#comparison-features) and
+[`pipeline_features`](pipeline_features.html#pipeline-generated-features) are
+both generated in order to train the model. These sections are also used extensively
+by the Matching task.
+
 ## Matching
 
 ### Overview
