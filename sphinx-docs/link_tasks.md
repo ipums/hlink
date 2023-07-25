@@ -112,10 +112,16 @@ The steps in each of these tasks are the same:
 
 ### Overview
 
-Report on characteristics of the linked data.
+Report on characteristics of the linked data. This step is experimental and focused
+primarily on demographic census data. At the moment, it does not allow very much
+configuration.
 
 ### Task steps
 
-* Step 0: For households with anyone linked in round 1, report the percent of remaining household members linked in round 2.
+* Step 0: For households with anyone linked in Matching, report the percent of remaining household members linked in Household Matching.
 * Step 1: Report on the representivity of linked data compared to source populations.
 * Step 2: Pull in key demographic data for linked individuals and export a fixed-width crosswalk file.
+
+### Related Configuration Sections
+
+* The `alias` attributes are read from both [`datasource_a`](config.html#data-sources) and [`datasource_b`](config.html#data-sources). The step uses them to construct the output reports.
