@@ -96,6 +96,12 @@ Generate a table with potential matches between households in the two datasets.
 * Step 1: Filter households based on `hh_comparisons` configuration settings.
 * Step 2: Score the potential matches with the trained model. This step will be automatically skipped if machine learning is not being used.
 
+### Related Configuration Sections
+
+* [`comparison_features`](config.html#comparison-features) and [`pipeline_features`](pipeline_features.html#pipeline-generated-features) are used as they are in the Matching task.
+* [`hh_comparisons`](config.html#household-comparisons) correspond to `comparisons` in the Matching task and may be thought of as "post-blocking filters". Only potential matches that pass these comparisons will be eligible for being scored as matches.
+* [`hh_training`](config.html#household-training-and-models) corresponds to `training` in Matching.
+
 ## Model Exploration and Household Model Exploration
 
 ### Overview
