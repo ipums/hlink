@@ -106,8 +106,7 @@ Generate a table with potential matches between households in the two datasets.
 
 ### Overview
 
-Model Exploration and its household counterpart allow users to
-evaluate the performance of different types of models and different parameter combinations
+Evaluate the performance of different types of models and different parameter combinations
 on training data. These tasks are highly configurable and are typically not part of a full
 linking run. Instead, they are usually run ahead of time, and then the best-performing
 model is chosen and used for the full linking run.
@@ -134,7 +133,7 @@ The steps in each of these tasks are the same:
 
 ### Overview
 
-Report on characteristics of the linked data. This step is experimental and focused
+Report on characteristics of the linked data. This task is experimental and focused
 primarily on demographic census data. At the moment, it does not allow very much
 configuration.
 
