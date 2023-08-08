@@ -54,7 +54,7 @@ class LinkStepRegisterRawDfs(LinkStep):
 
         if config["datasource_a"].get("convert_ints_to_longs", False):
             logging.debug(
-                f"Converting all columns in datasource_a with type 'int' to type 'long'"
+                "Converting all columns in datasource_a with type 'int' to type 'long'"
             )
             df_a = self._convert_ints_to_longs(df_a_filtered)
         else:
@@ -62,7 +62,7 @@ class LinkStepRegisterRawDfs(LinkStep):
 
         if config["datasource_b"].get("convert_ints_to_longs", False):
             logging.debug(
-                f"Converting all columns in datasource_b with type 'int' to type 'long'"
+                "Converting all columns in datasource_b with type 'int' to type 'long'"
             )
             df_b = self._convert_ints_to_longs(df_b_filtered)
         else:
