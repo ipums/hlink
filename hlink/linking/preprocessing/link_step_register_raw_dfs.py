@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 import os.path
+import logging
 
 from hlink.errors import DataError
 from hlink.linking.link_step import LinkStep
@@ -48,14 +49,33 @@ class LinkStepRegisterRawDfs(LinkStep):
         self._load_unpartitioned(file_type_a, "_a", path_a)
         self._load_unpartitioned(file_type_b, "_b", path_b)
 
+        df_a_filtered = self._filter_dataframe(config, "a")
+        df_b_filtered = self._filter_dataframe(config, "b")
+
+        if config["datasource_a"].get("convert_ints_to_longs", False):
+            logging.debug(
+                f"Converting all columns in datasource_a with type 'int' to type 'long'"
+            )
+            df_a = self._convert_ints_to_longs(df_a_filtered)
+        else:
+            df_a = df_a_filtered
+
+        if config["datasource_b"].get("convert_ints_to_longs", False):
+            logging.debug(
+                f"Converting all columns in datasource_b with type 'int' to type 'long'"
+            )
+            df_b = self._convert_ints_to_longs(df_b_filtered)
+        else:
+            df_b = df_b_filtered
+
         self.task.run_register_python(
             name="raw_df_a",
-            func=lambda: self._filter_dataframe(config, "a"),
+            func=lambda: df_a,
             persist=True,
         )
         self.task.run_register_python(
             name="raw_df_b",
-            func=lambda: self._filter_dataframe(config, "b"),
+            func=lambda: df_b,
             persist=True,
         )
 
@@ -141,6 +161,9 @@ class LinkStepRegisterRawDfs(LinkStep):
                 else:
                     raise ValueError(f"Invalid filter: {dataset_filter}")
         return filtered_df
+
+    def _convert_ints_to_longs(self, df):
+        return df
 
     def _check_for_all_spaces_unrestricted_file(self, df_name):
         df = self.task.spark.table(df_name)
