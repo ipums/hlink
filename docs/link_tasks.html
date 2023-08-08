@@ -40,13 +40,27 @@
 <h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this heading">¶</a></h2>
 <section id="overview">
 <h3>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h3>
-<p>Read in raw data and prepare it for linking.</p>
+<p>Read in raw data and prepare it for linking. This task may include a variety of
+transformations on the data, such as stripping out whitespace and normalizing strings
+that have common abbreviations. The same transformations are applied to both input
+datasets.</p>
 </section>
 <section id="task-steps">
 <h3>Task steps<a class="headerlink" href="#task-steps" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Step 0: Register raw dataframes with the program. Read raw data in from .parquet or .csv files.</p></li>
+<li><p>Step 0: Read raw data in from Parquet or CSV files. Register the raw dataframes with the program.</p></li>
 <li><p>Step 1: Prepare the dataframes for linking. Perform substitutions, transformations, and column mappings as requested.</p></li>
+</ul>
+</section>
+<section id="related-configuration-sections">
+<h3>Related Configuration Sections<a class="headerlink" href="#related-configuration-sections" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The <a class="reference external" href="config.html#data-sources"><code class="docutils literal notranslate"><span class="pre">datasource_a</span></code> and <code class="docutils literal notranslate"><span class="pre">datasource_b</span></code></a> sections specify where to find the input data.</p></li>
+<li><p><a class="reference external" href="column_mapping_transforms.html#column-mapping-transforms"><code class="docutils literal notranslate"><span class="pre">column_mappings</span></code></a>,
+<a class="reference external" href="feature_selection_transforms.html#feature-selection-transforms"><code class="docutils literal notranslate"><span class="pre">feature_selections</span></code></a>,
+and <a class="reference external" href="substitutions.html#substitutions"><code class="docutils literal notranslate"><span class="pre">substitution_columns</span></code></a> may all be used to define transformations on the input data.</p></li>
+<li><p>The <a class="reference external" href="config.html#filter"><code class="docutils literal notranslate"><span class="pre">filter</span></code></a> section may be used to filter some records out of the input data
+as they are read in.</p></li>
 </ul>
 </section>
 </section>
@@ -54,76 +68,149 @@
 <h2>Training and Household Training<a class="headerlink" href="#training-and-household-training" title="Permalink to this heading">¶</a></h2>
 <section id="id1">
 <h3>Overview<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
-<p>Train a machine learning model to use for classification of potential links.</p>
+<p>Train a machine learning model to use for classification of potential links. This
+requires training data, which is read in in the first step. Comparison features
+are generated for the training data, and then the model is trained on the data
+and saved for use in the Matching task.</p>
 </section>
 <section id="id2">
 <h3>Task steps<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>The steps in each of these tasks are the same:</p>
 <ul class="simple">
-<li><p>Step 0: Ingest the training data from a .csv file.</p></li>
+<li><p>Step 0: Ingest the training data from a CSV file.</p></li>
 <li><p>Step 1: Create comparison features.</p></li>
 <li><p>Step 2: Train and save the model.</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Related Configuration Sections<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The <a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">training</span></code></a> section is the most important
+for Training and provides configuration attributes for many aspects of the task.
+For Household Training, use the <a class="reference external" href="config.html#household-training-and-models"><code class="docutils literal notranslate"><span class="pre">hh_training</span></code></a>
+section instead.</p></li>
+<li><p><a class="reference external" href="config.html#comparison-features"><code class="docutils literal notranslate"><span class="pre">comparison_features</span></code></a> and
+<a class="reference external" href="pipeline_features.html#pipeline-generated-features"><code class="docutils literal notranslate"><span class="pre">pipeline_features</span></code></a> are
+both generated in order to train the model. These sections are also used extensively
+by the Matching task.</p></li>
 </ul>
 </section>
 </section>
 <section id="matching">
 <h2>Matching<a class="headerlink" href="#matching" title="Permalink to this heading">¶</a></h2>
-<section id="id3">
-<h3>Overview<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
-<p>Run the linking algorithm, generating a table with potential matches between individuals in the two datasets.</p>
-</section>
 <section id="id4">
-<h3>Task steps<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>Run the linking algorithm, generating a table with potential matches between records in the two datasets.
+This is the core of hlink’s work and may take the longest of all of the tasks. Universe
+definition and blocking reduce the number of comparisons needed when
+determining potential matches, which can drastically improve the runtime of Matching.</p>
+</section>
+<section id="id5">
+<h3>Task steps<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Step 0: Perform blocking, exploding any columns that need it.</p></li>
-<li><p>Step 1: Run the matching algorithm, outputting potential matches to a <code class="docutils literal notranslate"><span class="pre">potential_matches</span></code> table.</p></li>
+<li><p>Step 0: Perform blocking, separating records into different buckets to reduce the total number
+of comparisons needed during matching. Some columns may be “exploded” here if needed.</p></li>
+<li><p>Step 1: Run the matching algorithm, outputting potential matches to the <code class="docutils literal notranslate"><span class="pre">potential_matches</span></code> table.</p></li>
 <li><p>Step 2: Score the potential matches with the trained model. This step will be automatically skipped if machine learning is not being used.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Related Configuration Sections<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The <a class="reference external" href="config.html#potential-matches-universe"><code class="docutils literal notranslate"><span class="pre">potential_matches_universe</span></code></a> section may be used to
+provide a universe for matches in the form of a SQL condition. Only records that satisfy the
+condition are eligible for matching.</p></li>
+<li><p><a class="reference external" href="config.html#blocking"><code class="docutils literal notranslate"><span class="pre">blocking</span></code></a> specifies how to block the input records into separate buckets
+before matching. Two records are eligible to match with one another only if they
+are grouped into the same blocking bucket.</p></li>
+<li><p><a class="reference external" href="config.html#comparison-features"><code class="docutils literal notranslate"><span class="pre">comparison_features</span></code></a> support computing features
+on each record. These features may be passed to a machine learning model through the
+<a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">training</span></code></a> section and/or passed to deterministic
+rules with the <a class="reference external" href="config.html#comparisons"><code class="docutils literal notranslate"><span class="pre">comparisons</span></code></a> section. There are many
+different <a class="reference internal" href="comparison_types.html"><span class="doc">comparison types</span></a> available for use with
+<code class="docutils literal notranslate"><span class="pre">comparison_features</span></code>.</p></li>
+<li><p><a class="reference external" href="pipeline_features.html#pipeline-generated-features"><code class="docutils literal notranslate"><span class="pre">pipeline_features</span></code></a> are machine learning transformations
+useful for reshaping and interacting data before they are fed to the machine learning
+model.</p></li>
 </ul>
 </section>
 </section>
 <section id="household-matching">
 <h2>Household Matching<a class="headerlink" href="#household-matching" title="Permalink to this heading">¶</a></h2>
-<section id="id5">
-<h3>Overview<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<section id="id7">
+<h3>Overview<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
 <p>Generate a table with potential matches between households in the two datasets.</p>
 </section>
-<section id="id6">
-<h3>Task steps<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<section id="id8">
+<h3>Task steps<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Block on households.</p></li>
 <li><p>Step 1: Filter households based on <code class="docutils literal notranslate"><span class="pre">hh_comparisons</span></code> configuration settings.</p></li>
 <li><p>Step 2: Score the potential matches with the trained model. This step will be automatically skipped if machine learning is not being used.</p></li>
 </ul>
 </section>
+<section id="id9">
+<h3>Related Configuration Sections<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="config.html#comparison-features"><code class="docutils literal notranslate"><span class="pre">comparison_features</span></code></a> and <a class="reference external" href="pipeline_features.html#pipeline-generated-features"><code class="docutils literal notranslate"><span class="pre">pipeline_features</span></code></a> are used as they are in the Matching task.</p></li>
+<li><p><a class="reference external" href="config.html#household-comparisons"><code class="docutils literal notranslate"><span class="pre">hh_comparisons</span></code></a> correspond to <code class="docutils literal notranslate"><span class="pre">comparisons</span></code> in the Matching task and may be thought of as “post-blocking filters”. Only potential matches that pass these comparisons will be eligible for being scored as matches.</p></li>
+<li><p><a class="reference external" href="config.html#household-training-and-models"><code class="docutils literal notranslate"><span class="pre">hh_training</span></code></a> corresponds to <code class="docutils literal notranslate"><span class="pre">training</span></code> in Matching.</p></li>
+</ul>
+</section>
 </section>
 <section id="model-exploration-and-household-model-exploration">
 <h2>Model Exploration and Household Model Exploration<a class="headerlink" href="#model-exploration-and-household-model-exploration" title="Permalink to this heading">¶</a></h2>
-<section id="id7">
-<h3>Overview<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
-<p>There are two dedicated linking tasks for model exploration.  <code class="docutils literal notranslate"><span class="pre">model_exploration</span></code> uses configuration settings from the Training section of the config file.  <code class="docutils literal notranslate"><span class="pre">hh_model_exploration</span></code> uses configuration settings from the Household Training section of the config file. See documentation of the <a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">[training]</span></code></a> and <a class="reference external" href="config.html#household-training-and-models"><code class="docutils literal notranslate"><span class="pre">[hh_training]</span></code></a> config sections for more details.</p>
+<section id="id10">
+<h3>Overview<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
+<p>Evaluate the performance of different types of models and different parameter combinations
+on training data. These tasks are highly configurable and are typically not part of a full
+linking run. Instead, they are usually run ahead of time, and then the best-performing
+model is chosen and used for the full linking run.</p>
 </section>
-<section id="id8">
-<h3>Task steps<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<section id="id11">
+<h3>Task steps<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h3>
 <p>The steps in each of these tasks are the same:</p>
 <ul class="simple">
-<li><p>Step 0: Ingest the specified training data file specified in the config with the  <code class="docutils literal notranslate"><span class="pre">dataset</span></code> tag.</p></li>
-<li><p>Step 1: Create training features on the training data, or use those in the training data file (specified in the respective config section with the <code class="docutils literal notranslate"><span class="pre">use_training_data_features</span></code> flag).</p></li>
-<li><p>Step 2: Run <code class="docutils literal notranslate"><span class="pre">n_training_iterations</span></code> number of train-test splits on each of the models in the config <code class="docutils literal notranslate"><span class="pre">model_parameters</span></code>.</p></li>
+<li><p>Step 0: Ingest the training data file specified in the config with the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> attribute.</p></li>
+<li><p>Step 1: Create training features on the training data. If the <code class="docutils literal notranslate"><span class="pre">use_training_data_features</span></code>
+attribute is provided in the respective training config section, then instead read
+features from the training data file.</p></li>
+<li><p>Step 2: Run <code class="docutils literal notranslate"><span class="pre">n_training_iterations</span></code> number of train-test splits on each of the
+models in the config <code class="docutils literal notranslate"><span class="pre">model_parameters</span></code>.</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>Related Configuration Sections<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">training</span></code></a> is used extensively by Model Exploration,
+and <a class="reference external" href="config.html#household-training-and-models"><code class="docutils literal notranslate"><span class="pre">hh_training</span></code></a> is used extensively
+by Household Model Exploration.</p></li>
+<li><p><a class="reference external" href="config.html#comparison-features"><code class="docutils literal notranslate"><span class="pre">comparison_features</span></code></a> and
+<a class="reference external" href="pipeline_features.html#pipeline-generated-features"><code class="docutils literal notranslate"><span class="pre">pipeline_features</span></code></a> are
+used to generate features that are passed as input to the trained models.</p></li>
 </ul>
 </section>
 </section>
 <section id="reporting">
 <h2>Reporting<a class="headerlink" href="#reporting" title="Permalink to this heading">¶</a></h2>
-<section id="id9">
-<h3>Overview<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
-<p>Report on characteristics of the linked data.</p>
+<section id="id13">
+<h3>Overview<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h3>
+<p>Report on characteristics of the linked data. This task is experimental and focused
+primarily on demographic census data. At the moment, it does not allow very much
+configuration.</p>
 </section>
-<section id="id10">
-<h3>Task steps<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
+<section id="id14">
+<h3>Task steps<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Step 0: For households with anyone linked in round 1, report the percent of remaining household members linked in round 2.</p></li>
+<li><p>Step 0: For households with anyone linked in Matching, report the percent of remaining household members linked in Household Matching.</p></li>
 <li><p>Step 1: Report on the representivity of linked data compared to source populations.</p></li>
 <li><p>Step 2: Pull in key demographic data for linked individuals and export a fixed-width crosswalk file.</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>Related Configuration Sections<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">alias</span></code> attributes are read from both <a class="reference external" href="config.html#data-sources"><code class="docutils literal notranslate"><span class="pre">datasource_a</span></code></a> and <a class="reference external" href="config.html#data-sources"><code class="docutils literal notranslate"><span class="pre">datasource_b</span></code></a>. The step uses them to construct the output reports.</p></li>
 </ul>
 </section>
 </section>
