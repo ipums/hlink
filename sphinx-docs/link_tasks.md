@@ -106,13 +106,29 @@ Generate a table with potential matches between households in the two datasets.
 
 ### Overview
 
-There are two dedicated linking tasks for model exploration.  `model_exploration` uses configuration settings from the Training section of the config file.  `hh_model_exploration` uses configuration settings from the Household Training section of the config file. See documentation of the [`[training]`](config.html#training-and-models) and [`[hh_training]`](config.html#household-training-and-models) config sections for more details.
+Model Exploration and its household counterpart allow users to
+evaluate the performance of different types of models and different parameter combinations
+on training data. These tasks are highly configurable and are typically not part of a full
+linking run. Instead, they are usually run ahead of time, and then the best-performing
+model is chosen and used for the full linking run.
 
 ### Task steps
 The steps in each of these tasks are the same:
- * Step 0: Ingest the specified training data file specified in the config with the  `dataset` tag.
- * Step 1: Create training features on the training data, or use those in the training data file (specified in the respective config section with the `use_training_data_features` flag).
- * Step 2: Run `n_training_iterations` number of train-test splits on each of the models in the config `model_parameters`.
+ * Step 0: Ingest the training data file specified in the config with the `dataset` attribute.
+ * Step 1: Create training features on the training data. If the `use_training_data_features`
+   attribute is provided in the respective training config section, then instead read
+   features from the training data file.
+ * Step 2: Run `n_training_iterations` number of train-test splits on each of the
+   models in the config `model_parameters`.
+
+### Related Configuration Sections
+
+* [`training`](config.html#training-and-models) is used extensively by Model Exploration,
+  and [`hh_training`](config.html#household-training-and-models) is used extensively
+  by Household Model Exploration.
+* [`comparison_features`](config.html#comparison-features) and
+  [`pipeline_features`](pipeline_features.html#pipeline-generated-features) are
+  used to generate features that are passed as input to the trained models.
 
 ## Reporting
 
