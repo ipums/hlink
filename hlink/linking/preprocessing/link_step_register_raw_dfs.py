@@ -6,6 +6,9 @@
 import os.path
 import logging
 
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import col
+
 from hlink.errors import DataError
 from hlink.linking.link_step import LinkStep
 
@@ -162,8 +165,14 @@ class LinkStepRegisterRawDfs(LinkStep):
                     raise ValueError(f"Invalid filter: {dataset_filter}")
         return filtered_df
 
-    def _convert_ints_to_longs(self, df):
-        return df
+    def _convert_ints_to_longs(self, df: DataFrame) -> DataFrame:
+        df_casted = df
+
+        for (column, datatype) in df.dtypes:
+            if datatype == "int":
+                df_casted = df_casted.withColumn(column, col(column).cast("long"))
+
+        return df_casted
 
     def _check_for_all_spaces_unrestricted_file(self, df_name):
         df = self.task.spark.table(df_name)
