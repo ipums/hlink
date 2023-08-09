@@ -250,6 +250,44 @@ def test_step_0_check_for_all_spaces_unrestricted_data(
         preprocessing.run_step(0)
 
 
+def test_step_0_convert_ints_to_longs(
+    preprocessing, spark, preprocessing_conf, input_data_dir_path
+):
+    preprocessing_conf["datasource_a"] = {
+        "file": os.path.join(input_data_dir_path, "test_csv_data_a.csv"),
+        "alias": "test_csv_data_a",
+        "convert_ints_to_longs": True,
+    }
+
+    preprocessing_conf["datasource_b"] = {
+        "file": os.path.join(input_data_dir_path, "test_csv_data_b.csv"),
+        "alias": "test_csv_data_b",
+        "convert_ints_to_longs": False,
+    }
+
+    preprocessing.run_step(0)
+
+    # No data type conversion happens in the unpartitioned tables
+    unpartitioned_a = spark.table("raw_df_unpartitioned_a")
+    assert ("bpl", "int") in unpartitioned_a.dtypes
+    assert ("namefrst", "string") in unpartitioned_a.dtypes
+
+    unpartitioned_b = spark.table("raw_df_unpartitioned_b")
+    assert ("bpl", "int") in unpartitioned_b.dtypes
+    assert ("namefrst", "string") in unpartitioned_b.dtypes
+
+    # Data type conversion happens for raw_df_a because we requested it,
+    # but not for raw_df_b, since we set convert_ints_to_longs = False.
+    raw_df_a = spark.table("raw_df_a")
+    assert ("bpl", "bigint") in raw_df_a.dtypes
+    assert ("namefrst", "string") in raw_df_a.dtypes
+    assert "int" not in {dtype for (_, dtype) in raw_df_a.dtypes}
+
+    raw_df_b = spark.table("raw_df_b")
+    assert ("bpl", "int") in raw_df_b.dtypes
+    assert ("namefrst", "string") in raw_df_b.dtypes
+
+
 def test_step_1_transform_attach_variable(
     preprocessing, spark, preprocessing_conf, region_code_path
 ):

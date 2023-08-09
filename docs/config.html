@@ -431,12 +431,19 @@ It uses machine learning to probabilistically link the two datasets.</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">alias</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The short name for the datasource. Must be alphanumeric with no spaces.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">file</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Required. The path to the input file. The file can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">parquet</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convert_ints_to_longs</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">boolean</span></code>. Optional. If set to true, automatically
+convert each column with type <code class="docutils literal notranslate"><span class="pre">int</span></code> in the input file to type <code class="docutils literal notranslate"><span class="pre">long</span></code>. This can be
+especially useful when reading from CSV files, as Spark may assume that columns are
+type <code class="docutils literal notranslate"><span class="pre">int</span></code> when they should be <code class="docutils literal notranslate"><span class="pre">long</span></code>. Parquet files have their own schema included
+in the file, so this may be less useful for them. Note that Spark also sometimes
+uses the term <code class="docutils literal notranslate"><span class="pre">bigint</span></code> to mean the same thing as <code class="docutils literal notranslate"><span class="pre">long</span></code>.</p></li>
 </ul>
 </li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">datasource_a</span><span class="p">]</span>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;us1900&quot;</span>
 <span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;/path/to/my_file.csv&quot;</span>
+<span class="n">convert_ints_to_longs</span> <span class="o">=</span> <span class="n">true</span>
 </pre></div>
 </div>
 </section>

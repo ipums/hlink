@@ -399,11 +399,18 @@ drop_data_from_scored_matches = false
 * Attributes:
   * `alias` -- Type: `string`. The short name for the datasource. Must be alphanumeric with no spaces.
   * `file` -- Type: `string`. Required. The path to the input file. The file can be `csv` or `parquet`.
+  * `convert_ints_to_longs` -- Type: `boolean`. Optional. If set to true, automatically
+    convert each column with type `int` in the input file to type `long`. This can be
+    especially useful when reading from CSV files, as Spark may assume that columns are
+    type `int` when they should be `long`. Parquet files have their own schema included
+    in the file, so this may be less useful for them. Note that Spark also sometimes
+    uses the term `bigint` to mean the same thing as `long`.
 
 ```
 [datasource_a]
 alias = "us1900"
 file = "/path/to/my_file.csv"
+convert_ints_to_longs = true
 ```
 
 ## Filter
