@@ -25,7 +25,8 @@ def show_table_row_count(spark, table_name):
 
 
 def show_table_columns(spark, table_name):
-    spark.sql(f"DESCRIBE {table_name}").show(1000, truncate=False)
+    # We don't make use of comments, so the comment column is full of nulls.
+    spark.sql(f"DESCRIBE {table_name}").drop("comment").show(1000, truncate=False)
 
 
 def show_column_summary(spark, table_name, col_name):
