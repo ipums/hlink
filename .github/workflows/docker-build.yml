@@ -15,7 +15,13 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag $HLINK_TAG
-      
+
+    - name: Check dependency versions
+      run: |
+        docker run $HLINK_TAG echo "Python version: $(python -V)"
+        echo "Java version:"
+        docker run $HLINK_TAG java -version
+    
     - name: Check formatting with black
       run: docker run $HLINK_TAG black --check .
       
