@@ -18,9 +18,9 @@ jobs:
 
     - name: Check dependency versions
       run: |
-        echo "Python version: $(python -V)"
+        docker run $HLINK_TAG echo "Python version: $(python -V)"
         echo "Java version:"
-        java -version
+        docker run $HLINK_TAG java -version
     
     - name: Check formatting with black
       run: docker run $HLINK_TAG black --check .
