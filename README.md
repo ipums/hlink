@@ -12,8 +12,7 @@ Wellington, J., R. Harper, and K.J. Thompson. 2022. "hlink." https://github.com/
 
 ## Installation
 
-hlink runs on Python 3.10.
-Java 8 or [Java 11](https://openjdk.org/install/) is required for the PySpark integration. 
+hlink runs on Python 3.10 and requires Java 8 or greater for integration with PySpark.
 
 You can install the python package from pip:
 ```
