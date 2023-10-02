@@ -8,28 +8,31 @@ env:
 jobs:
 
   build:
-
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version: ["3.10", "3.11"]
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag $HLINK_TAG
+      run: docker build . --file Dockerfile --tag $HLINK_TAG-${{ matrix.python_version}} --build-arg PYTHON_VERSION=${{ matrix.python_version }}
 
     - name: Check dependency versions
       run: |
-        docker run $HLINK_TAG echo "Python version: $(python -V)"
+        docker run $HLINK_TAG-${{ matrix.python_version}} echo "Python version: $(python -V)"
         echo "Java version:"
-        docker run $HLINK_TAG java -version
+        docker run $HLINK_TAG-${{ matrix.python_version}} java -version
     
     - name: Check formatting with black
-      run: docker run $HLINK_TAG black --check .
+      run: docker run $HLINK_TAG-${{ matrix.python_version}} black --check .
       
     - name: Lint with flake8
-      run: docker run $HLINK_TAG flake8 --count .
+      run: docker run $HLINK_TAG-${{ matrix.python_version}} flake8 --count .
       
     - name: Test
-      run: docker run $HLINK_TAG pytest
+      run: docker run $HLINK_TAG-${{ matrix.python_version}} pytest
     
     - name: Build sdist and wheel
-      run: docker run $HLINK_TAG python -m build
+      run: docker run $HLINK_TAG-${{ matrix.python_version}} python -m build
