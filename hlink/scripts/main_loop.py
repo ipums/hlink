@@ -69,12 +69,17 @@ class Main(Cmd):
         self.reload_auto_complete_cache()
 
     def reload_auto_complete_cache(self):
+        """Reload the cache of Spark table names for autocompletion."""
         self.table_names = [t.name for t in self.spark.catalog.listTables()]
 
     def precmd(self, line: str) -> str:
         if line.strip() != "":
             logging.info(f"[User Input] {line}")
         return line
+
+    def postcmd(self, stop, line):
+        self.reload_auto_complete_cache()
+        return stop
 
     # These are meant to be flags / switches, not long options with arguments  following them
     def extract_flags_from_args(self, applicable_flags, split_args):
@@ -211,9 +216,9 @@ class Main(Cmd):
 
     @split_and_check_args(1)
     def do_run_step(self, split_args):
-        """Run the specified household linking step.
+        """Run the specified linking step.
         Arg 1: step number (an integer)
-        Hint: Use the command 'get_steps' to fetch a list of all the household linking steps."""
+        Hint: Use the command 'get_steps' to fetch a list of all the linking steps for the current task."""
         print(f"Link task: {self.current_link_task}")
         step_num = int(split_args[0])
         self.current_link_task.run_step(step_num)
