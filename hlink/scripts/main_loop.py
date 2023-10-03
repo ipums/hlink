@@ -69,12 +69,17 @@ class Main(Cmd):
         self.reload_auto_complete_cache()
 
     def reload_auto_complete_cache(self):
+        """Reload the cache of Spark table names for autocompletion."""
         self.table_names = [t.name for t in self.spark.catalog.listTables()]
 
     def precmd(self, line: str) -> str:
         if line.strip() != "":
             logging.info(f"[User Input] {line}")
         return line
+
+    def postcmd(self, stop, line):
+        self.reload_auto_complete_cache()
+        return stop
 
     # These are meant to be flags / switches, not long options with arguments  following them
     def extract_flags_from_args(self, applicable_flags, split_args):
