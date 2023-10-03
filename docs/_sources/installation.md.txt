@@ -4,8 +4,8 @@
 
 Make sure that you have each of these installed on your system before running hlink.
 
-- Python 3.10
-- Java 8 or Java 11, used for integration with [Apache Spark](https://spark.apache.org) via the pyspark
+- Python 3.10 or 3.11
+- Java 8 or greater, used for integration with [Apache Spark](https://spark.apache.org) via the pyspark
 package
 
 ## Installing from PyPI 
