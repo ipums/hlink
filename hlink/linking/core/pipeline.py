@@ -9,8 +9,8 @@ from pyspark.ml.feature import (
     OneHotEncoder,
     VectorAssembler,
     Bucketizer,
+    Interaction,
 )
-import hlink.linking.transformers.interaction_transformer
 import hlink.linking.transformers.float_cast_transformer
 import logging
 
@@ -129,10 +129,10 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
                             input_cols.append(col_names_dict[key])
                         else:
                             input_cols.append(key)
-                    interaction_transformer = hlink.linking.transformers.interaction_transformer.InteractionTransformer(
+                    interaction = Interaction(
                         inputCols=input_cols, outputCol=x["output_column"]
                     )
-                    pipeline_stages.append(interaction_transformer)
+                    pipeline_stages.append(interaction)
             else:
                 continue
 
