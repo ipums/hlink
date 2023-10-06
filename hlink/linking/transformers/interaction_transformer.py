@@ -3,10 +3,20 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import warnings
 from pyspark.ml.util import JavaMLReadable, JavaMLWritable
 from pyspark.ml.param.shared import HasInputCols, HasOutputCol
 from pyspark import keyword_only
 from pyspark.ml.wrapper import JavaTransformer
+
+
+warnings.warn(
+    "interaction_transformer is deprecated and will be removed in the future. "
+    "This module provides the InteractionTransformer class, which is a backport of pyspark.ml.feature.Interaction. "
+    "Please use pyspark.ml.feature.Interaction instead.",
+    category=DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class InteractionTransformer(
