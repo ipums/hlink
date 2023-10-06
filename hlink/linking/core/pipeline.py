@@ -109,32 +109,33 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         pipeline_stages.append(encoder)
 
     if "pipeline_features" in conf:
-        for x in conf["pipeline_features"]:
-            if x["output_column"] in pipeline_input_cols:
-                if x["transformer_type"] == "bucketizer":
-                    splits = x["splits"]
-                    if x["input_column"] in col_names_dict.keys():
-                        input_col = col_names_dict[x["input_column"]]
+        for pipeline_feature in conf["pipeline_features"]:
+            if pipeline_feature["output_column"] in pipeline_input_cols:
+                if pipeline_feature["transformer_type"] == "bucketizer":
+                    splits = pipeline_feature["splits"]
+                    if pipeline_feature["input_column"] in col_names_dict.keys():
+                        input_col = col_names_dict[pipeline_feature["input_column"]]
                     else:
-                        input_col = x["input_column"]
+                        input_col = pipeline_feature["input_column"]
                     bucketizer = Bucketizer(
-                        splits=splits, inputCol=input_col, outputCol=x["output_column"]
+                        splits=splits,
+                        inputCol=input_col,
+                        outputCol=pipeline_feature["output_column"],
                     )
                     pipeline_stages.append(bucketizer)
 
-                elif x["transformer_type"] == "interaction":
+                elif pipeline_feature["transformer_type"] == "interaction":
                     input_cols = []
-                    for key in x["input_columns"]:
+                    for key in pipeline_feature["input_columns"]:
                         if key in col_names_dict.keys():
                             input_cols.append(col_names_dict[key])
                         else:
                             input_cols.append(key)
                     interaction = Interaction(
-                        inputCols=input_cols, outputCol=x["output_column"]
+                        inputCols=input_cols,
+                        outputCol=pipeline_feature["output_column"],
                     )
                     pipeline_stages.append(interaction)
-            else:
-                continue
 
     if len(categorical_pipeline_features) > 0:
         encoded_output_cols = [
