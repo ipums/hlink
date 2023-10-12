@@ -265,3 +265,33 @@ def test_immyr_diff_w_imm_caution(spark, conf):
     assert prepped_data.query("id_a == 6")["immyear_caution"].iloc[0] == 3
     assert prepped_data.query("id_a == 7")["immyear_caution"].iloc[0] == 0
     assert prepped_data.query("id_a == 8")["immyear_caution"].iloc[0] == 0
+
+
+def test_multi_jaro_winkler_search_comparison_feature(
+    spark, datasource_multi_jaro_winkler_search_input
+):
+    feature = {
+        "alias": "test_jw_search",
+        "comparison_type": "multi_jaro_winkler_search",
+        "num_cols": 2,
+        "jw_col_template": "s{n}_namefrst",
+        "jw_threshold": 0.7,
+        "equal_and_not_null_templates": ["s{n}_bpl", "s{n}_sex"],
+    }
+    table_a, table_b = datasource_multi_jaro_winkler_search_input
+
+    sql_expr = comparison_feature_core.generate_comparison_feature(
+        feature, "id", include_as=True
+    )
+
+    table_a.createOrReplaceTempView("table_a")
+    table_b.createOrReplaceTempView("table_b")
+
+    df = spark.sql(
+        f"SELECT a.id AS id_a, b.id AS id_b, {sql_expr} FROM table_a a CROSS JOIN table_b b"
+    )
+
+    assert df.filter((df.id_a == 1) & (df.id_b == 101)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 1) & (df.id_b == 102)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 1) & (df.id_b == 103)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 1) & (df.id_b == 104)).collect()[0].test_jw_search
