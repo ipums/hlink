@@ -311,7 +311,7 @@ def test_multi_jaro_winkler_search_equal_templates_optional(
         "alias": "test_jw_search",
         "comparison_type": "multi_jaro_winkler_search",
         "num_cols": 2,
-        "jw_col_template": "s{n}_namefrst1",
+        "jw_col_template": "s{n}_namefrst",
         "jw_threshold": 0.9,
     }
 

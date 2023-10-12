@@ -530,19 +530,29 @@ def generate_comparison_feature(feature, id_col, include_as=False):
                 f"jw(nvl(a.{jw_col_a}, ''), nvl(b.{jw_col_b}, '')) >= {jw_threshold}"
             )
 
-            equal_cols = [
-                (template_a.replace("{n}", str(i)), template_b.replace("{n}", str(j)))
-                for (template_a, template_b) in zip(equal_templates, equal_templates)
-            ]
+            # We may not have any equal_templates at all. Careful not to have trailing
+            # ANDs or ORs in this case.
+            if len(equal_templates) > 0:
+                equal_cols = [
+                    (
+                        template_a.replace("{n}", str(i)),
+                        template_b.replace("{n}", str(j)),
+                    )
+                    for (template_a, template_b) in zip(
+                        equal_templates, equal_templates
+                    )
+                ]
 
-            equal_exprs = [
-                f"a.{col_a} IS NOT NULL AND b.{col_b} IS NOT NULL AND a.{col_a} = b.{col_b}"
-                for (col_a, col_b) in equal_cols
-            ]
+                equal_exprs = [
+                    f"a.{col_a} IS NOT NULL AND b.{col_b} IS NOT NULL AND a.{col_a} = b.{col_b}"
+                    for (col_a, col_b) in equal_cols
+                ]
 
-            equal_expr = " AND ".join(f"({expr})" for expr in equal_exprs)
+                equal_expr = " AND ".join(f"({expr})" for expr in equal_exprs)
 
-            sub_exprs.append(f"({jw_expr}) AND {equal_expr}")
+                sub_exprs.append(f"({jw_expr}) AND {equal_expr}")
+            else:
+                sub_exprs.append(jw_expr)
 
         final_expr = " OR ".join(f"({sub_expr})" for sub_expr in sub_exprs)
         expr = final_expr
