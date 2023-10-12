@@ -795,6 +795,15 @@ def datasource_multi_jaro_winkler_search_input(spark):
                 s1_sex=2,
                 s2_sex=2,
             ),
+            Row(
+                id=2,
+                s1_namefrst="andirs",
+                s2_namefrst="l",
+                s1_bpl=1,
+                s2_bpl=22,
+                s1_sex=None,
+                s2_sex=1,
+            ),
         ],
         schema,
     )
