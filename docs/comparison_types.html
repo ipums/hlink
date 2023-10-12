@@ -950,13 +950,13 @@ for this (M, N) combination.</p></li>
 </div>
 <p>does 25 comparisons. For each (M, N) in the Cartesian product {1, 2, 3, 4, 5}
 × {1, 2, 3, 4, 5}, it computes</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jw</span><span class="p">(</span><span class="n">nvl</span><span class="p">(</span><span class="n">sM_namefrst</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">nvl</span><span class="p">(</span><span class="n">sN_namefrst</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mf">0.7</span> <span class="n">AND</span>
-<span class="n">sM_bpl</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
-<span class="n">sN_bpl</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
-<span class="n">sM_bpl</span> <span class="o">=</span> <span class="n">sN_bpl</span> <span class="n">AND</span>
-<span class="n">sM_sex</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
-<span class="n">sN_sex</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
-<span class="n">sM_sex</span> <span class="o">=</span> <span class="n">sN_sex</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jw</span><span class="p">(</span><span class="n">nvl</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">sM_namefrst</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">nvl</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">sN_namefrst</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mf">0.7</span> <span class="n">AND</span>
+<span class="n">a</span><span class="o">.</span><span class="n">sM_bpl</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
+<span class="n">b</span><span class="o">.</span><span class="n">sN_bpl</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
+<span class="n">a</span><span class="o">.</span><span class="n">sM_bpl</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sN_bpl</span> <span class="n">AND</span>
+<span class="n">a</span><span class="o">.</span><span class="n">sM_sex</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
+<span class="n">b</span><span class="o">.</span><span class="n">sN_sex</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span> <span class="n">AND</span>
+<span class="n">a</span><span class="o">.</span><span class="n">sM_sex</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sN_sex</span>
 </pre></div>
 </div>
 <p>It returns 1 if any of these expressions evaluate to 1, and 0 if all of them

@@ -767,13 +767,13 @@ does 25 comparisons. For each (M, N) in the Cartesian product {1, 2, 3, 4, 5}
 × {1, 2, 3, 4, 5}, it computes
 
 ```
-jw(nvl(sM_namefrst, ''), nvl(sN_namefrst, '')) >= 0.7 AND
-sM_bpl IS NOT NULL AND
-sN_bpl IS NOT NULL AND
-sM_bpl = sN_bpl AND
-sM_sex IS NOT NULL AND
-sN_sex IS NOT NULL AND
-sM_sex = sN_sex
+jw(nvl(a.sM_namefrst, ''), nvl(b.sN_namefrst, '')) >= 0.7 AND
+a.sM_bpl IS NOT NULL AND
+b.sN_bpl IS NOT NULL AND
+a.sM_bpl = b.sN_bpl AND
+a.sM_sex IS NOT NULL AND
+b.sN_sex IS NOT NULL AND
+a.sM_sex = b.sN_sex
 ```
 
 It returns 1 if any of these expressions evaluate to 1, and 0 if all of them
