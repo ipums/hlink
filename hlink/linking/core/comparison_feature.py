@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 import itertools
+import logging
 
 
 def create_feature_tables(
@@ -507,6 +508,44 @@ def generate_comparison_feature(feature, id_col, include_as=False):
     elif comp_type == "present_and_not_equal":
         col = feature["column_name"]
         expr = f"IF(a.{col} IS NOT NULL AND b.{col} IS NOT NULL AND cast(a.{col} as string) != '' and cast(b.{col} as string) != '' and a.{col} > 0, IF(a.{col} IS DISTINCT FROM b.{col}, TRUE, FALSE), FALSE)"
+
+    elif comp_type == "multi_jaro_winkler_search":
+        num_cols: int = feature["num_cols"]
+        jw_template: str = feature["jw_col_template"]
+        jw_threshold: float = feature["jw_threshold"]
+        equal_templates: list[str] = feature.get("equal_and_not_null_templates", [])
+
+        col_range = list(range(1, num_cols + 1))
+        tuples = list(itertools.product(col_range, col_range))
+
+        logging.debug(
+            f"multi_jaro_winkler_search with alias {feature.get('alias')}: there are {len(tuples)} subcomparisons"
+        )
+        sub_exprs = []
+        for (i, j) in tuples:
+            jw_col_a = jw_template.replace("{n}", str(i))
+            jw_col_b = jw_template.replace("{n}", str(j))
+
+            jw_expr = (
+                f"jw(nvl(a.{jw_col_a}, ''), nvl(b.{jw_col_b}, '')) >= {jw_threshold}"
+            )
+
+            equal_cols = [
+                (template_a.replace("{n}", str(i)), template_b.replace("{n}", str(j)))
+                for (template_a, template_b) in zip(equal_templates, equal_templates)
+            ]
+
+            equal_exprs = [
+                f"a.{col_a} IS NOT NULL AND b.{col_b} IS NOT NULL AND a.{col_a} = b.{col_b}"
+                for (col_a, col_b) in equal_cols
+            ]
+
+            equal_expr = " AND ".join(f"({expr})" for expr in equal_exprs)
+
+            sub_exprs.append(f"({jw_expr}) AND {equal_expr}")
+
+        final_expr = " OR ".join(f"({sub_expr})" for sub_expr in sub_exprs)
+        expr = final_expr
 
     else:
         raise ValueError(f"No comparison type: {feature['comparison_type']}")
