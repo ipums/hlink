@@ -771,6 +771,89 @@ def datasource_extra_children_input(spark):
 
 
 @pytest.fixture(scope="function")
+def datasource_multi_jaro_winkler_search_input(spark):
+    schema = StructType(
+        [
+            StructField("id", LongType()),
+            StructField("s1_namefrst", StringType()),
+            StructField("s2_namefrst", StringType()),
+            StructField("s1_bpl", LongType()),
+            StructField("s2_bpl", LongType()),
+            StructField("s1_sex", LongType()),
+            StructField("s2_sex", LongType()),
+        ]
+    )
+
+    table_a = spark.createDataFrame(
+        [
+            Row(
+                id=1,
+                s1_namefrst="catherine",
+                s2_namefrst="mary",
+                s1_bpl=1,
+                s2_bpl=1,
+                s1_sex=2,
+                s2_sex=2,
+            ),
+            Row(
+                id=2,
+                s1_namefrst="andirs",
+                s2_namefrst="l",
+                s1_bpl=1,
+                s2_bpl=22,
+                s1_sex=None,
+                s2_sex=1,
+            ),
+        ],
+        schema,
+    )
+
+    table_b = spark.createDataFrame(
+        [
+            Row(
+                id=101,
+                s1_namefrst="catherene",
+                s2_namefrst="bobby",
+                s1_bpl=1,
+                s2_bpl=1,
+                s1_sex=2,
+                s2_sex=1,
+            ),
+            Row(
+                id=102,
+                s1_namefrst="quy",
+                s2_namefrst="anders",
+                s1_bpl=None,
+                s2_bpl=1,
+                s1_sex=2,
+                s2_sex=1,
+            ),
+            Row(
+                id=103,
+                s1_namefrst="quy",
+                s2_namefrst="anders",
+                s1_bpl=1,
+                s2_bpl=1,
+                s1_sex=2,
+                s2_sex=1,
+            ),
+            Row(
+                id=104,
+                s1_namefrst="catherene",
+                s2_namefrst="bobby",
+                s1_bpl=1,
+                s2_bpl=1,
+                s1_sex=1,
+                s2_sex=1,
+            ),
+        ],
+        schema,
+    )
+
+    return table_a, table_b
+
+
+@pytest.fixture(scope="function")
 def matching_test_input(spark, conf, tmpdir_factory):
     """This configuration includes datasets for testing matching steps."""
     prepped_a_data = "input_data/matching_test_a.csv"

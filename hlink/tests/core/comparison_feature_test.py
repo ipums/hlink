@@ -265,3 +265,112 @@ def test_immyr_diff_w_imm_caution(spark, conf):
     assert prepped_data.query("id_a == 6")["immyear_caution"].iloc[0] == 3
     assert prepped_data.query("id_a == 7")["immyear_caution"].iloc[0] == 0
     assert prepped_data.query("id_a == 8")["immyear_caution"].iloc[0] == 0
+
+
+def test_multi_jaro_winkler_search_comparison_feature(
+    spark, datasource_multi_jaro_winkler_search_input
+):
+    feature = {
+        "alias": "test_jw_search",
+        "comparison_type": "multi_jaro_winkler_search",
+        "num_cols": 2,
+        "jw_col_template": "s{n}_namefrst",
+        "jw_threshold": 0.7,
+        "equal_and_not_null_templates": ["s{n}_bpl", "s{n}_sex"],
+    }
+    table_a, table_b = datasource_multi_jaro_winkler_search_input
+
+    sql_expr = comparison_feature_core.generate_comparison_feature(
+        feature, "id", include_as=True
+    )
+
+    table_a.createOrReplaceTempView("table_a")
+    table_b.createOrReplaceTempView("table_b")
+
+    df = spark.sql(
+        f"SELECT a.id AS id_a, b.id AS id_b, {sql_expr} FROM table_a a CROSS JOIN table_b b"
+    )
+
+    assert df.filter((df.id_a == 1) & (df.id_b == 101)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 1) & (df.id_b == 102)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 1) & (df.id_b == 103)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 1) & (df.id_b == 104)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 2) & (df.id_b == 101)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 2) & (df.id_b == 102)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 2) & (df.id_b == 103)).collect()[0].test_jw_search
+    assert not df.filter((df.id_a == 2) & (df.id_b == 104)).collect()[0].test_jw_search
+
+
+def test_multi_jaro_winkler_search_equal_templates_optional(
+    spark, datasource_multi_jaro_winkler_search_input
+):
+    """
+    The equal_and_not_null_templates attribute is optional and defaults to the empty list [].
+    """
+    feature = {
+        "alias": "test_jw_search",
+        "comparison_type": "multi_jaro_winkler_search",
+        "num_cols": 2,
+        "jw_col_template": "s{n}_namefrst",
+        "jw_threshold": 0.9,
+    }
+
+    table_a, table_b = datasource_multi_jaro_winkler_search_input
+
+    sql_expr = comparison_feature_core.generate_comparison_feature(
+        feature, "histid", include_as=True
+    )
+
+    table_a.createOrReplaceTempView("table_a")
+    table_b.createOrReplaceTempView("table_b")
+
+    # Just make sure that the query parses and runs
+    spark.sql(f"SELECT {sql_expr} FROM table_a a CROSS JOIN table_b b")
+
+
+def test_multi_jaro_winkler_search_column_templating():
+    """Test the comparison feature when...
+    - there are more than 10 columns
+    - there are several different templates to fill in
+    - some of the templates have multiple {n}s (or 0 {n}s!) and are strange
+    """
+    feature = {
+        "alias": "test_jw_search",
+        "comparison_type": "multi_jaro_winkler_search",
+        "num_cols": 11,
+        "jw_col_template": "COLUMN_NAME{n}",
+        "jw_threshold": 0.1,
+        "equal_and_not_null_templates": [
+            "TEST{n}_TEST{n}",
+            "{n}{n}{n}__COLUMN",
+            "static_column",
+        ],
+    }
+
+    sql_expr = comparison_feature_core.generate_comparison_feature(
+        feature, "id", include_as=True
+    )
+
+    # Check for various column names in the sql_expr, which is just a str
+    assert "COLUMN_NAME0" not in sql_expr
+    assert "COLUMN_NAME1" in sql_expr
+    assert "COLUMN_NAME9" in sql_expr
+    assert "COLUMN_NAME10" in sql_expr
+    assert "COLUMN_NAME11" in sql_expr
+    assert "COLUMN_NAME12" not in sql_expr
+
+    assert "TEST0_TEST0" not in sql_expr
+    assert "TEST1_TEST1" in sql_expr
+    assert "TEST3_TEST3" in sql_expr
+    assert "TEST3_TEST4" not in sql_expr
+    assert "TEST11_TEST11" in sql_expr
+    assert "TEST12_TEST12" not in sql_expr
+
+    assert "000__COLUMN" not in sql_expr
+    assert "111__COLUMN" in sql_expr
+    assert "111111__COLUMN" in sql_expr
+    assert "121212__COLUMN" not in sql_expr
+
+    assert "static_column" in sql_expr
+    assert "static_column1" not in sql_expr
+    assert "static_colum1" not in sql_expr

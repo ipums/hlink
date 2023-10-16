@@ -81,6 +81,26 @@ class LinkStepExplode(LinkStep):
                     feature_columns.append(c["column_name"])
                 elif c.get("column_names", False):
                     feature_columns += c["column_names"]
+                # A special case for multi_jaro_winkler_search because it supports
+                # templating. It doesn't store the column names it's going to use
+                # in a column_name or column_names attribute...
+                elif c.get("comparison_type") == "multi_jaro_winkler_search":
+                    num_cols = c["num_cols"]
+                    jw_col_template = c["jw_col_template"]
+                    equal_templates = c.get("equal_and_not_null_templates", [])
+
+                    # The comparison feature will iterate over the Cartesian product
+                    # of this range with itself. But this single loop gets us all
+                    # of the integers that will appear in the Cartesian product.
+                    for i in range(1, num_cols + 1):
+                        realized_jw_template = jw_col_template.replace("{n}", str(i))
+                        realized_equal_templates = [
+                            equal_template.replace("{n}", str(i))
+                            for equal_template in equal_templates
+                        ]
+
+                        feature_columns.append(realized_jw_template)
+                        feature_columns.extend(realized_equal_templates)
 
         exploded_df = df
 
