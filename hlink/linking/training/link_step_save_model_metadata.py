@@ -13,11 +13,8 @@ class LinkStepSaveModelMetadata(LinkStep):
         super().__init__(
             task,
             "save metadata about the model",
-            input_table_names=[
-                f"{task.table_prefix}training_features",
-                f"{task.table_prefix}training_vectorized",
-            ],
-            output_table_names=[f"{task.table_prefix}training_results"],
+            output_table_names=[f"{task.table_prefix}training_model_metadata"],
+            input_model_names=[f"{task.table_prefix}trained_model"],
         )
 
     def _run(self):
