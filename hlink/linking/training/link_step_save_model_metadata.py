@@ -19,10 +19,18 @@ class LinkStepSaveModelMetadata(LinkStep):
 
     def _run(self):
         training_conf = str(self.task.training_conf)
-        table_prefix = self.task.table_prefix
         config = self.task.link_run.config
 
-        self.task.spark.sql("set spark.sql.shuffle.partitions=1")
+        do_get_feature_importances = config[training_conf].get("feature_importances")
+
+        if do_get_feature_importances is None or not do_get_feature_importances:
+            print(
+                "Skipping the save model metadata training step. "
+                "To run this step and save model metadata like feature importances, "
+                "set feature_importances = true in the [training] section of your "
+                "config file."
+            )
+            return
 
         if "feature_importances" in config[training_conf]:
             if config[training_conf]["feature_importances"]:
