@@ -19,6 +19,7 @@ class LinkStepSaveModelMetadata(LinkStep):
 
     def _run(self):
         training_conf = str(self.task.training_conf)
+        table_prefix = self.task.table_prefix
         config = self.task.link_run.config
 
         do_get_feature_importances = config[training_conf].get("feature_importances")
@@ -34,21 +35,27 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         # retrieve the saved chosen model
         print("Loading chosen ML model...")
-        model_path = Path(config["spark_tmp_dir"]) / "chosen_model"
+
         try:
-            plm = PipelineModel.load(str(model_path))
-        except:
-            print(
-                "Model not found!  You might need to run step_2 to generate and train the chosen model if you haven't already done so."
+            pipeline_model = self.task.link_run.trained_models[
+                f"{table_prefix}trained_model"
+            ]
+        except KeyError as e:
+            new_error = RuntimeError(
+                "Model not found!  Please run training step 2 to generate and "
+                "train the chosen model. The model does not persist between runs "
+                "of hlink."
             )
+
+            raise new_error from e
 
         # make look at the features and their importances
         print("Retrieving model feature importances or coefficients...")
         try:
-            feature_imp = plm.stages[-2].coefficients
+            feature_imp = pipeline_model.stages[-2].coefficients
         except:
             try:
-                feature_imp = plm.stages[-2].featureImportances
+                feature_imp = pipeline_model.stages[-2].featureImportances
             except:
                 print(
                     "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."

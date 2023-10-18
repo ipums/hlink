@@ -261,3 +261,14 @@ def test_step_3_skipped_on_false_feature_importances(training_conf, training, ca
 
     output = capsys.readouterr().out
     assert "Skipping the save model metadata training step" in output
+
+
+def test_step_3_model_not_found(training_conf, training):
+    """Step 3 raises an exception when the trained model is not available."""
+
+    training_conf["training"]["feature_importances"] = True
+    with pytest.raises(
+        RuntimeError,
+        match="Model not found!  Please run training step 2 to generate and train the chosen model",
+    ):
+        training.run_step(3)
