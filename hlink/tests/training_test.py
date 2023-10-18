@@ -85,6 +85,7 @@ def test_all_steps(
 
     # training_conf["training"]["use_potential_matches_features"] = True
     training_conf["training"]["score_with_model"] = True
+    training_conf["training"]["feature_importances"] = True
     training_conf["spark_tmp_dir"] = spark_test_tmp_dir_path
 
     training.link_run.trained_models["trained_model"] = None
@@ -109,6 +110,8 @@ def test_all_steps(
     row = transformed_df.query("id_a == 10 and id_b == 50").iloc[0]
     assert row.prediction == 0
     assert row.state_distance_imp.round(0) == 1909
+
+    training.run_step(3)
 
 
 def test_step_2_bucketizer(spark, main, conf):
@@ -236,3 +239,25 @@ def test_step_2_interaction(spark, main, conf):
     assert prepped_data.query("var1 == 3")["interacted_vars012"].iloc[0][0] == 18
 
     main.do_drop_all("")
+
+
+def test_step_3_skipped_on_no_feature_importances(training_conf, training, capsys):
+    """Step 3 is skipped when there is no training.feature_importances attribute
+    in the config."""
+    assert "feature_importances" not in training_conf
+
+    training.run_step(3)
+
+    output = capsys.readouterr().out
+    assert "Skipping the save model metadata training step" in output
+
+
+def test_step_3_skipped_on_false_feature_importances(training_conf, training, capsys):
+    """Step 3 is skipped when training.feature_importances is set to false in
+    the config."""
+    training_conf["feature_importances"] = False
+
+    training.run_step(3)
+
+    output = capsys.readouterr().out
+    assert "Skipping the save model metadata training step" in output
