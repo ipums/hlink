@@ -3,9 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from pyspark.ml import PipelineModel
 from hlink.linking.link_step import LinkStep
-from pathlib import Path
 
 
 class LinkStepSaveModelMetadata(LinkStep):
@@ -13,7 +11,7 @@ class LinkStepSaveModelMetadata(LinkStep):
         super().__init__(
             task,
             "save metadata about the model",
-            output_table_names=[f"{task.table_prefix}training_model_metadata"],
+            output_table_names=[f"{task.table_prefix}training_feature_importances"],
             input_model_names=[f"{task.table_prefix}trained_model"],
         )
 
@@ -49,31 +47,43 @@ class LinkStepSaveModelMetadata(LinkStep):
 
             raise new_error from e
 
+        # The pipeline model has three stages: vector assembler, classifier, post
+        # transformer.
+        vector_assembler = pipeline_model.stages[0]
+        classifier = pipeline_model.stages[1]
+
         # make look at the features and their importances
         print("Retrieving model feature importances or coefficients...")
         try:
-            feature_imp = pipeline_model.stages[-2].coefficients
+            feature_imp = classifier.coefficients
         except:
             try:
-                feature_imp = pipeline_model.stages[-2].featureImportances
+                feature_imp = classifier.featureImportances
             except:
                 print(
                     "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
                 )
+                return
             else:
                 label = "Feature importances"
         else:
-            feature_imp = feature_imp.round(4)
             label = "Coefficients"
 
-        varlist = self.task.spark.table(f"{table_prefix}features_list").toPandas()
-        for i in varlist["idx"]:
-            varlist.at[i, "score"] = feature_imp[i]
-        varlist.sort_values("score", ascending=False, inplace=True)
-        vl = self.spark.createDataFrame(varlist)
-        vl.write.mode("overwrite").saveAsTable(f"{table_prefix}feature_importances")
+        column_names = vector_assembler.getInputCols()
+        # We need to convert from numpy float64s to Python floats to avoid type
+        # issues when creating the DataFrame below.
+        feature_importances = [
+            float(importance) for importance in feature_imp.toArray()
+        ]
 
-        print(
-            f"{label} have been saved to the Spark table '{table_prefix}feature_importances'."
+        features_df = self.task.spark.createDataFrame(
+            zip(column_names, feature_importances),
+            "feature_name: string, importance: double",
+        ).sort("importance", ascending=False)
+
+        feature_importances_table = (
+            f"{self.task.table_prefix}training_feature_importances"
         )
-        print(varlist)
+        features_df.write.mode("overwrite").saveAsTable(feature_importances_table)
+
+        print(f"{label} have been saved to the {feature_importances_table} table")
