@@ -112,6 +112,10 @@ def test_all_steps(
     assert row.state_distance_imp.round(0) == 1909
 
     training.run_step(3)
+    tf = spark.table("training_feature_importances").toPandas()
+    print(tf)
+    1/0
+
 
 
 def test_step_2_bucketizer(spark, main, conf):
