@@ -30,14 +30,20 @@ as they are read in.
 Train a machine learning model to use for classification of potential links. This
 requires training data, which is read in in the first step. Comparison features
 are generated for the training data, and then the model is trained on the data
-and saved for use in the Matching task.
+and saved for use in the Matching task. The last step optionally saves some metadata
+like feature importances or coefficients for the model to help with introspection.
 
 ### Task steps
 
-The steps in each of these tasks are the same:
+The first three steps in each of these tasks are the same:
 * Step 0: Ingest the training data from a CSV file.
 * Step 1: Create comparison features.
 * Step 2: Train and save the model.
+
+The last step is available only for Training, not for Household Training.
+* Step 3: Save the coefficients or feature importances of the model for inspection.
+  This step is skipped by default. To enable it, set the `training.feature_importances`
+  config attribute to true in your config file.
 
 ### Related Configuration Sections
 

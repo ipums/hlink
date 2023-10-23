@@ -71,15 +71,22 @@ as they are read in.</p></li>
 <p>Train a machine learning model to use for classification of potential links. This
 requires training data, which is read in in the first step. Comparison features
 are generated for the training data, and then the model is trained on the data
-and saved for use in the Matching task.</p>
+and saved for use in the Matching task. The last step optionally saves some metadata
+like feature importances or coefficients for the model to help with introspection.</p>
 </section>
 <section id="id2">
 <h3>Task steps<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
-<p>The steps in each of these tasks are the same:</p>
+<p>The first three steps in each of these tasks are the same:</p>
 <ul class="simple">
 <li><p>Step 0: Ingest the training data from a CSV file.</p></li>
 <li><p>Step 1: Create comparison features.</p></li>
 <li><p>Step 2: Train and save the model.</p></li>
+</ul>
+<p>The last step is available only for Training, not for Household Training.</p>
+<ul class="simple">
+<li><p>Step 3: Save the coefficients or feature importances of the model for inspection.
+This step is skipped by default. To enable it, set the <code class="docutils literal notranslate"><span class="pre">training.feature_importances</span></code>
+config attribute to true in your config file.</p></li>
 </ul>
 </section>
 <section id="id3">

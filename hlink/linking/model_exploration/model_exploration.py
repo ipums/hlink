@@ -8,7 +8,6 @@ from ..link_task import LinkTask
 from .link_step_ingest_file import LinkStepIngestFile
 from .link_step_create_features import LinkStepCreateFeatures
 from .link_step_train_test_models import LinkStepTrainTestModels
-from .link_step_get_feature_importances import LinkStepGetFeatureImportances
 
 
 class ModelExploration(LinkTask):
@@ -22,5 +21,4 @@ class ModelExploration(LinkTask):
             LinkStepIngestFile(self),
             LinkStepCreateFeatures(self),
             LinkStepTrainTestModels(self),
-            LinkStepGetFeatureImportances(self),
         ]

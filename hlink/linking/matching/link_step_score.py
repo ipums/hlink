@@ -4,7 +4,7 @@
 #   https://github.com/ipums/hlink
 
 import logging
-from pyspark.sql import Row, Window
+from pyspark.sql import Window
 from pyspark.sql import functions as f
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
@@ -89,8 +89,6 @@ class LinkStepScore(LinkStep):
             f"{table_prefix}potential_matches_pipeline"
         ).select(*pp_required_cols)
         score_tmp = plm.transform(pre_pipeline)
-        # TODO: Move save_feature_importances to training or model evaluation step
-        # _save_feature_importances(self.spark, score_tmp)
 
         alpha_threshold = chosen_model_params.get("threshold", 0.5)
         threshold_ratio = threshold_core.get_threshold_ratio(
@@ -108,22 +106,6 @@ class LinkStepScore(LinkStep):
         self._save_table_with_requested_columns(pm, pmp, predictions, id_a, id_b)
         self._save_predicted_matches(config, id_a, id_b)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
-
-    def _save_feature_importances(self, spark, score_tmp):
-        config = self.task.link_run.config
-        if not config[f"{self.task.training_conf}"].get("feature_importances", False):
-            return
-        cols = (
-            score_tmp.select("*").schema["features_vector"].metadata["ml_attr"]["attrs"]
-        )
-        list_extract = []
-        for i in cols:
-            list_extract += cols[i]
-
-        varlist = spark.createDataFrame(Row(**x) for x in list_extract)
-        varlist.write.mode("overwrite").saveAsTable(
-            f"{self.task.table_prefix}features_list"
-        )
 
     def _save_table_with_requested_columns(self, pm, pmp, predictions, id_a, id_b):
         # merge back in original data for feature verification

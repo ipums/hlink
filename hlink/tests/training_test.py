@@ -85,6 +85,7 @@ def test_all_steps(
 
     # training_conf["training"]["use_potential_matches_features"] = True
     training_conf["training"]["score_with_model"] = True
+    training_conf["training"]["feature_importances"] = True
     training_conf["spark_tmp_dir"] = spark_test_tmp_dir_path
 
     training.link_run.trained_models["trained_model"] = None
@@ -109,6 +110,20 @@ def test_all_steps(
     row = transformed_df.query("id_a == 10 and id_b == 50").iloc[0]
     assert row.prediction == 0
     assert row.state_distance_imp.round(0) == 1909
+
+    training.run_step(3)
+    tf = spark.table("training_feature_importances").toPandas()
+    for var in training_conf["training"]["independent_vars"]:
+        assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
+    assert all(
+        [col in ["feature_name", "coefficient_or_importance"] for col in tf.columns]
+    )
+    assert (tf["coefficient_or_importance"] >= 0).all() and (
+        tf["coefficient_or_importance"] <= 1
+    ).all()
+    assert 0.4 <= tf.loc[0, "coefficient_or_importance"] <= 0.5
+    assert 0.2 <= tf.loc[1, "coefficient_or_importance"] <= 0.3
+    assert (tf.iloc[2:, 1] <= 0.1).all()
 
 
 def test_step_2_bucketizer(spark, main, conf):
@@ -236,3 +251,36 @@ def test_step_2_interaction(spark, main, conf):
     assert prepped_data.query("var1 == 3")["interacted_vars012"].iloc[0][0] == 18
 
     main.do_drop_all("")
+
+
+def test_step_3_skipped_on_no_feature_importances(training_conf, training, capsys):
+    """Step 3 is skipped when there is no training.feature_importances attribute
+    in the config."""
+    assert "feature_importances" not in training_conf["training"]
+
+    training.run_step(3)
+
+    output = capsys.readouterr().out
+    assert "Skipping the save model metadata training step" in output
+
+
+def test_step_3_skipped_on_false_feature_importances(training_conf, training, capsys):
+    """Step 3 is skipped when training.feature_importances is set to false in
+    the config."""
+    training_conf["training"]["feature_importances"] = False
+
+    training.run_step(3)
+
+    output = capsys.readouterr().out
+    assert "Skipping the save model metadata training step" in output
+
+
+def test_step_3_model_not_found(training_conf, training):
+    """Step 3 raises an exception when the trained model is not available."""
+
+    training_conf["training"]["feature_importances"] = True
+    with pytest.raises(
+        RuntimeError,
+        match="Model not found!  Please run training step 2 to generate and train the chosen model",
+    ):
+        training.run_step(3)

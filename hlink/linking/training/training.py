@@ -8,6 +8,7 @@ from ..link_task import LinkTask
 from .link_step_ingest_file import LinkStepIngestFile
 from .link_step_create_comparison_features import LinkStepCreateComparisonFeatures
 from .link_step_train_and_save_model import LinkStepTrainAndSaveModel
+from .link_step_save_model_metadata import LinkStepSaveModelMetadata
 
 
 class Training(LinkTask):
@@ -21,4 +22,5 @@ class Training(LinkTask):
             LinkStepIngestFile(self),
             LinkStepCreateComparisonFeatures(self),
             LinkStepTrainAndSaveModel(self),
+            LinkStepSaveModelMetadata(self),
         ]
