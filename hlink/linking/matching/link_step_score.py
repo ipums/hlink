@@ -4,7 +4,7 @@
 #   https://github.com/ipums/hlink
 
 import logging
-from pyspark.sql import Row, Window
+from pyspark.sql import Window
 from pyspark.sql import functions as f
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
