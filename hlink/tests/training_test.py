@@ -244,7 +244,7 @@ def test_step_2_interaction(spark, main, conf):
 def test_step_3_skipped_on_no_feature_importances(training_conf, training, capsys):
     """Step 3 is skipped when there is no training.feature_importances attribute
     in the config."""
-    assert "feature_importances" not in training_conf
+    assert "feature_importances" not in training_conf["training"]
 
     training.run_step(3)
 
@@ -255,7 +255,7 @@ def test_step_3_skipped_on_no_feature_importances(training_conf, training, capsy
 def test_step_3_skipped_on_false_feature_importances(training_conf, training, capsys):
     """Step 3 is skipped when training.feature_importances is set to false in
     the config."""
-    training_conf["feature_importances"] = False
+    training_conf["training"]["feature_importances"] = False
 
     training.run_step(3)
 
