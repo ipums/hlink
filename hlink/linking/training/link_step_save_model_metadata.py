@@ -7,6 +7,18 @@ from hlink.linking.link_step import LinkStep
 
 
 class LinkStepSaveModelMetadata(LinkStep):
+    """Save metadata about the trained machine learning model.
+
+    By default this step is skipped. The training.feature_importances config
+    attribute enables it. The step saves either coefficients or feature
+    importances for the trained model, depending on the type of model. It saves
+    these data to the training_feature_importances Spark table.
+
+    This step is primarily helpful for debugging issues with machine learning
+    features and understanding how those features affect scoring of potential
+    matches.
+    """
+
     def __init__(self, task):
         super().__init__(
             task,
@@ -31,9 +43,7 @@ class LinkStepSaveModelMetadata(LinkStep):
             )
             return
 
-        # retrieve the saved chosen model
         print("Loading chosen ML model...")
-
         try:
             pipeline_model = self.task.link_run.trained_models[
                 f"{table_prefix}trained_model"
@@ -52,7 +62,6 @@ class LinkStepSaveModelMetadata(LinkStep):
         vector_assembler = pipeline_model.stages[0]
         classifier = pipeline_model.stages[1]
 
-        # make look at the features and their importances
         print("Retrieving model feature importances or coefficients...")
         try:
             feature_imp = classifier.coefficients
