@@ -115,12 +115,15 @@ def test_all_steps(
     tf = spark.table("training_feature_importances").toPandas()
     for var in training_conf["training"]["independent_vars"]:
         assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
-    assert all([col in ['feature_name', 'coefficient_or_importance'] for col in tf.columns])
-    assert (tf['coefficient_or_importance'] >= 0).all() and (tf['coefficient_or_importance'] <= 1).all()
-    assert 0.4 <= tf.loc[0, 'coefficient_or_importance'] <= 0.5
-    assert 0.2 <= tf.loc[1, 'coefficient_or_importance'] <= 0.3
+    assert all(
+        [col in ["feature_name", "coefficient_or_importance"] for col in tf.columns]
+    )
+    assert (tf["coefficient_or_importance"] >= 0).all() and (
+        tf["coefficient_or_importance"] <= 1
+    ).all()
+    assert 0.4 <= tf.loc[0, "coefficient_or_importance"] <= 0.5
+    assert 0.2 <= tf.loc[1, "coefficient_or_importance"] <= 0.3
     assert (tf.iloc[2:, 1] <= 0.1).all()
-
 
 
 def test_step_2_bucketizer(spark, main, conf):
