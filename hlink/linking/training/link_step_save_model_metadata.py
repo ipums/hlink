@@ -87,7 +87,7 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         features_df = self.task.spark.createDataFrame(
             zip(column_names, feature_importances),
-            "feature_name: string, importance: double",
+            "feature_name: string, coefficient_or_importance: double",
         ).sort("importance", ascending=False)
 
         feature_importances_table = (
