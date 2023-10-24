@@ -87,20 +87,23 @@ class LinkStepSaveModelMetadata(LinkStep):
         ]
 
         tf_prepped = self.task.spark.table(f"{table_prefix}training_features_prepped")
+        tf_prepped_row = tf_prepped.head()
 
+        # Expand categorical features into multiple columns for display with their
+        # respective coefficients / feature importances.
         true_cols = []
         for col in column_names:
             if col.endswith("_onehotencoded"):
-                true_cols += [
-                    f"{col[:-13]}{i}" for i in range(len(tf_prepped[col].iloc[0]))
-                ]
+                base_col = col.removesuffix("_onehotencoded")
+                num_categories = len(tf_prepped_row[col])
+                true_cols.extend(f"{base_col}_{i}" for i in range(num_categories))
             else:
-                true_cols += [col]
+                true_cols.append(col)
 
         features_df = self.task.spark.createDataFrame(
-            zip(true_cols, feature_importances),
+            zip(true_cols, feature_importances, strict=True),
             "feature_name: string, coefficient_or_importance: double",
-        ).sort("coefficient_or_importance", ascending=False)
+        ).sort("feature_name")
 
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"
