@@ -4,8 +4,6 @@
 #   https://github.com/ipums/hlink
 
 from hlink.linking.link_step import LinkStep
-import hlink.linking.core.pipeline as pipeline_core
-from pyspark.ml import Pipeline
 
 
 class LinkStepSaveModelMetadata(LinkStep):
