@@ -4,7 +4,8 @@
 #   https://github.com/ipums/hlink
 
 from hlink.linking.link_step import LinkStep
-
+import hlink.linking.core.pipeline as pipeline_core
+from pyspark.ml import Pipeline
 
 class LinkStepSaveModelMetadata(LinkStep):
     """Save metadata about the trained machine learning model.
@@ -85,8 +86,22 @@ class LinkStepSaveModelMetadata(LinkStep):
             float(importance) for importance in feature_imp.toArray()
         ]
 
+        # Maybe find a way to hide this table earlier or get # of coefficients earlier rather than re-call
+        tf = self.task.spark.table(f"{table_prefix}training_features")
+
+        pre_pipeline = self.task.link_run.trained_models[f"{table_prefix}pre_pipeline"]
+        tf_prepped = pre_pipeline.transform(tf).toPandas()
+
+        true_cols = []
+        for col in column_names:
+            if col.endswith("_onehotencoded"):
+                true_cols += [f"{col[:-13]}{i}" for i in range(len(tf_prepped[col].iloc[0]))]
+            else:
+                true_cols += [col]
+                
+
         features_df = self.task.spark.createDataFrame(
-            zip(column_names, feature_importances),
+            zip(true_cols, feature_importances),
             "feature_name: string, coefficient_or_importance: double",
         ).sort("coefficient_or_importance", ascending=False)
 

@@ -122,8 +122,9 @@ def test_all_steps(
         tf["coefficient_or_importance"] <= 1
     ).all()
     assert 0.4 <= tf.loc[0, "coefficient_or_importance"] <= 0.5
-    assert 0.2 <= tf.loc[1, "coefficient_or_importance"] <= 0.3
-    assert (tf.iloc[2:, 1] <= 0.1).all()
+    assert 0.1 <= tf.loc[1, "coefficient_or_importance"] <= 0.2
+    assert 0.1 <= tf.loc[2, "coefficient_or_importance"] <= 0.2
+    assert (tf.iloc[3:, 1] <= 0.1).all()
 
 
 def test_step_2_bucketizer(spark, main, conf):
