@@ -23,6 +23,7 @@ class LinkStepSaveModelMetadata(LinkStep):
         super().__init__(
             task,
             "save metadata about the model",
+            input_table_names=[f"{task.table_prefix}training_features_prepped"],
             output_table_names=[f"{task.table_prefix}training_feature_importances"],
             input_model_names=[f"{task.table_prefix}trained_model"],
         )
@@ -85,11 +86,7 @@ class LinkStepSaveModelMetadata(LinkStep):
             float(importance) for importance in feature_imp.toArray()
         ]
 
-        # Maybe find a way to hide this table earlier or get # of coefficients earlier rather than re-call
-        tf = self.task.spark.table(f"{table_prefix}training_features")
-
-        pre_pipeline = self.task.link_run.trained_models[f"{table_prefix}pre_pipeline"]
-        tf_prepped = pre_pipeline.transform(tf).toPandas()
+        tf_prepped = self.task.spark.table(f"{table_prefix}training_features_prepped")
 
         true_cols = []
         for col in column_names:
