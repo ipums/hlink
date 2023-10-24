@@ -99,6 +99,7 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         encoder = OneHotEncoder(
             inputCols=categorical_comparison_features,
             outputCols=encoded_output_cols,
+            handleInvalid="keep",
             dropLast=False,
         )
         # feature_names = list((set(feature_names) - set(categorical_comparison_features)) | set(encoded_output_cols))
@@ -143,6 +144,7 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         encoder = OneHotEncoder(
             inputCols=categorical_pipeline_features,
             outputCols=encoded_output_cols,
+            handleInvalid="keep",
             dropLast=False,
         )
         # feature_names = list((set(feature_names) - set(categorical_pipeline_features)) | set(encoded_output_cols))
