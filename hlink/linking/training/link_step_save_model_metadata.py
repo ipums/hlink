@@ -7,6 +7,7 @@ from hlink.linking.link_step import LinkStep
 import hlink.linking.core.pipeline as pipeline_core
 from pyspark.ml import Pipeline
 
+
 class LinkStepSaveModelMetadata(LinkStep):
     """Save metadata about the trained machine learning model.
 
@@ -95,10 +96,11 @@ class LinkStepSaveModelMetadata(LinkStep):
         true_cols = []
         for col in column_names:
             if col.endswith("_onehotencoded"):
-                true_cols += [f"{col[:-13]}{i}" for i in range(len(tf_prepped[col].iloc[0]))]
+                true_cols += [
+                    f"{col[:-13]}{i}" for i in range(len(tf_prepped[col].iloc[0]))
+                ]
             else:
                 true_cols += [col]
-                
 
         features_df = self.task.spark.createDataFrame(
             zip(true_cols, feature_importances),

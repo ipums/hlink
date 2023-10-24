@@ -5,7 +5,7 @@
 
 import sys
 from pathlib import Path
-import tempfile
+
 from hlink.spark.session import SparkConnection
 
 
@@ -21,10 +21,10 @@ class SparkFactory:
     """
 
     def __init__(self):
-        spark_dir = Path("/tmp/spark").resolve()
+        spark_dir = Path("spark").resolve()
         self.derby_dir = spark_dir / "derby"
         self.warehouse_dir = spark_dir / "warehouse"
-        self.tmp_dir = spark_dir / tempfile.gettempdir()
+        self.tmp_dir = spark_dir / "tmp"
         self.python = sys.executable
         self.db_name = "linking"
         self.is_local = True
