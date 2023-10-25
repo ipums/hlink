@@ -113,7 +113,6 @@ def test_all_steps(
 
     training.run_step(3)
     tf = spark.table("training_feature_importances").toPandas()
-    print(tf)
     for var in training_conf["training"]["independent_vars"]:
         assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
     assert all(
