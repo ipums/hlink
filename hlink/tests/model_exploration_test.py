@@ -242,7 +242,7 @@ def test_step_1_OneHotEncoding(
     ]
     assert training_v.shape[0] == 9
     assert all(c in training_v.columns for c in columns_expected)
-    assert len(training_v["features_vector"][0]) == 5
+    assert len(training_v["features_vector"][0]) == 4
 
 
 def test_step_2_scale_values(
@@ -256,7 +256,7 @@ def test_step_2_scale_values(
     training_v = spark.table("model_eval_training_vectorized").toPandas()
 
     assert training_v.shape == (9, 9)
-    assert len(training_v["features_vector"][0]) == 5
+    assert len(training_v["features_vector"][0]) == 4
     assert training_v["features_vector"][0][0].round(2) == 2.85
 
 
@@ -427,35 +427,36 @@ def test_step_2_interact_categorial_vars(
     assert prepped_data.shape == (9, 11)
     assert list(
         prepped_data.query("id_a == 10 and id_b == 10")["regionf_onehotencoded"].iloc[0]
-    ) == [0, 1, 0, 0]
+    ) == [0, 1, 0]
     assert list(
         prepped_data.query("id_a == 20 and id_b == 50")["regionf_onehotencoded"].iloc[0]
-    ) == [0, 0, 1, 0]
+    ) == [0, 0, 1]
     assert list(
         prepped_data.query("id_a == 10 and id_b == 10")["td_match_onehotencoded"].iloc[
             0
         ]
-    ) == [0, 1, 0]
+    ) == [0, 1]
     assert list(
         prepped_data.query("id_a == 20 and id_b == 50")["td_match_onehotencoded"].iloc[
             0
         ]
-    ) == [1, 0, 0]
+    ) == [1, 0]
     assert list(
         prepped_data.query("id_a == 10 and id_b == 50")[
             "regionf_interacted_tdmatch"
         ].iloc[0]
-    ) == [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    ) == [0, 0, 1, 0, 0, 0]
     assert list(
         prepped_data.query("id_a == 10 and id_b == 10")[
             "regionf_interacted_tdmatch"
         ].iloc[0]
-    ) == [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+    ) == [0, 0, 0, 1, 0, 0]
     assert list(
         prepped_data.query("id_a == 30 and id_b == 50")[
             "regionf_interacted_tdmatch"
         ].iloc[0]
-    ) == [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+    ) == [0, 0, 0, 0, 0, 1]
+
     assert (
         len(
             list(
@@ -464,7 +465,7 @@ def test_step_2_interact_categorial_vars(
                 ]
             )
         )
-        == 17
+        == 10
     )
 
 
@@ -510,7 +511,7 @@ def test_step_2_VectorAssembly(
 
     vdf = spark.table("model_eval_training_vectorized").toPandas()
 
-    assert len(vdf.query("id_a == 20 and id_b == 30")["features_vector"].iloc[0]) == 6
+    assert len(vdf.query("id_a == 20 and id_b == 30")["features_vector"].iloc[0]) == 5
     assert 3187 in (
         vdf.query("id_a == 20 and id_b == 30")["features_vector"].iloc[0].values.round()
     )
