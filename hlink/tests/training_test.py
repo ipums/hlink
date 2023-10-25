@@ -113,6 +113,7 @@ def test_all_steps(
 
     training.run_step(3)
     tf = spark.table("training_feature_importances").toPandas()
+    print(tf)
     for var in training_conf["training"]["independent_vars"]:
         assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
     assert all(
@@ -121,10 +122,32 @@ def test_all_steps(
     assert (tf["coefficient_or_importance"] >= 0).all() and (
         tf["coefficient_or_importance"] <= 1
     ).all()
-    assert 0.4 <= tf.loc[0, "coefficient_or_importance"] <= 0.5
-    assert 0.1 <= tf.loc[1, "coefficient_or_importance"] <= 0.2
-    assert 0.1 <= tf.loc[2, "coefficient_or_importance"] <= 0.2
-    assert (tf.iloc[3:, 1] <= 0.1).all()
+
+    assert (
+        0.4
+        <= tf.query("feature_name == 'namelast_jw_imp'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.5
+    )
+    assert (
+        0.1
+        <= tf.query("feature_name == 'namelast_jw_buckets_4'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.2
+    )
+    assert (
+        0.2
+        <= tf.query("feature_name == 'state_distance_imp'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.3
+    )
+    assert (
+        tf.query("feature_name == 'regionf_0'")["coefficient_or_importance"].item()
+        <= 0.1
+    )
 
 
 def test_step_2_bucketizer(spark, main, conf):
