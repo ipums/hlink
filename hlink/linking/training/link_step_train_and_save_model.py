@@ -18,7 +18,7 @@ class LinkStepTrainAndSaveModel(LinkStep):
             task,
             "train and save the model",
             input_table_names=[f"{task.table_prefix}training_features"],
-            output_table_names=[],
+            output_table_names=[f"{task.table_prefix}training_features_prepped"],
             output_model_names=[f"{task.table_prefix}trained_model"],
         )
 
@@ -59,6 +59,10 @@ class LinkStepTrainAndSaveModel(LinkStep):
         pre_pipeline = Pipeline(stages=pipeline_stages[:-1]).fit(tf)
         self.task.link_run.trained_models[f"{table_prefix}pre_pipeline"] = pre_pipeline
         tf_prepped = pre_pipeline.transform(tf)
+
+        tf_prepped.write.mode("overwrite").saveAsTable(
+            f"{table_prefix}training_features_prepped"
+        )
 
         classifier, post_transformer = classifier_core.choose_classifier(
             chosen_model_type, chosen_model_params, dep_var

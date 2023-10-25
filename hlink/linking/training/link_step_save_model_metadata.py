@@ -23,6 +23,7 @@ class LinkStepSaveModelMetadata(LinkStep):
         super().__init__(
             task,
             "save metadata about the model",
+            input_table_names=[f"{task.table_prefix}training_features_prepped"],
             output_table_names=[f"{task.table_prefix}training_feature_importances"],
             input_model_names=[f"{task.table_prefix}trained_model"],
         )
@@ -85,10 +86,24 @@ class LinkStepSaveModelMetadata(LinkStep):
             float(importance) for importance in feature_imp.toArray()
         ]
 
+        tf_prepped = self.task.spark.table(f"{table_prefix}training_features_prepped")
+        tf_prepped_row = tf_prepped.head()
+
+        # Expand categorical features into multiple columns for display with their
+        # respective coefficients / feature importances.
+        true_cols = []
+        for col in column_names:
+            if col.endswith("_onehotencoded"):
+                base_col = col.removesuffix("_onehotencoded")
+                num_categories = len(tf_prepped_row[col])
+                true_cols.extend(f"{base_col}_{i}" for i in range(num_categories))
+            else:
+                true_cols.append(col)
+
         features_df = self.task.spark.createDataFrame(
-            zip(column_names, feature_importances),
+            zip(true_cols, feature_importances, strict=True),
             "feature_name: string, coefficient_or_importance: double",
-        ).sort("coefficient_or_importance", ascending=False)
+        ).sort("feature_name")
 
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"
