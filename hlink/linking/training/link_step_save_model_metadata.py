@@ -87,13 +87,20 @@ class LinkStepSaveModelMetadata(LinkStep):
         ]
 
         tf_prepped = self.task.spark.table(f"{table_prefix}training_features_prepped")
+        tf_prepped_schema = dict(tf_prepped.dtypes)
         tf_prepped_row = tf_prepped.head()
 
         # Expand categorical features into multiple columns for display with their
         # respective coefficients / feature importances.
         true_cols = []
         for col in column_names:
-            if col.endswith("_onehotencoded"):
+            # Columns with type "vector" are categorical and may have more than one coefficient.
+            # Many of these columns end with "_onehotencoded", and we remove that
+            # suffix to clean up the column names. Categorical columns created through
+            # feature interaction will probably not have the "_onehotencoded" suffix,
+            # so we can't just check for that to find the categorical features.
+            data_type = tf_prepped_schema[col]
+            if data_type == "vector":
                 base_col = col.removesuffix("_onehotencoded")
                 num_categories = len(tf_prepped_row[col])
                 true_cols.extend(f"{base_col}_{i}" for i in range(num_categories))

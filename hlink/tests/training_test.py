@@ -331,13 +331,20 @@ def test_step_3_interacted_categorical_features(
     training.run_step(2)
     training.run_step(3)
 
-    tf = spark.table("training_feature_importances")
+    tf = spark.table("training_feature_importances").toPandas()
     assert (
         0.0
         <= tf.query("feature_name == 'regionf_interacted_namelast_jw_0'")[
             "coefficient_or_importance"
         ].item()
         <= 1.0
+    )
+    assert (
+        0.4
+        <= tf.query("feature_name == 'namelast_jw_imp'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.5
     )
 
 
