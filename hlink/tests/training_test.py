@@ -277,21 +277,38 @@ def test_step_2_interaction(spark, main, conf):
     main.do_drop_all("")
 
 
-def test_step_3_skipped_on_no_feature_importances(training_conf, training, capsys):
+def test_step_3_requires_table(training_conf, training):
+    training_conf["training"]["feature_importances"] = True
+    with pytest.raises(RuntimeError, match="Missing input tables"):
+        training.run_step(3)
+
+
+def test_step_3_skipped_on_no_feature_importances(
+    training_conf, training, spark, capsys
+):
     """Step 3 is skipped when there is no training.feature_importances attribute
     in the config."""
     assert "feature_importances" not in training_conf["training"]
-
+    mock_tf_prepped = spark.createDataFrame(
+        [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
+    )
+    mock_tf_prepped.write.saveAsTable("training_features_prepped")
     training.run_step(3)
 
     output = capsys.readouterr().out
     assert "Skipping the save model metadata training step" in output
 
 
-def test_step_3_skipped_on_false_feature_importances(training_conf, training, capsys):
+def test_step_3_skipped_on_false_feature_importances(
+    training_conf, training, spark, capsys
+):
     """Step 3 is skipped when training.feature_importances is set to false in
     the config."""
     training_conf["training"]["feature_importances"] = False
+    mock_tf_prepped = spark.createDataFrame(
+        [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
+    )
+    mock_tf_prepped.write.saveAsTable("training_features_prepped")
 
     training.run_step(3)
 
@@ -299,10 +316,13 @@ def test_step_3_skipped_on_false_feature_importances(training_conf, training, ca
     assert "Skipping the save model metadata training step" in output
 
 
-def test_step_3_model_not_found(training_conf, training):
+def test_step_3_model_not_found(training_conf, training, spark):
     """Step 3 raises an exception when the trained model is not available."""
-
     training_conf["training"]["feature_importances"] = True
+    mock_tf_prepped = spark.createDataFrame(
+        [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
+    )
+    mock_tf_prepped.write.saveAsTable("training_features_prepped")
     with pytest.raises(
         RuntimeError,
         match="Model not found!  Please run training step 2 to generate and train the chosen model",
