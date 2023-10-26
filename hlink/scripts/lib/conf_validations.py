@@ -162,8 +162,11 @@ def check_comparison_features(config, columns_available):
         raise ValueError(
             "No [[comparison_features]] exist. Please add [[comparison_features]]."
         )
+    duplicates = []
     for c in comparison_features:
         alias = c.get("alias")
+        if alias in comps:
+            duplicates.append(alias)
         if alias is None:
             raise ValueError(
                 f"No alias exists for a [[comparison_features]]: {c}. Please add an 'alias'."
@@ -181,7 +184,10 @@ def check_comparison_features(config, columns_available):
                     raise ValueError(
                         f"Within [[comparison_features]] the 'column_name' {cname} is not available from a previous [[column_mappings]] or [[feature_selections]]: {c}"
                     )
+
         comps.append(alias)
+    if duplicates != []:
+        raise ValueError(f"Alias names are not unique: {duplicates}")
     return comps
 
 
@@ -203,6 +209,7 @@ def check_feature_selections(config, columns_available):
     feature_selections = config.get("feature_selections")
     if feature_selections is None:
         return
+    duplicates = []
     for f in feature_selections:
         input_column = f.get("input_column")
         output_column = f.get("output_column") or f.get("output_col")
@@ -219,7 +226,11 @@ def check_feature_selections(config, columns_available):
             raise ValueError(
                 f"No 'output_column' or 'output_col' value for [[feature_selections]]: {f}"
             )
+        if output_column in columns_available:
+            duplicates.append(output_column)
         columns_available.append(output_column)
+    if duplicates != []:
+        raise ValueError(f"Output column are not unique: {duplicates}")
 
 
 def check_substitution_columns(config, columns_available):
@@ -258,6 +269,7 @@ def check_column_mappings(config, df_a, df_b):
     if not column_mappings:
         raise ValueError("No [[column_mappings]] exist in the conf file.")
     columns_available = []
+    duplicates = []
     for c in column_mappings:
         alias = c.get("alias")
         column_name = c.get("column_name")
@@ -279,10 +291,14 @@ def check_column_mappings(config, df_a, df_b):
                     raise ValueError(
                         f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_b and no previous [[column_mapping]] alias exists for it. Column mapping: {c}. Available columns: \n {df_b.columns}"
                     )
+        if column_name in columns_available:
+            duplicates.append(column_name)
         if alias:
             columns_available.append(alias)
         else:
             columns_available.append(column_name)
+    if duplicates != []:
+        raise ValueError(f"Column names are not unique: {duplicates}")
     return columns_available
 
 

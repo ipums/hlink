@@ -29,7 +29,8 @@ class SparkConnection:
         self.python = python
 
     def spark_conf(self, executor_cores, executor_memory, driver_memory, cores):
-        spark_package_path = os.path.dirname(hlink.spark.__file__)
+        ## Was getting an error where hlink.spark.__file__ return None and everything breaks
+        spark_package_path = os.path.dirname(hlink.spark.session.__file__)
         jar_path = os.path.join(
             spark_package_path, "jars", "hlink_lib-assembly-1.0.jar"
         )
