@@ -272,6 +272,78 @@ def test_step_2_interaction(spark, main, conf):
     main.do_drop_all("")
 
 
+def test_step_3_interacted_categorical_features(
+    training_conf, training, training_data_path, spark
+):
+    training_conf["comparison_features"] = [
+        {
+            "alias": "regionf",
+            "column_name": "region",
+            "comparison_type": "fetch_a",
+            "categorical": True,
+        },
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast",
+            "comparison_type": "jaro_winkler",
+        },
+        {
+            "alias": "exact",
+            "column_names": ["namelast", "namelast"],
+            "comparison_type": "all_equals",
+        },
+    ]
+
+    training_conf["training"]["dataset"] = training_data_path
+    training_conf["training"]["dependent_var"] = "match"
+    training_conf["training"]["independent_vars"] = [
+        "regionf",
+        "namelast_jw",
+        "regionf_interacted_namelast_jw",
+        "exact",
+    ]
+    # Interacting a categorical feature with another feature creates a new categorical
+    # feature. We should get coefficients for this new categorical feature as well.
+    training_conf["pipeline_features"] = [
+        {
+            "input_columns": ["regionf", "namelast_jw"],
+            "output_column": "regionf_interacted_namelast_jw",
+            "transformer_type": "interaction",
+        }
+    ]
+    training_conf["training"]["chosen_model"] = {
+        "type": "random_forest",
+        "maxDepth": 6,
+        "numTrees": 100,
+        "featureSubsetStrategy": "sqrt",
+    }
+
+    # training_conf["training"]["use_potential_matches_features"] = True
+    training_conf["training"]["score_with_model"] = True
+    training_conf["training"]["feature_importances"] = True
+
+    training.run_step(0)
+    training.run_step(1)
+    training.run_step(2)
+    training.run_step(3)
+
+    tf = spark.table("training_feature_importances").toPandas()
+    assert (
+        0.0
+        <= tf.query("feature_name == 'regionf_interacted_namelast_jw_0'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 1.0
+    )
+    assert (
+        0.4
+        <= tf.query("feature_name == 'namelast_jw_imp'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.5
+    )
+
+
 def test_step_3_requires_table(training_conf, training):
     training_conf["training"]["feature_importances"] = True
     with pytest.raises(RuntimeError, match="Missing input tables"):
