@@ -187,7 +187,9 @@ def check_comparison_features(config, columns_available):
 
         comps.append(alias)
     if duplicates != []:
-        raise ValueError(f"Alias names are not unique. Check comparison features section to use unique aliases for each feature: {', '.join(duplicates)}")
+        raise ValueError(
+            f"Alias names are not unique. Check comparison features section to use unique aliases for each feature: {', '.join(duplicates)}"
+        )
     return comps
 
 
@@ -230,7 +232,9 @@ def check_feature_selections(config, columns_available):
             duplicates.append(output_column)
         columns_available.append(output_column)
     if duplicates != []:
-        raise ValueError(f"Output columns are not unique. Check feature selectionss to ensure output columns are unique: {', '.join(duplicates)}")
+        raise ValueError(
+            f"Output columns are not unique. Check feature selectionss to ensure output columns are unique: {', '.join(duplicates)}"
+        )
 
 
 def check_substitution_columns(config, columns_available):
@@ -301,7 +305,9 @@ def check_column_mappings(config, df_a, df_b):
         else:
             columns_available.append(column_name)
     if duplicates != []:
-        raise ValueError(f"Column names are not unique. Check column mappings to ensure unique aliases or column names are used: {', '.join(duplicates)}")
+        raise ValueError(
+            f"Column names are not unique. Check column mappings to ensure unique aliases or column names are used: {', '.join(duplicates)}"
+        )
     return columns_available
 
 
