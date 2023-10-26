@@ -1,0 +1,36 @@
+id_column = "ID"
+
+[datasource_a]
+file = "hlink/tests/input_data/conf_validation/a.csv"
+
+[datasource_b]
+file = "hlink/tests/input_data/conf_validation/b.csv"
+
+[[column_mappings]]
+column_name = "NAMEFRST"
+
+[[column_mappings]]
+column_name = "NAMELAST"
+
+[[feature_selections]]
+input_column = "NAMEFRST"
+output_col = "namefrst_clean_bigrams"
+transform = "bigrams"
+
+[[feature_selections]]
+input_column = "NAMELAST"
+output_col = "namelast_clean_bigrams"
+transform = "bigrams"
+
+[[blocking]]
+column_name = "NAMELAST"
+
+[[comparison_features]]
+alias = "bg_namefrst"
+column_name = "namefrst_clean_bigrams"
+
+## Duplicate alias, should throw error
+[[comparison_features]]
+alias = "bg_namefrst"
+column_name = "namelast_clean_bigrams"
+

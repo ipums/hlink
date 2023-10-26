@@ -13,6 +13,9 @@ from hlink.linking.link_run import LinkRun
         ("missing_datasource_b", r"Section \[datasource_b\] does not exist in config"),
         ("no_id_column_a", "Datasource A is missing the id column 'ID'"),
         ("no_id_column_b", "Datasource B is missing the id column 'ID'"),
+        ("duplicate_comp_features", "Alias names are not unique"),
+        ("duplicate_feature_sel", "Output columns are not unique"),
+        ("duplicate_col_maps", "Column names are not unique"),
     ],
 )
 def test_invalid_conf(conf_dir_path, spark, conf_name, error_msg):

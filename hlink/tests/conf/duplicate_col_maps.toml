@@ -1,0 +1,14 @@
+id_column = "ID"
+
+[datasource_a]
+file = "hlink/tests/input_data/conf_validation/a.csv"
+
+[datasource_b]
+file = "hlink/tests/input_data/conf_validation/b.csv"
+
+[[column_mappings]]
+column_name = "NAMEFRST"
+
+## Duplicate column name, should throw error
+[[column_mappings]]
+column_name = "NAMEFRST"

@@ -230,7 +230,7 @@ def check_feature_selections(config, columns_available):
             duplicates.append(output_column)
         columns_available.append(output_column)
     if duplicates != []:
-        raise ValueError(f"Output column are not unique: {duplicates}")
+        raise ValueError(f"Output columns are not unique: {duplicates}")
 
 
 def check_substitution_columns(config, columns_available):
