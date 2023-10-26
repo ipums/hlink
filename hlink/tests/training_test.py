@@ -116,7 +116,10 @@ def test_all_steps(
     for var in training_conf["training"]["independent_vars"]:
         assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
     assert all(
-        [col in ["feature_name", "coefficient_or_importance"] for col in tf.columns]
+        [
+            col in ["feature_name", "category", "coefficient_or_importance"]
+            for col in tf.columns
+        ]
     )
     assert (tf["coefficient_or_importance"] >= 0).all() and (
         tf["coefficient_or_importance"] <= 1
@@ -124,27 +127,27 @@ def test_all_steps(
 
     assert (
         0.4
-        <= tf.query("feature_name == 'namelast_jw_imp'")[
-            "coefficient_or_importance"
-        ].item()
+        <= tf.query("feature_name == 'namelast_jw'")["coefficient_or_importance"].item()
         <= 0.5
     )
     assert (
         0.1
-        <= tf.query("feature_name == 'namelast_jw_buckets_4'")[
+        <= tf.query("feature_name == 'namelast_jw_buckets' and category == 4")[
             "coefficient_or_importance"
         ].item()
         <= 0.2
     )
     assert (
         0.1
-        <= tf.query("feature_name == 'state_distance_imp'")[
+        <= tf.query("feature_name == 'state_distance'")[
             "coefficient_or_importance"
         ].item()
         <= 0.2
     )
     assert (
-        tf.query("feature_name == 'regionf_0'")["coefficient_or_importance"].item()
+        tf.query("feature_name == 'regionf' and category == 0")[
+            "coefficient_or_importance"
+        ].item()
         <= 0.1
     )
 
@@ -330,16 +333,14 @@ def test_step_3_interacted_categorical_features(
     tf = spark.table("training_feature_importances").toPandas()
     assert (
         0.0
-        <= tf.query("feature_name == 'regionf_interacted_namelast_jw_0'")[
-            "coefficient_or_importance"
-        ].item()
+        <= tf.query(
+            "feature_name == 'regionf_interacted_namelast_jw' and category == 0"
+        )["coefficient_or_importance"].item()
         <= 1.0
     )
     assert (
         0.4
-        <= tf.query("feature_name == 'namelast_jw_imp'")[
-            "coefficient_or_importance"
-        ].item()
+        <= tf.query("feature_name == 'namelast_jw'")["coefficient_or_importance"].item()
         <= 0.5
     )
 

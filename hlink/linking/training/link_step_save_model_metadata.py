@@ -103,14 +103,18 @@ class LinkStepSaveModelMetadata(LinkStep):
             if data_type == "vector":
                 base_col = col.removesuffix("_onehotencoded")
                 num_categories = len(tf_prepped_row[col])
-                true_cols.extend(f"{base_col}_{i}" for i in range(num_categories))
+                true_cols.extend((base_col, i) for i in range(num_categories))
             else:
-                true_cols.append(col)
+                base_col = col.removesuffix("_imp")
+                true_cols.append((base_col, None))
+
+        true_column_names = [column_name for (column_name, _) in true_cols]
+        true_categories = [category for (_, category) in true_cols]
 
         features_df = self.task.spark.createDataFrame(
-            zip(true_cols, feature_importances, strict=True),
-            "feature_name: string, coefficient_or_importance: double",
-        ).sort("feature_name")
+            zip(true_column_names, true_categories, feature_importances, strict=True),
+            "feature_name: string, category: int, coefficient_or_importance: double",
+        ).sort("feature_name", "category")
 
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"
