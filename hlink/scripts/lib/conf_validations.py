@@ -165,7 +165,7 @@ def check_comparison_features(config, columns_available):
     duplicates = []
     for c in comparison_features:
         alias = c.get("alias")
-        if alias in comps:
+        if alias in comps or alias in columns_available:
             duplicates.append(alias)
         if alias is None:
             raise ValueError(
@@ -291,8 +291,8 @@ def check_column_mappings(config, df_a, df_b):
                     raise ValueError(
                         f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_b and no previous [[column_mapping]] alias exists for it. Column mapping: {c}. Available columns: \n {df_b.columns}"
                     )
-        if column_name in columns_available:
-            duplicates.append(column_name)
+        if column_name in columns_available or alias in columns_available:
+            duplicates.append(alias if alias else column_name)
         if alias:
             columns_available.append(alias)
         else:
