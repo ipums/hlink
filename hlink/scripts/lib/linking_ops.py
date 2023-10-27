@@ -36,7 +36,6 @@ def show_step_info(link_task, link_run):
                 print(Fore.MAGENTA + f"\t\t{output_model_name}" + Style.RESET_ALL)
 
 
-
 def show_tasks(current_task, link_run, link_task_choices):
     """Show information about the available link tasks for the link run.
 
@@ -69,4 +68,3 @@ def show_tasks(current_task, link_run, link_task_choices):
             print("\tProduces no persistent tables.")
         else:
             print("\tProduces tables: " + str(output_tables))
-
