@@ -1,0 +1,24 @@
+id_column = "ID"
+
+[datasource_a]
+file = "hlink/tests/input_data/conf_validation/a.csv"
+
+[datasource_b]
+file = "hlink/tests/input_data/conf_validation/b.csv"
+
+[[column_mappings]]
+column_name = "NAMEFRST"
+
+[[column_mappings]]
+column_name = "NAMELAST"
+
+[[feature_selections]]
+input_column = "NAMEFRST"
+output_col = "namefrst_clean_bigrams"
+transform = "bigrams"
+
+## Duplicate output_col, should throw error
+[[feature_selections]]
+input_column = "NAMELAST"
+output_col = "namefrst_clean_bigrams"
+transform = "bigrams"
