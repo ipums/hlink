@@ -165,12 +165,12 @@ def check_comparison_features(config, columns_available):
     duplicates = []
     for c in comparison_features:
         alias = c.get("alias")
-        if alias in comps or alias in columns_available:
-            duplicates.append(alias)
         if alias is None:
             raise ValueError(
                 f"No alias exists for a [[comparison_features]]: {c}. Please add an 'alias'."
             )
+        if alias in comps:
+            duplicates.append(alias)
         column_name = c.get("column_name") or c.get("first_init_col")
         column_names = c.get("column_names") or c.get("mid_init_cols")
         if column_name is not None:
@@ -188,7 +188,7 @@ def check_comparison_features(config, columns_available):
         comps.append(alias)
     if duplicates != []:
         raise ValueError(
-            f"Alias names are not unique. Check comparison features section to use unique aliases for each feature: {', '.join(duplicates)}"
+            f"Alias names are not unique. Check comparison features section to use unique aliases for each feature: {', '.join(set(duplicates))}"
         )
     return comps
 
