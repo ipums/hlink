@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Column mapping transforms &#8212; hlink 3.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Comparison types, transform add-ons, aggregate features, and household aggregate features" href="comparison_types.html" />
@@ -35,7 +32,7 @@
           <div class="body" role="main">
             
   <section id="column-mapping-transforms">
-<h1>Column mapping transforms<a class="headerlink" href="#column-mapping-transforms" title="Permalink to this heading">¶</a></h1>
+<h1>Column mapping transforms<a class="headerlink" href="#column-mapping-transforms" title="Link to this heading">¶</a></h1>
 <p>Each header below represents a column mapping transform type. Transforms are used in the context of the <code class="docutils literal notranslate"><span class="pre">column_mappings</span></code> list.
 Each transform operates on a single input column and outputs a single output column.</p>
 <p>Some transforms are suffixed by “a” or “b”. These suffixes mean that the transforms apply
@@ -62,7 +59,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 </pre></div>
 </div>
 <section id="add-to-a">
-<h2>add_to_a<a class="headerlink" href="#add-to-a" title="Permalink to this heading">¶</a></h2>
+<h2>add_to_a<a class="headerlink" href="#add-to-a" title="Link to this heading">¶</a></h2>
 <p>Add the given <code class="docutils literal notranslate"><span class="pre">value</span></code> to a column from dataset A.</p>
 <p>Maps numerical → numerical.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;add_to_a&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">11</span><span class="p">}]</span>
@@ -70,7 +67,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 </div>
 </section>
 <section id="concat-to-a">
-<h2>concat_to_a<a class="headerlink" href="#concat-to-a" title="Permalink to this heading">¶</a></h2>
+<h2>concat_to_a<a class="headerlink" href="#concat-to-a" title="Link to this heading">¶</a></h2>
 <p>Concatenate the string <code class="docutils literal notranslate"><span class="pre">value</span></code> to the end of a column in dataset A.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;concat_to_a&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">}]</span>
@@ -78,7 +75,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 </div>
 </section>
 <section id="concat-to-b">
-<h2>concat_to_b<a class="headerlink" href="#concat-to-b" title="Permalink to this heading">¶</a></h2>
+<h2>concat_to_b<a class="headerlink" href="#concat-to-b" title="Link to this heading">¶</a></h2>
 <p>Concatenate the string <code class="docutils literal notranslate"><span class="pre">value</span></code> to the end of a column in dataset B.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;concat_to_b&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">}]</span>
@@ -86,7 +83,7 @@ below. Often attributes are just named <code class="docutils literal notranslate
 </div>
 </section>
 <section id="lowercase-strip">
-<h2>lowercase_strip<a class="headerlink" href="#lowercase-strip" title="Permalink to this heading">¶</a></h2>
+<h2>lowercase_strip<a class="headerlink" href="#lowercase-strip" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Convert alphabetical characters to lower-case and strip white
 space characters from the start and end of the strings in the column.</p>
 <p>Maps string → string.</p>
@@ -95,7 +92,7 @@ space characters from the start and end of the strings in the column.</p>
 </div>
 </section>
 <section id="rationalize-name-words">
-<h2>rationalize_name_words<a class="headerlink" href="#rationalize-name-words" title="Permalink to this heading">¶</a></h2>
+<h2>rationalize_name_words<a class="headerlink" href="#rationalize-name-words" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Replace the characters <code class="docutils literal notranslate"><span class="pre">?</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, and <code class="docutils literal notranslate"><span class="pre">-</span></code> with spaces. Since
 people’s names in raw census data can contain these characters, replacing these characters
 can lead to better matching.</p>
@@ -105,7 +102,7 @@ can lead to better matching.</p>
 </div>
 </section>
 <section id="remove-qmark-hyphen">
-<h2>remove_qmark_hyphen<a class="headerlink" href="#remove-qmark-hyphen" title="Permalink to this heading">¶</a></h2>
+<h2>remove_qmark_hyphen<a class="headerlink" href="#remove-qmark-hyphen" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Remove the characters <code class="docutils literal notranslate"><span class="pre">?</span></code> and <code class="docutils literal notranslate"><span class="pre">-</span></code> from strings in the column.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_qmark_hyphen&quot;</span><span class="p">}]</span>
@@ -113,7 +110,7 @@ can lead to better matching.</p>
 </div>
 </section>
 <section id="remove-punctuation">
-<h2>remove_punctuation<a class="headerlink" href="#remove-punctuation" title="Permalink to this heading">¶</a></h2>
+<h2>remove_punctuation<a class="headerlink" href="#remove-punctuation" title="Link to this heading">¶</a></h2>
 <p>Remove most punctuation from strings in the column. This transform removes these characters:
 <code class="docutils literal notranslate"><span class="pre">?</span> <span class="pre">-</span> <span class="pre">\</span> <span class="pre">/</span> <span class="pre">&quot;</span> <span class="pre">'</span> <span class="pre">:</span> <span class="pre">,</span> <span class="pre">.</span> <span class="pre">[</span> <span class="pre">]</span> <span class="pre">{</span> <span class="pre">}</span></code>.</p>
 <p>Maps string → string.</p>
@@ -122,7 +119,7 @@ can lead to better matching.</p>
 </div>
 </section>
 <section id="replace-apostrophe">
-<h2>replace_apostrophe<a class="headerlink" href="#replace-apostrophe" title="Permalink to this heading">¶</a></h2>
+<h2>replace_apostrophe<a class="headerlink" href="#replace-apostrophe" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Replace each apostrophe <code class="docutils literal notranslate"><span class="pre">'</span></code> with a space.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;replace_apostrophe&quot;</span><span class="p">}]</span>
@@ -130,7 +127,7 @@ can lead to better matching.</p>
 </div>
 </section>
 <section id="remove-alternate-names">
-<h2>remove_alternate_names<a class="headerlink" href="#remove-alternate-names" title="Permalink to this heading">¶</a></h2>
+<h2>remove_alternate_names<a class="headerlink" href="#remove-alternate-names" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. If a string in the column contains the string <code class="docutils literal notranslate"><span class="pre">or</span></code> (”or” surrounded by spaces),
 then remove the <code class="docutils literal notranslate"><span class="pre">or</span></code> and all following characters.</p>
 <p>Maps string → string.</p>
@@ -139,7 +136,7 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 </div>
 </section>
 <section id="remove-suffixes">
-<h2>remove_suffixes<a class="headerlink" href="#remove-suffixes" title="Permalink to this heading">¶</a></h2>
+<h2>remove_suffixes<a class="headerlink" href="#remove-suffixes" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Given a list of suffixes, remove them from the strings in the column.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
@@ -152,7 +149,7 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 </div>
 </section>
 <section id="remove-stop-words">
-<h2>remove_stop_words<a class="headerlink" href="#remove-stop-words" title="Permalink to this heading">¶</a></h2>
+<h2>remove_stop_words<a class="headerlink" href="#remove-stop-words" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Remove last words from names such as street names.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
@@ -165,7 +162,7 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 </div>
 </section>
 <section id="remove-prefixes">
-<h2>remove_prefixes<a class="headerlink" href="#remove-prefixes" title="Permalink to this heading">¶</a></h2>
+<h2>remove_prefixes<a class="headerlink" href="#remove-prefixes" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Remove prefixes like “Ms.”, “Mr.”, or “Mrs.” from names.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In some census data, &quot;ah&quot; is a prefix from Chinese names.</span>
@@ -174,7 +171,7 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 </div>
 </section>
 <section id="condense-strip-whitespace">
-<h2>condense_strip_whitespace<a class="headerlink" href="#condense-strip-whitespace" title="Permalink to this heading">¶</a></h2>
+<h2>condense_strip_whitespace<a class="headerlink" href="#condense-strip-whitespace" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. Take white space that may be more than one character or contain
 non-space characters and replace it with a single space.</p>
 <p>Maps string → string.</p>
@@ -183,7 +180,7 @@ non-space characters and replace it with a single space.</p>
 </div>
 </section>
 <section id="remove-one-letter-names">
-<h2>remove_one_letter_names<a class="headerlink" href="#remove-one-letter-names" title="Permalink to this heading">¶</a></h2>
+<h2>remove_one_letter_names<a class="headerlink" href="#remove-one-letter-names" title="Link to this heading">¶</a></h2>
 <p>Used in name cleaning. If a name is a single character, remove it and leave the white space behind.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;remove_one_letter_names&quot;</span><span class="p">}]</span>
@@ -191,7 +188,7 @@ non-space characters and replace it with a single space.</p>
 </div>
 </section>
 <section id="split">
-<h2>split<a class="headerlink" href="#split" title="Permalink to this heading">¶</a></h2>
+<h2>split<a class="headerlink" href="#split" title="Link to this heading">¶</a></h2>
 <p>Split the column value on space characters.</p>
 <p>Maps string → array of string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">column_mappings</span><span class="p">]]</span>
@@ -202,7 +199,7 @@ non-space characters and replace it with a single space.</p>
 </div>
 </section>
 <section id="array-index">
-<h2>array_index<a class="headerlink" href="#array-index" title="Permalink to this heading">¶</a></h2>
+<h2>array_index<a class="headerlink" href="#array-index" title="Link to this heading">¶</a></h2>
 <p>If the column contains an array, select the element at the given position.</p>
 <p>This can be used as the input to another transform. In the example below, the first transform selects the second (index 1) item from  the “namefrst_split” column that contains a set of names split on white space. Then the substring 0,1 is selected, which gives the first initial of the person’s probable middle name.</p>
 <p>Maps array of T → T.</p>
@@ -217,7 +214,7 @@ non-space characters and replace it with a single space.</p>
 </div>
 </section>
 <section id="mapping">
-<h2>mapping<a class="headerlink" href="#mapping" title="Permalink to this heading">¶</a></h2>
+<h2>mapping<a class="headerlink" href="#mapping" title="Link to this heading">¶</a></h2>
 <p>Map single or multiple values to a single output value, otherwise known as a “recoding.”</p>
 <p>Maps T → U.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">column_mappings</span><span class="p">]]</span>
@@ -236,7 +233,7 @@ non-space characters and replace it with a single space.</p>
 </div>
 </section>
 <section id="substring">
-<h2>substring<a class="headerlink" href="#substring" title="Permalink to this heading">¶</a></h2>
+<h2>substring<a class="headerlink" href="#substring" title="Link to this heading">¶</a></h2>
 <p>Replace a column with a substring of the data in the column.</p>
 <p>Maps string → string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="p">[</span>
@@ -246,7 +243,7 @@ non-space characters and replace it with a single space.</p>
 </div>
 </section>
 <section id="divide-by-int">
-<h2>divide_by_int<a class="headerlink" href="#divide-by-int" title="Permalink to this heading">¶</a></h2>
+<h2>divide_by_int<a class="headerlink" href="#divide-by-int" title="Link to this heading">¶</a></h2>
 <p>Divide data in a column by an integer value. It may leave a non-integer result.</p>
 <p>For instance, the following example takes the birthplace variable and converts it
 from the detailed version to the general version. The two least significant digits
@@ -264,7 +261,7 @@ them by dividing by 100 and rounding to the lowest whole number (floor function)
 </div>
 </section>
 <section id="when-value">
-<h2>when_value<a class="headerlink" href="#when-value" title="Permalink to this heading">¶</a></h2>
+<h2>when_value<a class="headerlink" href="#when-value" title="Link to this heading">¶</a></h2>
 <p>Apply conditional logic to replacement of values in a column. Works like the SQL <code class="docutils literal notranslate"><span class="pre">if()</span></code> or <code class="docutils literal notranslate"><span class="pre">case()</span></code> expressions in the SQL <code class="docutils literal notranslate"><span class="pre">select</span></code> clause.
 When the value of a column is <code class="docutils literal notranslate"><span class="pre">value</span></code> replace it with <code class="docutils literal notranslate"><span class="pre">if_value</span></code>. Otherwise replace it with <code class="docutils literal notranslate"><span class="pre">else_value</span></code>.</p>
 <p>The following example replaces all “race” IPUMS codes with 0 (white) or 1 (non-white). An IPUMS code of 100 is the “white” race category.</p>
@@ -277,7 +274,7 @@ When the value of a column is <code class="docutils literal notranslate"><span c
 </div>
 </section>
 <section id="get-floor">
-<h2>get_floor<a class="headerlink" href="#get-floor" title="Permalink to this heading">¶</a></h2>
+<h2>get_floor<a class="headerlink" href="#get-floor" title="Link to this heading">¶</a></h2>
 <p>Round down to the nearest whole number.</p>
 <p>This example produces the general version of the IPUMS “relate” variable. The variable
 is coded such that detailed categories are between the hundreds (300 is child of household
@@ -390,7 +387,7 @@ The general categories are usually all that’s needed (1 == household head, 2 =
       &copy;2019-2022, IPUMS.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

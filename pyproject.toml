@@ -32,7 +32,11 @@ dev = [
     "pre-commit>=2.0",
     "twine>=4.0",
     "build>=0.6",
-    "sphinx==5.1.1",
+    # These are pinned so tightly because their version numbers appear in the docs.
+    # So if you use a different version, it creates a huge diff in the docs.
+    # TODO: auto-generate docs on push to GitHub instead of committing them to the
+    # repo.
+    "sphinx==7.2.6",
     "recommonmark==0.7.1",
 ]
 
