@@ -9,6 +9,8 @@ import hlink.linking.core.transforms as transforms_core
 
 def select_column_mapping(column_mapping, df_selected, is_a, column_selects):
     name = column_mapping["column_name"]
+    if "rename" in column_mapping and not is_a:
+        df_selected = df_selected.withColumnRenamed(column_mapping["rename"], name)
     if "override_column_a" in column_mapping and is_a:
         override_name = column_mapping["override_column_a"]
         column_select = col(override_name)

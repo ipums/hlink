@@ -279,10 +279,13 @@ def check_column_mappings(config, df_a, df_b):
         column_name = c.get("column_name")
         set_value_column_a = c.get("set_value_column_a")
         set_value_column_b = c.get("set_value_column_b")
+        rename = c.get("rename")
         if not column_name:
             raise ValueError(
                 f"The following [[column_mappings]] has no 'column_name' attribute: {c}"
             )
+        if rename:
+            df_b = df_b.withColumnRenamed(rename, column_name)
         if set_value_column_a is None:
             if column_name.lower() not in [c.lower() for c in df_a.columns]:
                 if column_name not in columns_available:
