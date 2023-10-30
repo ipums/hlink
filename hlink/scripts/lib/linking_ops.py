@@ -3,12 +3,12 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from colorama import init as colorama_init, deinit as colorama_deinit, Fore, Style
+from colorama import Fore, Style, just_fix_windows_console
 
 
 def show_step_info(link_task, link_run):
     """Show step information for the given `link_task`."""
-    colorama_init()
+    just_fix_windows_console()
     print(Fore.CYAN + f"Link task: {link_task}" + Style.RESET_ALL)
 
     steps = link_task.get_steps()
@@ -35,8 +35,6 @@ def show_step_info(link_task, link_run):
             for output_model_name in step.output_model_names:
                 print(Fore.MAGENTA + f"\t\t{output_model_name}" + Style.RESET_ALL)
 
-    colorama_deinit()
-
 
 def show_tasks(current_task, link_run, link_task_choices):
     """Show information about the available link tasks for the link run.
@@ -46,7 +44,7 @@ def show_tasks(current_task, link_run, link_task_choices):
         link_run (LinkRun)
         link_task_choices (Dict[str, LinkTask]): a dict mapping string names to link tasks
     """
-    colorama_init()
+    just_fix_windows_console()
     print(Fore.CYAN + f"Current link task: {current_task}")
 
     print("Linking task choices are: " + Style.RESET_ALL)
@@ -70,5 +68,3 @@ def show_tasks(current_task, link_run, link_task_choices):
             print("\tProduces no persistent tables.")
         else:
             print("\tProduces tables: " + str(output_tables))
-
-    colorama_deinit()

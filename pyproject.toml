@@ -14,7 +14,7 @@ classifiers = [
     "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
 ]
 dependencies = [
-    "colorama~=0.4.0",
+    "colorama>=0.4.6",
     "ipython~=8.3.0",
     "Jinja2~=3.1.0",
     "numpy>=1.22.0",

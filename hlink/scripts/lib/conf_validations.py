@@ -18,60 +18,57 @@ def print_ok():
 
 def analyze_conf(link_run):
     """Print an analysis of the configuration of the `link_run`."""
-    colorama.init()
+    colorama.just_fix_windows_console()
 
-    try:
-        print_checking("datasource_a")
-        df_a = parse_datasource(link_run, "datasource_a")
-        check_datasource(link_run.config, df_a, "A")
-        print_ok()
+    print_checking("datasource_a")
+    df_a = parse_datasource(link_run, "datasource_a")
+    check_datasource(link_run.config, df_a, "A")
+    print_ok()
 
-        print_checking("datasource_b")
-        df_b = parse_datasource(link_run, "datasource_b")
-        check_datasource(link_run.config, df_b, "B")
-        print_ok()
+    print_checking("datasource_b")
+    df_b = parse_datasource(link_run, "datasource_b")
+    check_datasource(link_run.config, df_b, "B")
+    print_ok()
 
-        print_checking("filters")
-        check_filters(link_run.config, df_a, df_b)
-        print_ok()
+    print_checking("filters")
+    check_filters(link_run.config, df_a, df_b)
+    print_ok()
 
-        print_checking("column_mappings")
-        columns_available = check_column_mappings(link_run.config, df_a, df_b)
-        print_ok()
+    print_checking("column_mappings")
+    columns_available = check_column_mappings(link_run.config, df_a, df_b)
+    print_ok()
 
-        print_checking("substitution_columns")
-        check_substitution_columns(link_run.config, columns_available)
-        print_ok()
+    print_checking("substitution_columns")
+    check_substitution_columns(link_run.config, columns_available)
+    print_ok()
 
-        print_checking("feature_selections")
-        check_feature_selections(link_run.config, columns_available)
-        print_ok()
+    print_checking("feature_selections")
+    check_feature_selections(link_run.config, columns_available)
+    print_ok()
 
-        print_checking("blocking")
-        check_blocking(link_run.config, columns_available)
-        print_ok()
+    print_checking("blocking")
+    check_blocking(link_run.config, columns_available)
+    print_ok()
 
-        print_checking("comparison_features")
-        comp_features = check_comparison_features(link_run.config, columns_available)
-        print_ok()
+    print_checking("comparison_features")
+    comp_features = check_comparison_features(link_run.config, columns_available)
+    print_ok()
 
-        print_checking("comparisons")
-        check_comparisons(link_run.config, comp_features)
-        print_ok()
+    print_checking("comparisons")
+    check_comparisons(link_run.config, comp_features)
+    print_ok()
 
-        print_checking("pipeline_features")
-        check_pipeline_features(link_run.config, comp_features)
-        print_ok()
+    print_checking("pipeline_features")
+    check_pipeline_features(link_run.config, comp_features)
+    print_ok()
 
-        print_checking("training")
-        check_training(link_run.config, comp_features)
-        print_ok()
+    print_checking("training")
+    check_training(link_run.config, comp_features)
+    print_ok()
 
-        print_checking("hh_training")
-        check_hh_training(link_run.config, comp_features)
-        print_ok()
-    finally:
-        colorama.deinit()
+    print_checking("hh_training")
+    check_hh_training(link_run.config, comp_features)
+    print_ok()
 
 
 def check_hh_training(config, comp_features):
