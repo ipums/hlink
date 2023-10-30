@@ -14,7 +14,7 @@ def show_step_info(link_task, link_run):
     steps = link_task.get_steps()
     tables = link_run.known_tables
 
-    for (i, step) in enumerate(steps):
+    for i, step in enumerate(steps):
         print(Fore.GREEN + f"step {i}: {step}" + Style.RESET_ALL)
 
         print("\tTables used:")

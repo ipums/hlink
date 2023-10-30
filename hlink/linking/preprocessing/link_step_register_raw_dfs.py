@@ -168,7 +168,7 @@ class LinkStepRegisterRawDfs(LinkStep):
     def _convert_ints_to_longs(self, df: DataFrame) -> DataFrame:
         df_casted = df
 
-        for (column, datatype) in df.dtypes:
+        for column, datatype in df.dtypes:
             if datatype == "int":
                 df_casted = df_casted.withColumn(column, col(column).cast("long"))
 
@@ -184,7 +184,6 @@ class LinkStepRegisterRawDfs(LinkStep):
         df_len = df.count()
 
         for column_name in string_cols:
-
             if ("name" in str.lower(column_name)) or (
                 "street" in str.lower(column_name)
             ):

@@ -219,7 +219,8 @@ def test_step_0_filters_expression_and_household(
 
 def test_step_0_filters_datasource(preprocessing, spark, preprocessing_conf):
     """Test a filter run in preprocessing step 0 which selects rows from the raw data according
-    to an expression AND only applies the expression to a specified datasource (a or b)"""
+    to an expression AND only applies the expression to a specified datasource (a or b)
+    """
 
     # overwrite the config filter value to include an expression filter which includes a datasource argument.
     preprocessing_conf["filter"] = [

@@ -32,7 +32,6 @@ def test_removal_of_duplicate_histid_b(
 
 
 def test_step_2_any_equals(spark, matching_household_conf, matching, preprocessing):
-
     matching_household_conf["column_mappings"].append(
         {
             "column_name": "namefrst_std",
@@ -119,7 +118,6 @@ def test_step_2_any_equals(spark, matching_household_conf, matching, preprocessi
 
 
 def test_step_2_sum(spark, matching_household_conf, matching, preprocessing):
-
     matching_household_conf["feature_selections"] = [
         {
             "output_col": "namelast_popularity",

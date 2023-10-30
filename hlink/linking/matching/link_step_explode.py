@@ -65,7 +65,6 @@ class LinkStepExplode(LinkStep):
         )
 
     def _explode(self, df, comparisons, comparison_features, blocking, id_column, is_a):
-
         # comp_feature_names, dist_features_to_run, feature_columns = comparison_core.get_feature_specs_from_comp(
         #     comparisons, comparison_features
         # )

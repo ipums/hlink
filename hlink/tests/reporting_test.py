@@ -9,7 +9,6 @@ import os
 
 
 def test_report_r2_percent_linked(reporting, spark, reporting_test_data_r2_pct):
-
     pdfa_path, pm_path, hhpm_path = reporting_test_data_r2_pct
 
     reporting.spark.read.csv(pdfa_path, header=True).write.mode(
@@ -57,7 +56,6 @@ def test_report_r2_percent_linked(reporting, spark, reporting_test_data_r2_pct):
 def test_report_representivity(
     reporting, spark, reporting_test_data_representivity, integration_conf
 ):
-
     rdf_path, pdf_path, pm_path, hhpm_path = reporting_test_data_representivity
 
     reporting.spark.read.csv(rdf_path, header=True).write.mode("overwrite").saveAsTable(
