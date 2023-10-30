@@ -66,9 +66,7 @@ def predict_using_thresholds(
             pred_df.drop("prediction"), alpha_threshold, threshold_ratio, id_col
         )
     else:
-        return _apply_alpha_threshold(
-            pred_df.drop("prediction"), alpha_threshold
-        )
+        return _apply_alpha_threshold(pred_df.drop("prediction"), alpha_threshold)
 
 
 def _apply_alpha_threshold(pred_df, alpha_threshold):
