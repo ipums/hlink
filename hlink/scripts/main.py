@@ -9,7 +9,7 @@ import logging
 import os
 from pathlib import Path
 import json
-import pkg_resources
+import importlib.metadata
 import readline
 import sys
 import traceback
@@ -74,7 +74,7 @@ def load_conf(conf_name, user):
 def cli():
     """Called by the hlink script."""
     if "--version" in sys.argv:
-        version = pkg_resources.get_distribution("hlink").version
+        version = importlib.metadata.version("hlink")
         print(f"Hlink version: {version}")
         return
     args = _parse_args()
@@ -239,7 +239,7 @@ def _setup_logging(conf):
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
     conf_name = Path(conf["conf_path"]).stem
-    hlink_version = pkg_resources.get_distribution("hlink").version
+    hlink_version = importlib.metadata.version("hlink")
 
     log_file = log_dir / f"{conf_name}-{session_id}.log"
 

@@ -4,7 +4,7 @@
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-import pkg_resources
+import importlib.metadata
 
 # -- Path setup --------------------------------------------------------------
 
@@ -25,7 +25,7 @@ project = "hlink"
 copyright = "2019-2022, IPUMS"
 author = "Jacob Wellington, Kelly Thompson, Jonas Helgertz, Riley Harper"
 
-version = pkg_resources.get_distribution("hlink").version
+version = importlib.metadata.version("hlink")
 # The full version, including alpha/beta/rc tags
 release = version
 
