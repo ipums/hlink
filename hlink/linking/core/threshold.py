@@ -66,12 +66,10 @@ def predict_using_thresholds(
             pred_df.drop("prediction"), alpha_threshold, threshold_ratio, id_col
         )
     else:
-        return _apply_alpha_threshold(
-            pred_df.drop("prediction"), alpha_threshold, threshold_ratio
-        )
+        return _apply_alpha_threshold(pred_df.drop("prediction"), alpha_threshold)
 
 
-def _apply_alpha_threshold(pred_df, alpha_threshold, threshold_ratio):
+def _apply_alpha_threshold(pred_df, alpha_threshold):
     return pred_df.selectExpr(
         "*",
         f"case when probability >= {alpha_threshold} then 1 else 0 end as prediction",

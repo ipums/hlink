@@ -49,7 +49,7 @@ def create_feature_tables(
             table_name,
             template="aggregate_features",
             t_ctx={
-                "id": config["id_column"],
+                "id": id_col,
                 "potential_matches": f"tmp_{table_name}",
                 "advanced_comp_features": advanced_comp_features,
             },
@@ -61,7 +61,7 @@ def create_feature_tables(
             table_name,
             template="hh_aggregate_features",
             t_ctx={
-                "id": config["id_column"],
+                "id": id_col,
                 "hh_col": config[f"{link_task.training_conf}"].get("hh_col", "serialp"),
                 "potential_matches": f"tmp_{table_name}",
                 "hh_comp_features": hh_comp_features,
@@ -74,7 +74,7 @@ def create_feature_tables(
             table_name,
             template="aggregate_features",
             t_ctx={
-                "id": config["id_column"],
+                "id": id_col,
                 "potential_matches": f"tmp_{table_name}",
                 "advanced_comp_features": advanced_comp_features,
             },
@@ -83,7 +83,7 @@ def create_feature_tables(
             af,
             template="hh_aggregate_features",
             t_ctx={
-                "id": config["id_column"],
+                "id": id_col,
                 "potential_matches": f"tmp_{table_name}",
                 "hh_comp_features": hh_comp_features,
             },
