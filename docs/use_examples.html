@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Advanced Workflow Examples &#8212; hlink 3.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configuration" href="config.html" />
@@ -35,14 +32,14 @@
           <div class="body" role="main">
             
   <section id="advanced-workflow-examples">
-<h1>Advanced Workflow Examples<a class="headerlink" href="#advanced-workflow-examples" title="Permalink to this heading">¶</a></h1>
+<h1>Advanced Workflow Examples<a class="headerlink" href="#advanced-workflow-examples" title="Link to this heading">¶</a></h1>
 <section id="export-training-data-after-generating-features-to-reuse-in-different-linking-years">
-<h2>Export training data after generating features to reuse in different linking years<a class="headerlink" href="#export-training-data-after-generating-features-to-reuse-in-different-linking-years" title="Permalink to this heading">¶</a></h2>
+<h2>Export training data after generating features to reuse in different linking years<a class="headerlink" href="#export-training-data-after-generating-features-to-reuse-in-different-linking-years" title="Link to this heading">¶</a></h2>
 <p>It is common to have a single training data set that spans two linked years, which is then used to train a model that is applied to a different set of linked years.  For example, we have a training data set that spans linked individuals from the 1900 census to the 1910 census.  We use this training data to predict links in the full count 1900-1910 linking run, but we also use this training data to link year pairs 1910-1920, 1920-1930, and 1930-1940.</p>
 <p>When this training data set is used for the years it was derived from, the only columns necessary are the HISTIDs identifying the individuals in the data and the dependent variable (usually a boolean <code class="docutils literal notranslate"><span class="pre">match</span></code> column) for the model training. Features for the machine learning model generation are created from the source data available in the full count run.</p>
 <p>However, when this training data set is used for other years, the program does not have access to the source full count files, and can’t generate the ML features from the given data.  In this scenario, you would need to save a copy of the <code class="docutils literal notranslate"><span class="pre">training_features</span></code> and <code class="docutils literal notranslate"><span class="pre">hh_training_features</span></code> Spark tables to .csv so you can point to that in the other year pair runs, and indicate the <code class="docutils literal notranslate"><span class="pre">use_potential_matches_features</span> <span class="pre">=</span> <span class="pre">true</span></code> flag in both the <code class="docutils literal notranslate"><span class="pre">training</span></code> and <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> sections of the configuration.</p>
 <section id="example-training-data-export-with-generated-ml-features">
-<h3>Example training data export with generated ML features<a class="headerlink" href="#example-training-data-export-with-generated-ml-features" title="Permalink to this heading">¶</a></h3>
+<h3>Example training data export with generated ML features<a class="headerlink" href="#example-training-data-export-with-generated-ml-features" title="Link to this heading">¶</a></h3>
 <ol>
 <li><p>Create a config file and put it in your hlink config directory.</p></li>
 <li><p>Launch the hlink program in interactive mode:</p>
@@ -95,11 +92,11 @@ Writes<span class="w"> </span>a<span class="w"> </span>dataframe<span class="w">
 </section>
 </section>
 <section id="ml-model-exploration-and-export-of-lists-of-potential-false-positives-negatives-in-training-data">
-<h2>ML model exploration and export of lists of potential false positives/negatives in training data<a class="headerlink" href="#ml-model-exploration-and-export-of-lists-of-potential-false-positives-negatives-in-training-data" title="Permalink to this heading">¶</a></h2>
+<h2>ML model exploration and export of lists of potential false positives/negatives in training data<a class="headerlink" href="#ml-model-exploration-and-export-of-lists-of-potential-false-positives-negatives-in-training-data" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">hlink</span></code> accepts a matrix of ML models and hyper-parameters to run train/test splits for you, and outputs data you can use to select and tune your models.  You can see example <code class="docutils literal notranslate"><span class="pre">training</span></code> and <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> configuration sections that implement this in the <a class="reference external" href="config.html#training-and-models">training</a> and <a class="reference external" href="config.html#household-training-and-models">household training</a> sections of the configuration documentation.</p>
 <p>The model exploration link task also allows you to export lists of potential false positives (FPs) and false negatives (FNs) in your training data.  This is calculated when running the train/test splits in the regular model exploration tasks if the <code class="docutils literal notranslate"><span class="pre">output_suspicious_TD</span></code> flag is true.</p>
 <section id="example-model-exploration-and-fp-fn-export-workflow">
-<h3>Example model exploration and FP/FN export workflow<a class="headerlink" href="#example-model-exploration-and-fp-fn-export-workflow" title="Permalink to this heading">¶</a></h3>
+<h3>Example model exploration and FP/FN export workflow<a class="headerlink" href="#example-model-exploration-and-fp-fn-export-workflow" title="Link to this heading">¶</a></h3>
 <ol>
 <li><p>Create a config file that has a <code class="docutils literal notranslate"><span class="pre">training</span></code> and/or <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> section with model parameters to explore. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">training</span><span class="p">]</span>
@@ -237,7 +234,7 @@ hlink $ csv repeat_FNs /my/output/1900_1910_potential_FNs.csv
       &copy;2019-2022, IPUMS.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

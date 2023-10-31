@@ -522,7 +522,7 @@ def generate_comparison_feature(feature, id_col, include_as=False):
             f"multi_jaro_winkler_search with alias {feature.get('alias')}: there are {len(tuples)} subcomparisons"
         )
         sub_exprs = []
-        for (i, j) in tuples:
+        for i, j in tuples:
             jw_col_a = jw_template.replace("{n}", str(i))
             jw_col_b = jw_template.replace("{n}", str(j))
 

@@ -218,7 +218,8 @@ class Main(Cmd):
     def do_run_step(self, split_args):
         """Run the specified linking step.
         Arg 1: step number (an integer)
-        Hint: Use the command 'get_steps' to fetch a list of all the linking steps for the current task."""
+        Hint: Use the command 'get_steps' to fetch a list of all the linking steps for the current task.
+        """
         print(f"Link task: {self.current_link_task}")
         step_num = int(split_args[0])
         self.current_link_task.run_step(step_num)

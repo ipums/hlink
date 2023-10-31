@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Link Tasks &#8212; hlink 3.5.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Running hlink" href="running_the_program.html" />
@@ -35,25 +32,25 @@
           <div class="body" role="main">
             
   <section id="link-tasks">
-<h1>Link Tasks<a class="headerlink" href="#link-tasks" title="Permalink to this heading">¶</a></h1>
+<h1>Link Tasks<a class="headerlink" href="#link-tasks" title="Link to this heading">¶</a></h1>
 <section id="preprocessing">
-<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this heading">¶</a></h2>
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">¶</a></h2>
 <section id="overview">
-<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
 <p>Read in raw data and prepare it for linking. This task may include a variety of
 transformations on the data, such as stripping out whitespace and normalizing strings
 that have common abbreviations. The same transformations are applied to both input
 datasets.</p>
 </section>
 <section id="task-steps">
-<h3>Task steps<a class="headerlink" href="#task-steps" title="Permalink to this heading">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#task-steps" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Read raw data in from Parquet or CSV files. Register the raw dataframes with the program.</p></li>
 <li><p>Step 1: Prepare the dataframes for linking. Perform substitutions, transformations, and column mappings as requested.</p></li>
 </ul>
 </section>
 <section id="related-configuration-sections">
-<h3>Related Configuration Sections<a class="headerlink" href="#related-configuration-sections" title="Permalink to this heading">¶</a></h3>
+<h3>Related Configuration Sections<a class="headerlink" href="#related-configuration-sections" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The <a class="reference external" href="config.html#data-sources"><code class="docutils literal notranslate"><span class="pre">datasource_a</span></code> and <code class="docutils literal notranslate"><span class="pre">datasource_b</span></code></a> sections specify where to find the input data.</p></li>
 <li><p><a class="reference external" href="column_mapping_transforms.html#column-mapping-transforms"><code class="docutils literal notranslate"><span class="pre">column_mappings</span></code></a>,
@@ -65,9 +62,9 @@ as they are read in.</p></li>
 </section>
 </section>
 <section id="training-and-household-training">
-<h2>Training and Household Training<a class="headerlink" href="#training-and-household-training" title="Permalink to this heading">¶</a></h2>
+<h2>Training and Household Training<a class="headerlink" href="#training-and-household-training" title="Link to this heading">¶</a></h2>
 <section id="id1">
-<h3>Overview<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <p>Train a machine learning model to use for classification of potential links. This
 requires training data, which is read in in the first step. Comparison features
 are generated for the training data, and then the model is trained on the data
@@ -75,7 +72,7 @@ and saved for use in the Matching task. The last step optionally saves some meta
 like feature importances or coefficients for the model to help with introspection.</p>
 </section>
 <section id="id2">
-<h3>Task steps<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
 <p>The first three steps in each of these tasks are the same:</p>
 <ul class="simple">
 <li><p>Step 0: Ingest the training data from a CSV file.</p></li>
@@ -90,7 +87,7 @@ config attribute to true in your config file.</p></li>
 </ul>
 </section>
 <section id="id3">
-<h3>Related Configuration Sections<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<h3>Related Configuration Sections<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The <a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">training</span></code></a> section is the most important
 for Training and provides configuration attributes for many aspects of the task.
@@ -104,16 +101,16 @@ by the Matching task.</p></li>
 </section>
 </section>
 <section id="matching">
-<h2>Matching<a class="headerlink" href="#matching" title="Permalink to this heading">¶</a></h2>
+<h2>Matching<a class="headerlink" href="#matching" title="Link to this heading">¶</a></h2>
 <section id="id4">
-<h3>Overview<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <p>Run the linking algorithm, generating a table with potential matches between records in the two datasets.
 This is the core of hlink’s work and may take the longest of all of the tasks. Universe
 definition and blocking reduce the number of comparisons needed when
 determining potential matches, which can drastically improve the runtime of Matching.</p>
 </section>
 <section id="id5">
-<h3>Task steps<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Perform blocking, separating records into different buckets to reduce the total number
 of comparisons needed during matching. Some columns may be “exploded” here if needed.</p></li>
@@ -122,7 +119,7 @@ of comparisons needed during matching. Some columns may be “exploded” here i
 </ul>
 </section>
 <section id="id6">
-<h3>Related Configuration Sections<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<h3>Related Configuration Sections<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The <a class="reference external" href="config.html#potential-matches-universe"><code class="docutils literal notranslate"><span class="pre">potential_matches_universe</span></code></a> section may be used to
 provide a universe for matches in the form of a SQL condition. Only records that satisfy the
@@ -143,13 +140,13 @@ model.</p></li>
 </section>
 </section>
 <section id="household-matching">
-<h2>Household Matching<a class="headerlink" href="#household-matching" title="Permalink to this heading">¶</a></h2>
+<h2>Household Matching<a class="headerlink" href="#household-matching" title="Link to this heading">¶</a></h2>
 <section id="id7">
-<h3>Overview<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
 <p>Generate a table with potential matches between households in the two datasets.</p>
 </section>
 <section id="id8">
-<h3>Task steps<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: Block on households.</p></li>
 <li><p>Step 1: Filter households based on <code class="docutils literal notranslate"><span class="pre">hh_comparisons</span></code> configuration settings.</p></li>
@@ -157,7 +154,7 @@ model.</p></li>
 </ul>
 </section>
 <section id="id9">
-<h3>Related Configuration Sections<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
+<h3>Related Configuration Sections<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="config.html#comparison-features"><code class="docutils literal notranslate"><span class="pre">comparison_features</span></code></a> and <a class="reference external" href="pipeline_features.html#pipeline-generated-features"><code class="docutils literal notranslate"><span class="pre">pipeline_features</span></code></a> are used as they are in the Matching task.</p></li>
 <li><p><a class="reference external" href="config.html#household-comparisons"><code class="docutils literal notranslate"><span class="pre">hh_comparisons</span></code></a> correspond to <code class="docutils literal notranslate"><span class="pre">comparisons</span></code> in the Matching task and may be thought of as “post-blocking filters”. Only potential matches that pass these comparisons will be eligible for being scored as matches.</p></li>
@@ -166,16 +163,16 @@ model.</p></li>
 </section>
 </section>
 <section id="model-exploration-and-household-model-exploration">
-<h2>Model Exploration and Household Model Exploration<a class="headerlink" href="#model-exploration-and-household-model-exploration" title="Permalink to this heading">¶</a></h2>
+<h2>Model Exploration and Household Model Exploration<a class="headerlink" href="#model-exploration-and-household-model-exploration" title="Link to this heading">¶</a></h2>
 <section id="id10">
-<h3>Overview<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
 <p>Evaluate the performance of different types of models and different parameter combinations
 on training data. These tasks are highly configurable and are typically not part of a full
 linking run. Instead, they are usually run ahead of time, and then the best-performing
 model is chosen and used for the full linking run.</p>
 </section>
 <section id="id11">
-<h3>Task steps<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
 <p>The steps in each of these tasks are the same:</p>
 <ul class="simple">
 <li><p>Step 0: Ingest the training data file specified in the config with the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> attribute.</p></li>
@@ -187,7 +184,7 @@ models in the config <code class="docutils literal notranslate"><span class="pre
 </ul>
 </section>
 <section id="id12">
-<h3>Related Configuration Sections<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
+<h3>Related Configuration Sections<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="config.html#training-and-models"><code class="docutils literal notranslate"><span class="pre">training</span></code></a> is used extensively by Model Exploration,
 and <a class="reference external" href="config.html#household-training-and-models"><code class="docutils literal notranslate"><span class="pre">hh_training</span></code></a> is used extensively
@@ -199,15 +196,15 @@ used to generate features that are passed as input to the trained models.</p></l
 </section>
 </section>
 <section id="reporting">
-<h2>Reporting<a class="headerlink" href="#reporting" title="Permalink to this heading">¶</a></h2>
+<h2>Reporting<a class="headerlink" href="#reporting" title="Link to this heading">¶</a></h2>
 <section id="id13">
-<h3>Overview<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h3>
+<h3>Overview<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
 <p>Report on characteristics of the linked data. This task is experimental and focused
 primarily on demographic census data. At the moment, it does not allow very much
 configuration.</p>
 </section>
 <section id="id14">
-<h3>Task steps<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
+<h3>Task steps<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Step 0: For households with anyone linked in Matching, report the percent of remaining household members linked in Household Matching.</p></li>
 <li><p>Step 1: Report on the representivity of linked data compared to source populations.</p></li>
@@ -215,7 +212,7 @@ configuration.</p>
 </ul>
 </section>
 <section id="id15">
-<h3>Related Configuration Sections<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h3>
+<h3>Related Configuration Sections<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">alias</span></code> attributes are read from both <a class="reference external" href="config.html#data-sources"><code class="docutils literal notranslate"><span class="pre">datasource_a</span></code></a> and <a class="reference external" href="config.html#data-sources"><code class="docutils literal notranslate"><span class="pre">datasource_b</span></code></a>. The step uses them to construct the output reports.</p></li>
 </ul>
@@ -301,7 +298,7 @@ configuration.</p>
       &copy;2019-2022, IPUMS.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

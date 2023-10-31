@@ -10,7 +10,6 @@ def get_comparison_leaves(comp):
     comp_leaves = []
 
     def _get_comp_leaf(comp, comp_leaves):
-
         if "comp_a" in comp:
             _get_comp_leaf(comp["comp_a"], comp_leaves)
             _get_comp_leaf(comp["comp_b"], comp_leaves)

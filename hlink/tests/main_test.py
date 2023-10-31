@@ -151,7 +151,7 @@ def test_load_conf_keys_set_no_env(monkeypatch, tmp_path):
 
     conf = load_conf(filename, "test")
 
-    for (key, value) in contents.items():
+    for key, value in contents.items():
         assert conf[key] == value
 
     # Check for extra keys added by load_conf()
@@ -300,7 +300,7 @@ def test_load_conf_keys_set_env(
 
     conf = load_conf(filename, user)
 
-    for (key, value) in contents.items():
+    for key, value in contents.items():
         assert conf[key] == value
 
     # Check for extra keys added by load_conf()
