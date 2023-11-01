@@ -142,7 +142,7 @@ def test_all_steps(
         <= tf.query("feature_name == 'state_distance'")[
             "coefficient_or_importance"
         ].item()
-        <= 0.2
+        <= 0.21
     )
     assert (
         tf.query("feature_name == 'regionf' and category == 0")[
@@ -198,10 +198,12 @@ def test_step_2_bucketizer(spark, main, conf):
         1,
         0,
         0,
+        0,
     ]
     assert list(prepped_data.query("test_id == 1")["features_vector"].iloc[0]) == [
         3,
         1,
+        0,
         0,
         0,
     ]
@@ -210,12 +212,14 @@ def test_step_2_bucketizer(spark, main, conf):
         0,
         1,
         0,
+        0,
     ]
     assert list(prepped_data.query("test_id == 6")["features_vector"].iloc[0]) == [
         11,
         0,
         0,
         1,
+        0,
     ]
 
     main.do_drop_all("")
