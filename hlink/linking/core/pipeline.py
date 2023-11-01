@@ -96,10 +96,17 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         encoded_output_cols = [
             x + "_onehotencoded" for x in categorical_comparison_features
         ]
+        # Here and below for categorical pipeline features we set handleInvalid
+        # to keep. This adds an extra category to the one-hot encoded result which
+        # represents "invalid categories" not seen in the training data that are
+        # encountered in the matching step. These categories generally receive a
+        # coefficient of 0.0 and don't contribute to the match probability. The
+        # alternative is to error out when we see these values, which we don't want.
         encoder = OneHotEncoder(
             inputCols=categorical_comparison_features,
             outputCols=encoded_output_cols,
             dropLast=False,
+            handleInvalid="keep",
         )
         # feature_names = list((set(feature_names) - set(categorical_comparison_features)) | set(encoded_output_cols))
         for x in categorical_comparison_features:
@@ -140,10 +147,13 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
         encoded_output_cols = [
             x + "_onehotencoded" for x in categorical_pipeline_features
         ]
+        # See the comment on categorical pipeline features above for reasoning on
+        # handleInvalid="keep".
         encoder = OneHotEncoder(
             inputCols=categorical_pipeline_features,
             outputCols=encoded_output_cols,
             dropLast=False,
+            handleInvalid="keep",
         )
         # feature_names = list((set(feature_names) - set(categorical_pipeline_features)) | set(encoded_output_cols))
         for x in categorical_pipeline_features:
