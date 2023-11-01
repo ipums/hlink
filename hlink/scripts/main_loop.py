@@ -47,9 +47,6 @@ def split_and_check_args(expected_count):
 class Main(Cmd):
     """Main program which handles user input. See https://docs.python.org/3/library/cmd.html for more information."""
 
-    prompt = "hlink $ "
-    intro = "Welcome to hlink. Type ? to list commands and q to quit.\n"
-
     def __init__(
         self,
         link_run,
@@ -57,6 +54,8 @@ class Main(Cmd):
     ):
         self.link_run = link_run
         self.spark = self.link_run.spark
+        self.prompt = "hlink $ "
+        self.intro = "Welcome to hlink. Type ? to list commands and q to quit.\n"
 
         if start_task is None:
             self.current_link_task = self.link_run.preprocessing
