@@ -51,10 +51,12 @@ class Main(Cmd):
         self,
         link_run,
         start_task: Optional[str] = None,
+        run_name: Optional[str] = None,
     ):
         self.link_run = link_run
         self.spark = self.link_run.spark
-        self.prompt = "hlink $ "
+
+        self.prompt = "hlink $ " if run_name is None else f"hlink ({run_name}) $ "
         self.intro = "Welcome to hlink. Type ? to list commands and q to quit.\n"
 
         if start_task is None:
