@@ -30,7 +30,8 @@ def load_conf(conf_name, user):
     """Load and return the hlink config dictionary.
 
     Add the following attributes to the config dictionary:
-    "derby_dir", "warehouse_dir", "spark_tmp_dir", "log_dir", "python", "conf_path"
+    "derby_dir", "warehouse_dir", "spark_tmp_dir", "log_dir", "python",
+    "conf_path", "run_name"
     """
     if "HLINK_CONF" not in os.environ:
         global_conf = None
@@ -67,6 +68,7 @@ def load_conf(conf_name, user):
         conf["log_dir"] = user_dir / "logs"
         conf["python"] = global_conf["python"]
 
+    conf["run_name"] = run_name
     print(f"*** Using config file {conf['conf_path']}")
     return conf
 
@@ -111,9 +113,14 @@ def cli():
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
 
+    run_name = run_conf["run_name"]
+
     try:
         if args.execute_tasks:
-            main = Main(LinkRun(spark, run_conf, use_preexisting_tables=False))
+            main = Main(
+                LinkRun(spark, run_conf, use_preexisting_tables=False),
+                run_name=run_name,
+            )
             main.preloop()
 
             task_list = " ".join(args.execute_tasks)
@@ -123,13 +130,14 @@ def cli():
             main = Main(
                 LinkRun(spark, run_conf, use_preexisting_tables=False),
                 start_task=args.task,
+                run_name=run_name,
             )
             main.preloop()
             command = " ".join(args.execute_command)
             print(f"Running Command: {command}")
             main.onecmd(command)
         else:
-            _cli_loop(spark, args, run_conf)
+            _cli_loop(spark, args, run_conf, run_name)
         readline.write_history_file(history_file)
         spark.stop()
     except RuntimeError as err:
@@ -204,7 +212,7 @@ def _read_history_file(history_file):
     readline.read_history_file(history_file)
 
 
-def _cli_loop(spark, args, run_conf):
+def _cli_loop(spark, args, run_conf, run_name):
     if args.clean:
         print("Dropping preexisting tables")
         drop_all_tables(LinkRun(spark, run_conf))
@@ -220,7 +228,7 @@ def _cli_loop(spark, args, run_conf):
         report_and_log_error("", err)
 
     while True:
-        main = Main(LinkRun(spark, run_conf), start_task=args.task)
+        main = Main(LinkRun(spark, run_conf), start_task=args.task, run_name=run_name)
         try:
             main.cmdloop()
             if main.lastcmd == "reload":
@@ -238,7 +246,7 @@ def _setup_logging(conf):
 
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
-    conf_name = Path(conf["conf_path"]).stem
+    conf_name = conf["run_name"]
     hlink_version = importlib.metadata.version("hlink")
 
     log_file = log_dir / f"{conf_name}-{session_id}.log"
