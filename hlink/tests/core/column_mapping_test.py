@@ -1,4 +1,3 @@
-from numpy import select
 import pytest
 import pandas as pd
 
