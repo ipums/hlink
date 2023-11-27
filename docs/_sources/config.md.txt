@@ -1,20 +1,20 @@
 # Configuration
 1. [Basic Example Config File](#basic-config-file)
 2. [Advanced Example Config File](#advanced-config-file)
-3. [Top level configs](#top-level-configs)
-4. [Data sources](#data-sources)
+3. [Top-Level Configs](#top-level-configs)
+4. [Data Sources](#data-sources)
 5. [Filter](#filter)
-6. [Column mappings](#column-mappings)
-7. [Substitution columns](#substitution-columns)
-8. [Feature selections](#feature-selections)
-9. [Potential matches universe](#potential-matches-universe)
+6. [Column Mappings](#column-mappings)
+7. [Substitution Columns](#substitution-columns)
+8. [Feature Selections](#feature-selections)
+9. [Potential Matches Universe](#potential-matches-universe)
 10. [Blocking](#blocking)
 11. [Comparisons](#comparisons)
-12. [Household comparisons](#household-comparisons)
-13. [Comparison features](#comparison-features)
-14. [Pipeline-generated features](#pipeline-generated-features)
-15. [Training and models](#training-and-models)
-16. [Household training and models](#household-training-and-models)
+12. [Household Comparisons](#household-comparisons)
+13. [Comparison Features](#comparison-features)
+14. [Pipeline-Generated Features](#pipeline-generated-features)
+15. [Training and Models](#training-and-models)
+16. [Household Training and Models](#household-training-and-models)
 
 ## Basic Config File
 
@@ -438,16 +438,34 @@ datasource = "b"
 ```
 
 
-## [Column Mappings](column_mapping_transforms)
+## [Column Mappings](column_mappings)
 
 * Header name: `column_mappings`
-* Description: Base column mappings and transformations to extract from your input datasets.
+* Description: Base column mappings and transformations to extract from your
+  input datasets. Each column mapping requires a `column_name` which tells it
+  which input column to read from. Optionally you may provide an `alias` for
+  the column and `transforms` to modify it as it is read in. There are some additional
+  attributes listed below that are meant for advanced usage. These are described
+  in more detail on the [column mappings](column_mappings) page.
 * Required: True
 * Type: List
 * Attributes:
-  * `alias` -- Type: `string`. Optional; if not specified the new column name defaults to `column_name`. New name of column.
-  * `column_name` -- Type: `string`. Name of column in input data. Used as the name of the output column if `alias` is not specified.
-  * `transforms` -- Type: `List`. Optional. A list of transforms to apply, in order, to the input data. See the [column mapping transforms](column_mapping_transforms) section for more information.
+  * `column_name` -- Type: `string`. The name of the column in the input data.
+  * `alias` -- Type: `string`. Optional. The new name of the column to use
+    in hlink. By default, this is the same as `column_name`.
+  * `transforms` -- Type: `List`. Optional. A list of transforms to apply, in
+    order, to the input data. See the [column mapping transforms](column_mappings.html#transforms)
+    section for more information.
+  * `set_value_column_a` -- Type: `Any`. Optional. Set all records for dataset
+    A to the given literal value.
+  * `set_value_column_b` -- Type: `Any`. Optional. Set all records for dataset
+    B to the given literal value.
+  * `override_column_a` -- Type: `string`. Read from this column in dataset A
+    instead of the column specified with `column_name`.
+  * `override_column_b` -- Type: `string`. Read from this column in dataset B
+    instead of the column specified with `column_name`.
+  * `override_transforms` -- Type: `List`. Transforms to apply to the override
+    column specified with `override_column_a` or `override_column_b`.
 
 ```
 [[column_mappings]]
