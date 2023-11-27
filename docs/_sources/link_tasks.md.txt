@@ -17,7 +17,7 @@ datasets.
 ### Related Configuration Sections
 
 * The [`datasource_a` and `datasource_b`](config.html#data-sources) sections specify where to find the input data.
-* [```column_mappings```](column_mapping_transforms.html#column-mapping-transforms),
+* [`column_mappings`](column_mappings.html#column-mappings),
 [`feature_selections`](feature_selection_transforms.html#feature-selection-transforms),
 and [`substitution_columns`](substitutions.html#substitutions) may all be used to define transformations on the input data.
 * The [`filter`](config.html#filter) section may be used to filter some records out of the input data
