@@ -13,7 +13,7 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Column mapping transforms" href="column_mapping_transforms.html" />
+    <link rel="next" title="Column Mappings" href="column_mappings.html" />
     <link rel="prev" title="Advanced Workflow Examples" href="use_examples.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -36,20 +36,20 @@
 <ol class="simple">
 <li><p><a class="reference external" href="#basic-config-file">Basic Example Config File</a></p></li>
 <li><p><a class="reference external" href="#advanced-config-file">Advanced Example Config File</a></p></li>
-<li><p><a class="reference external" href="#top-level-configs">Top level configs</a></p></li>
-<li><p><a class="reference external" href="#data-sources">Data sources</a></p></li>
+<li><p><a class="reference external" href="#top-level-configs">Top-Level Configs</a></p></li>
+<li><p><a class="reference external" href="#data-sources">Data Sources</a></p></li>
 <li><p><a class="reference external" href="#filter">Filter</a></p></li>
-<li><p><a class="reference external" href="#column-mappings">Column mappings</a></p></li>
-<li><p><a class="reference external" href="#substitution-columns">Substitution columns</a></p></li>
-<li><p><a class="reference external" href="#feature-selections">Feature selections</a></p></li>
-<li><p><a class="reference external" href="#potential-matches-universe">Potential matches universe</a></p></li>
+<li><p><a class="reference external" href="#column-mappings">Column Mappings</a></p></li>
+<li><p><a class="reference external" href="#substitution-columns">Substitution Columns</a></p></li>
+<li><p><a class="reference external" href="#feature-selections">Feature Selections</a></p></li>
+<li><p><a class="reference external" href="#potential-matches-universe">Potential Matches Universe</a></p></li>
 <li><p><a class="reference external" href="#blocking">Blocking</a></p></li>
 <li><p><a class="reference external" href="#comparisons">Comparisons</a></p></li>
-<li><p><a class="reference external" href="#household-comparisons">Household comparisons</a></p></li>
-<li><p><a class="reference external" href="#comparison-features">Comparison features</a></p></li>
-<li><p><a class="reference external" href="#pipeline-generated-features">Pipeline-generated features</a></p></li>
-<li><p><a class="reference external" href="#training-and-models">Training and models</a></p></li>
-<li><p><a class="reference external" href="#household-training-and-models">Household training and models</a></p></li>
+<li><p><a class="reference external" href="#household-comparisons">Household Comparisons</a></p></li>
+<li><p><a class="reference external" href="#comparison-features">Comparison Features</a></p></li>
+<li><p><a class="reference external" href="#pipeline-generated-features">Pipeline-Generated Features</a></p></li>
+<li><p><a class="reference external" href="#training-and-models">Training and Models</a></p></li>
+<li><p><a class="reference external" href="#household-training-and-models">Household Training and Models</a></p></li>
 </ol>
 <section id="basic-config-file">
 <h2>Basic Config File<a class="headerlink" href="#basic-config-file" title="Link to this heading">¶</a></h2>
@@ -473,17 +473,35 @@ uses the term <code class="docutils literal notranslate"><span class="pre">bigin
 </div>
 </section>
 <section id="column-mappings">
-<h2><a class="reference internal" href="column_mapping_transforms.html"><span class="doc">Column Mappings</span></a><a class="headerlink" href="#column-mappings" title="Link to this heading">¶</a></h2>
+<h2><a class="reference internal" href="column_mappings.html"><span class="doc">Column Mappings</span></a><a class="headerlink" href="#column-mappings" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Header name: <code class="docutils literal notranslate"><span class="pre">column_mappings</span></code></p></li>
-<li><p>Description: Base column mappings and transformations to extract from your input datasets.</p></li>
+<li><p>Description: Base column mappings and transformations to extract from your
+input datasets. Each column mapping requires a <code class="docutils literal notranslate"><span class="pre">column_name</span></code> which tells it
+which input column to read from. Optionally you may provide an <code class="docutils literal notranslate"><span class="pre">alias</span></code> for
+the column and <code class="docutils literal notranslate"><span class="pre">transforms</span></code> to modify it as it is read in. There are some additional
+attributes listed below that are meant for advanced usage. These are described
+in more detail on the <a class="reference internal" href="column_mappings.html"><span class="doc">column mappings</span></a> page.</p></li>
 <li><p>Required: True</p></li>
 <li><p>Type: List</p></li>
 <li><p>Attributes:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">alias</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Optional; if not specified the new column name defaults to <code class="docutils literal notranslate"><span class="pre">column_name</span></code>. New name of column.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Name of column in input data. Used as the name of the output column if <code class="docutils literal notranslate"><span class="pre">alias</span></code> is not specified.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">transforms</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">List</span></code>. Optional. A list of transforms to apply, in order, to the input data. See the <a class="reference internal" href="column_mapping_transforms.html"><span class="doc">column mapping transforms</span></a> section for more information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">column_name</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The name of the column in the input data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">alias</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Optional. The new name of the column to use
+in hlink. By default, this is the same as <code class="docutils literal notranslate"><span class="pre">column_name</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transforms</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">List</span></code>. Optional. A list of transforms to apply, in
+order, to the input data. See the <a class="reference external" href="column_mappings.html#transforms">column mapping transforms</a>
+section for more information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_value_column_a</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">Any</span></code>. Optional. Set all records for dataset
+A to the given literal value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_value_column_b</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">Any</span></code>. Optional. Set all records for dataset
+B to the given literal value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">override_column_a</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Read from this column in dataset A
+instead of the column specified with <code class="docutils literal notranslate"><span class="pre">column_name</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">override_column_b</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Read from this column in dataset B
+instead of the column specified with <code class="docutils literal notranslate"><span class="pre">column_name</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">override_transforms</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">List</span></code>. Transforms to apply to the override
+column specified with <code class="docutils literal notranslate"><span class="pre">override_column_a</span></code> or <code class="docutils literal notranslate"><span class="pre">override_column_b</span></code>.</p></li>
 </ul>
 </li>
 </ul>
@@ -877,7 +895,7 @@ the ML model. Set this to true to enable training step 3.</p></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Configuration API</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="column_mapping_transforms.html">Column Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="column_mappings.html">Column Mappings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison_types.html">Comparison Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="feature_selection_transforms.html">Feature Selection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_features.html">Pipeline Features</a></li>
@@ -890,7 +908,7 @@ the ML model. Set this to true to enable training step 3.</p></li>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="use_examples.html" title="previous chapter">Advanced Workflow Examples</a></li>
-      <li>Next: <a href="column_mapping_transforms.html" title="next chapter">Column mapping transforms</a></li>
+      <li>Next: <a href="column_mappings.html" title="next chapter">Column Mappings</a></li>
   </ul></li>
 </ul>
 </div>

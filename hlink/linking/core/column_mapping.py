@@ -2,12 +2,19 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+from typing import Any
 
 from pyspark.sql.functions import col, lit
+from pyspark.sql import DataFrame
 import hlink.linking.core.transforms as transforms_core
 
 
-def select_column_mapping(column_mapping, df_selected, is_a, column_selects):
+def select_column_mapping(
+    column_mapping: dict[str, Any],
+    df_selected: DataFrame,
+    is_a: bool,
+    column_selects: list[str],
+) -> tuple[DataFrame, list[str]]:
     name = column_mapping["column_name"]
     if "override_column_a" in column_mapping and is_a:
         override_name = column_mapping["override_column_a"]

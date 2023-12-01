@@ -23,7 +23,7 @@ Configuration API
    :maxdepth: 2
    :caption: Configuration API
 
-   Column Mapping <column_mapping_transforms.md>
+   Column Mappings <column_mappings.md>
    Comparison Types <comparison_types.md>
    Feature Selection <feature_selection_transforms.md>
    Pipeline Features <pipeline_features.md>
