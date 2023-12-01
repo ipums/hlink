@@ -106,6 +106,25 @@ Maps string → string.
 transforms = [{type = "concat_to_b", value = " "}]
 ```
 
+### concat_two_cols
+
+Concatenate the values from two columns together as strings. This transform takes
+a `column_to_append` attribute, which specifies the name of the column to concatenate
+to the end of the mapped column. To concatenate more than two columns, you can
+use this transform multiple times in a row.
+
+If either of the columns are numerical, they are automatically converted to strings
+before the concatenation.
+
+Maps (string | numerical) → string.
+
+```toml
+# Concatenate two columns to the end of the mapped column.
+transforms = [
+    {type = "concat_two_cols", column_to_append = "statefip"},
+    {type = "concat_two_cols", column_to_append = "county"},
+]
+```
 
 ### lowercase_strip
 

@@ -122,6 +122,23 @@ a lowercase transform to only dataset B with the following configuration section
 </pre></div>
 </div>
 </section>
+<section id="concat-two-cols">
+<h3>concat_two_cols<a class="headerlink" href="#concat-two-cols" title="Link to this heading">¶</a></h3>
+<p>Concatenate the values from two columns together as strings. This transform takes
+a <code class="docutils literal notranslate"><span class="pre">column_to_append</span></code> attribute, which specifies the name of the column to concatenate
+to the end of the mapped column. To concatenate more than two columns, you can
+use this transform multiple times in a row.</p>
+<p>If either of the columns are numerical, they are automatically converted to strings
+before the concatenation.</p>
+<p>Maps (string | numerical) → string.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Concatenate two columns to the end of the mapped column.</span>
+<span class="n">transforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;concat_two_cols&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">column_to_append</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;statefip&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;concat_two_cols&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">column_to_append</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;county&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
 <section id="lowercase-strip">
 <h3>lowercase_strip<a class="headerlink" href="#lowercase-strip" title="Link to this heading">¶</a></h3>
 <p>Used in name cleaning. Convert alphabetical characters to lower-case and strip white
@@ -362,7 +379,7 @@ The general categories are usually all that’s needed (1 == household head, 2 =
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Configuration API</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Column Mapping</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Column Mappings</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#advanced-usage">Advanced Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#transforms">Transforms</a></li>
