@@ -53,11 +53,101 @@ def test_check_column_mappings_no_column_name(spark: SparkSession) -> None:
     df_a = spark.createDataFrame([[20], [40], [60]], ["AGE"])
     df_b = spark.createDataFrame([[70], [50], [30]], ["AGE"])
 
-    df_a.show()
-    df_b.show()
-
     expected_err = (
         r"The following \[\[column_mappings\]\] has no 'column_name' attribute:"
     )
     with pytest.raises(ValueError, match=expected_err):
         check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_column_name_not_available_datasource_a(
+    spark: SparkSession,
+) -> None:
+    """
+    Column mappings may only use column_names that appear in datasource A or a
+    previous column mapping.
+    """
+    config = {"column_mappings": [{"column_name": "HEIGHT"}]}
+
+    df_a = spark.createDataFrame([[20], [40], [60]], ["AGE"])
+    df_b = spark.createDataFrame([[70, 123], [50, 123], [30, 123]], ["AGE", "HEIGHT"])
+
+    expected_err = (
+        r"Within a \[\[column_mappings\]\] the column_name: 'HEIGHT' "
+        r"does not exist in datasource_a and no previous \[\[column_mapping\]\] "
+        "alias exists for it"
+    )
+
+    with pytest.raises(ValueError, match=expected_err):
+        check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_set_value_column_a_does_not_need_column(
+    spark: SparkSession,
+) -> None:
+    """
+    When set_value_column_a is present for a column mapping, that column does not
+    need to be present in datasource A.
+    """
+    config = {"column_mappings": [{"column_name": "HEIGHT", "set_value_column_a": 125}]}
+
+    df_a = spark.createDataFrame([[20], [40], [60]], ["AGE"])
+    df_b = spark.createDataFrame([[70, 123], [50, 123], [30, 123]], ["AGE", "HEIGHT"])
+
+    check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_column_name_not_available_datasource_b(
+    spark: SparkSession,
+) -> None:
+    """
+    Column mappings may only use column_names that appear in datasource B or a
+    previous column mapping.
+    """
+    config = {"column_mappings": [{"column_name": "HEIGHT"}]}
+
+    df_a = spark.createDataFrame([[70, 123], [50, 123], [30, 123]], ["AGE", "HEIGHT"])
+    df_b = spark.createDataFrame([[20], [40], [60]], ["AGE"])
+
+    expected_err = (
+        r"Within a \[\[column_mappings\]\] the column_name: 'HEIGHT' "
+        r"does not exist in datasource_b and no previous \[\[column_mapping\]\] "
+        "alias exists for it"
+    )
+
+    with pytest.raises(ValueError, match=expected_err):
+        check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_set_value_column_b_does_not_need_column(
+    spark: SparkSession,
+) -> None:
+    """
+    When set_value_column_b is present for a column mapping, that column does not
+    need to be present in datasource B.
+    """
+    config = {"column_mappings": [{"column_name": "HEIGHT", "set_value_column_b": 125}]}
+
+    df_a = spark.createDataFrame([[70, 123], [50, 123], [30, 123]], ["AGE", "HEIGHT"])
+    df_b = spark.createDataFrame([[20], [40], [60]], ["AGE"])
+
+    check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_previous_mappings_are_available(
+    spark: SparkSession,
+) -> None:
+    """
+    Columns created in a previous column mapping can be used in other column
+    mappings.
+    """
+    config = {
+        "column_mappings": [
+            {"column_name": "AGE", "alias": "AGE_HLINK"},
+            {"column_name": "AGE_HLINK", "alias": "AGE_HLINK2"},
+        ]
+    }
+    df_a = spark.createDataFrame([[70], [50], [30]], ["AGE"])
+    df_b = spark.createDataFrame([[20], [40], [60]], ["AGE"])
+
+    check_column_mappings(config, df_a, df_b)
