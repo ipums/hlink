@@ -73,7 +73,7 @@ def test_check_column_mappings_column_name_not_available_datasource_a(
     df_b = spark.createDataFrame([[70, 123], [50, 123], [30, 123]], ["AGE", "HEIGHT"])
 
     expected_err = (
-        r"Within a \[\[column_mappings\]\] the column_name: 'HEIGHT' "
+        r"Within a \[\[column_mappings\]\] the column_name 'HEIGHT' "
         r"does not exist in datasource_a and no previous \[\[column_mapping\]\] "
         "alias exists for it"
     )
@@ -110,7 +110,7 @@ def test_check_column_mappings_column_name_not_available_datasource_b(
     df_b = spark.createDataFrame([[20], [40], [60]], ["AGE"])
 
     expected_err = (
-        r"Within a \[\[column_mappings\]\] the column_name: 'HEIGHT' "
+        r"Within a \[\[column_mappings\]\] the column_name 'HEIGHT' "
         r"does not exist in datasource_b and no previous \[\[column_mapping\]\] "
         "alias exists for it"
     )
