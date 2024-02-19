@@ -179,3 +179,47 @@ def test_check_column_mappings_override_column_b(spark: SparkSession) -> None:
     df_b = spark.createDataFrame([[70], [50], [30]], ["AGE"])
 
     check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_override_column_a_not_present(
+    spark: SparkSession,
+) -> None:
+    """
+    The override_column_a column must be present in datasource A.
+    """
+    config = {
+        "column_mappings": [
+            {"column_name": "AGE", "override_column_a": "oops_not_there"}
+        ]
+    }
+    df_a = spark.createDataFrame([[20], [40], [60]], ["ageColumn"])
+    df_b = spark.createDataFrame([[70], [50], [30]], ["AGE"])
+
+    expected_err = (
+        r"Within a \[\[column_mappings\]\] the override_column_a column "
+        "'oops_not_there' does not exist in datasource_a"
+    )
+    with pytest.raises(ValueError, match=expected_err):
+        check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_override_column_b_not_present(
+    spark: SparkSession,
+) -> None:
+    """
+    The override_column_b column must be present in datasource B.
+    """
+    config = {
+        "column_mappings": [
+            {"column_name": "AGE", "override_column_b": "oops_not_there"}
+        ]
+    }
+    df_a = spark.createDataFrame([[20], [40], [60]], ["AGE"])
+    df_b = spark.createDataFrame([[70], [50], [30]], ["AGE"])
+
+    expected_err = (
+        r"Within a \[\[column_mappings\]\] the override_column_b column "
+        "'oops_not_there' does not exist in datasource_b"
+    )
+    with pytest.raises(ValueError, match=expected_err):
+        check_column_mappings(config, df_a, df_b)
