@@ -276,22 +276,41 @@ def check_column_mappings(config, df_a, df_b):
         column_name = c.get("column_name")
         set_value_column_a = c.get("set_value_column_a")
         set_value_column_b = c.get("set_value_column_b")
+        override_column_a = c.get("override_column_a")
+        override_column_b = c.get("override_column_b")
+
         if not column_name:
             raise ValueError(
                 f"The following [[column_mappings]] has no 'column_name' attribute: {c}"
             )
         if set_value_column_a is None:
-            if column_name.lower() not in [c.lower() for c in df_a.columns]:
-                if column_name not in columns_available:
+            datasource_a_columns = [column.lower() for column in df_a.columns]
+
+            if override_column_a is not None:
+                if override_column_a.lower() not in datasource_a_columns:
                     raise ValueError(
-                        f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_a and no previous [[column_mapping]] alias exists for it. \nColumn mapping: {c}. \nAvailable columns: \n {df_a.columns}"
+                        f"Within a [[column_mappings]] the override_column_a column '{override_column_a}' does not exist in datasource_a.\nColumn mapping: {c}.\nAvailable columns: {df_a.columns}"
                     )
+            else:
+                if column_name.lower() not in datasource_a_columns:
+                    if column_name not in columns_available:
+                        raise ValueError(
+                            f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_a and no previous [[column_mapping]] alias exists for it. \nColumn mapping: {c}. \nAvailable columns: \n {df_a.columns}"
+                        )
         if set_value_column_b is None:
-            if column_name.lower() not in [c.lower() for c in df_b.columns]:
-                if column_name not in columns_available:
+            datasource_b_columns = [column.lower() for column in df_b.columns]
+
+            if override_column_b is not None:
+                if override_column_b.lower() not in datasource_b_columns:
                     raise ValueError(
-                        f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_b and no previous [[column_mapping]] alias exists for it. Column mapping: {c}. Available columns: \n {df_b.columns}"
+                        f"Within a [[column_mappings]] the override_column_b column '{override_column_b}' does not exist in datasource_b.\nColumn mapping: {c}.\nAvailable columns: {df_b.columns}"
                     )
+            else:
+                if column_name.lower() not in datasource_b_columns:
+                    if column_name not in columns_available:
+                        raise ValueError(
+                            f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_b and no previous [[column_mapping]] alias exists for it. Column mapping: {c}. Available columns: \n {df_b.columns}"
+                        )
         if alias in columns_available:
             duplicates.append(alias)
         elif not alias and column_name in columns_available:
