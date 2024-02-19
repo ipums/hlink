@@ -306,7 +306,9 @@ def check_column_mappings_column_available(
             )
 
 
-def check_column_mappings(config, df_a, df_b):
+def check_column_mappings(
+    config: dict[str, Any], df_a: DataFrame, df_b: DataFrame
+) -> list[str]:
     column_mappings = config.get("column_mappings")
     if not column_mappings:
         raise ValueError("No [[column_mappings]] exist in the conf file.")
