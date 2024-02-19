@@ -151,3 +151,31 @@ def test_check_column_mappings_previous_mappings_are_available(
     df_b = spark.createDataFrame([[20], [40], [60]], ["AGE"])
 
     check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_override_column_a(spark: SparkSession) -> None:
+    """
+    The override_column_a attribute lets you control which column you read from
+    in datasource A.
+    """
+    config = {
+        "column_mappings": [{"column_name": "AGE", "override_column_a": "ageColumn"}]
+    }
+    df_a = spark.createDataFrame([[20], [40], [60]], ["ageColumn"])
+    df_b = spark.createDataFrame([[70], [50], [30]], ["AGE"])
+
+    check_column_mappings(config, df_a, df_b)
+
+
+def test_check_column_mappings_override_column_b(spark: SparkSession) -> None:
+    """
+    The override_column_b attribute lets you control which column you read from
+    in datasource B.
+    """
+    config = {
+        "column_mappings": [{"column_name": "ageColumn", "override_column_b": "AGE"}]
+    }
+    df_a = spark.createDataFrame([[20], [40], [60]], ["ageColumn"])
+    df_b = spark.createDataFrame([[70], [50], [30]], ["AGE"])
+
+    check_column_mappings(config, df_a, df_b)
