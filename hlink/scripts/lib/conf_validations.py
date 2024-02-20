@@ -3,9 +3,12 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from pyspark.sql.utils import AnalysisException
 from os import path
+from typing import Any, Literal
+
 import colorama
+from pyspark.sql.utils import AnalysisException
+from pyspark.sql import DataFrame
 
 
 def print_checking(section: str):
@@ -265,7 +268,47 @@ def check_substitution_columns(config, columns_available):
                 )
 
 
-def check_column_mappings(config, df_a, df_b):
+def check_column_mappings_column_available(
+    column_mapping: dict[str, Any],
+    df: DataFrame,
+    previous_mappings: list[str],
+    a_or_b: Literal["a", "b"],
+) -> None:
+    """
+    Check whether a column in a column mapping is available or not. Raise a
+    ValueError if it is not available.
+
+    previous_mappings is a list of columns mapped by previous column mappings.
+    """
+    column_name = column_mapping["column_name"]
+    override_column = column_mapping.get(f"override_column_{a_or_b}")
+    df_columns_lower = [column.lower() for column in df.columns]
+
+    if override_column is not None:
+        if override_column.lower() not in df_columns_lower:
+            raise ValueError(
+                f"Within a [[column_mappings]] the override_column_{a_or_b} column "
+                f"'{override_column}' does not exist in datasource_{a_or_b}.\n"
+                f"Column mapping: {column_mapping}\n"
+                f"Available columns: {df.columns}"
+            )
+    else:
+        if (
+            column_name.lower() not in df_columns_lower
+            and column_name not in previous_mappings
+        ):
+            raise ValueError(
+                f"Within a [[column_mappings]] the column_name '{column_name}' "
+                f"does not exist in datasource_{a_or_b} and no previous "
+                "[[column_mapping]] alias exists for it.\n"
+                f"Column mapping: {column_mapping}.\n"
+                f"Available columns:\n {df.columns}"
+            )
+
+
+def check_column_mappings(
+    config: dict[str, Any], df_a: DataFrame, df_b: DataFrame
+) -> list[str]:
     column_mappings = config.get("column_mappings")
     if not column_mappings:
         raise ValueError("No [[column_mappings]] exist in the conf file.")
@@ -276,22 +319,15 @@ def check_column_mappings(config, df_a, df_b):
         column_name = c.get("column_name")
         set_value_column_a = c.get("set_value_column_a")
         set_value_column_b = c.get("set_value_column_b")
+
         if not column_name:
             raise ValueError(
                 f"The following [[column_mappings]] has no 'column_name' attribute: {c}"
             )
         if set_value_column_a is None:
-            if column_name.lower() not in [c.lower() for c in df_a.columns]:
-                if column_name not in columns_available:
-                    raise ValueError(
-                        f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_a and no previous [[column_mapping]] alias exists for it. \nColumn mapping: {c}. \nAvailable columns: \n {df_a.columns}"
-                    )
+            check_column_mappings_column_available(c, df_a, columns_available, "a")
         if set_value_column_b is None:
-            if column_name.lower() not in [c.lower() for c in df_b.columns]:
-                if column_name not in columns_available:
-                    raise ValueError(
-                        f"Within a [[column_mappings]] the column_name: '{column_name}' does not exist in datasource_b and no previous [[column_mapping]] alias exists for it. Column mapping: {c}. Available columns: \n {df_b.columns}"
-                    )
+            check_column_mappings_column_available(c, df_b, columns_available, "b")
         if alias in columns_available:
             duplicates.append(alias)
         elif not alias and column_name in columns_available:

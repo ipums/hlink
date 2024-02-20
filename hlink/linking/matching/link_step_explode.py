@@ -115,26 +115,32 @@ class LinkStepExplode(LinkStep):
                 expand_length = exploding_column["expand_length"]
                 derived_from_column = exploding_column["derived_from"]
                 explode_selects = [
-                    explode(self._expand(derived_from_column, expand_length)).alias(
-                        exploding_column_name
+                    (
+                        explode(self._expand(derived_from_column, expand_length)).alias(
+                            exploding_column_name
+                        )
+                        if exploding_column_name == column
+                        else column
                     )
-                    if exploding_column_name == column
-                    else column
                     for column in all_column_names
                 ]
             else:
                 explode_selects = [
-                    explode(col(exploding_column_name)).alias(exploding_column_name)
-                    if exploding_column_name == c
-                    else c
+                    (
+                        explode(col(exploding_column_name)).alias(exploding_column_name)
+                        if exploding_column_name == c
+                        else c
+                    )
                     for c in all_column_names
                 ]
             if "dataset" in exploding_column:
                 derived_from_column = exploding_column["derived_from"]
                 explode_selects_with_derived_column = [
-                    col(derived_from_column).alias(exploding_column_name)
-                    if exploding_column_name == column
-                    else column
+                    (
+                        col(derived_from_column).alias(exploding_column_name)
+                        if exploding_column_name == column
+                        else column
+                    )
                     for column in all_column_names
                 ]
                 if exploding_column["dataset"] == "a":
