@@ -46,10 +46,10 @@ transform = "sql_condition"
 
 ## array
 
-Combine two input columns into an array output column.
+Combine any number of input columns into a single array output column.
 
 * Attributes:
-  * `input_columns` - Type: list of strings. Required. The two input columns.
+  * `input_columns` - Type: list of strings. Required. The list of input columns.
   * `output_column` - Type: `string`. Required.
 
 ```
