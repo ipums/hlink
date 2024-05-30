@@ -123,9 +123,9 @@ def generate_transforms(
             return df_selected
 
         elif transform == "array":
-            col1, col2 = feature_selection["input_columns"]
+            input_cols = feature_selection["input_columns"]
             output_col = feature_selection["output_column"]
-            df_selected = df_selected.withColumn(output_col, array(col1, col2))
+            df_selected = df_selected.withColumn(output_col, array(input_cols))
             return df_selected
 
         elif transform == "union":
