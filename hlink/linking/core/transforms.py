@@ -3,6 +3,8 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from typing import Any
+
 from pyspark.sql.functions import (
     array,
     collect_list,
@@ -24,13 +26,18 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql.types import ArrayType, LongType, StringType
 from pyspark.ml import Pipeline
-from pyspark.sql import Window
+from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.ml.feature import NGram, RegexTokenizer, CountVectorizer, MinHashLSH
 
 
 def generate_transforms(
-    spark, df_selected, feature_selections, link_task, is_a, id_col
-):
+    spark: SparkSession,
+    df_selected: DataFrame,
+    feature_selections: list[dict[str, Any]],
+    link_task,
+    is_a: bool,
+    id_col: str,
+) -> DataFrame:
     not_skipped_feature_selections = [
         c
         for c in feature_selections
@@ -43,7 +50,9 @@ def generate_transforms(
         if ("post_agg_feature" in c) and c["post_agg_feature"]
     ]
 
-    def parse_feature_selections(df_selected, feature_selection, is_a):
+    def parse_feature_selections(
+        df_selected: DataFrame, feature_selection: dict[str, Any], is_a: bool
+    ) -> DataFrame:
         transform = feature_selection["transform"]
 
         if not feature_selection.get("output_column", False):
@@ -114,9 +123,9 @@ def generate_transforms(
             return df_selected
 
         elif transform == "array":
-            col1, col2 = feature_selection["input_columns"]
+            input_cols = feature_selection["input_columns"]
             output_col = feature_selection["output_column"]
-            df_selected = df_selected.withColumn(output_col, array(col1, col2))
+            df_selected = df_selected.withColumn(output_col, array(input_cols))
             return df_selected
 
         elif transform == "union":
@@ -300,7 +309,7 @@ def generate_transforms(
     for feature_selection in not_skipped_feature_selections:
         df_selected = parse_feature_selections(df_selected, feature_selection, is_a)
 
-    def get_transforms(name, is_a):
+    def get_transforms(name: str, is_a: bool) -> list[dict[str, Any]]:
         to_process = []
         for f in not_skipped_feature_selections:
             if ("override_column_a" in f) and is_a:
