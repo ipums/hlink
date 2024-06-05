@@ -46,7 +46,7 @@ class LinkStepMatch(LinkStep):
                     config["id_column"],
                 )
 
-        t_ctx["blocking_columns"] = [bc["column_name"] for bc in blocking]
+        t_ctx["blocking_columns"] = [[bc["column_name"]] for bc in blocking]
 
         blocking_exploded_columns = [
             bc["column_name"] for bc in blocking if "explode" in bc and bc["explode"]
