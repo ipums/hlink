@@ -3,6 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from collections import defaultdict
 import logging
 from typing import Any
 
@@ -45,9 +46,18 @@ def extract_or_groups_from_blocking(blocking: list[dict[str, Any]]) -> list[list
     ```
 
     This function returns a list of or_groups, each of which is a list of
-    column names.
+    column names. It maintains the input order except that the implicit
+    or_groups are all placed after the explicit or_groups.
     """
-    raise NotImplementedError()
+    or_groups: defaultdict[str | None, list[str]] = defaultdict(list)
+
+    for blocking_table in blocking:
+        column_name = blocking_table["column_name"]
+        or_group = blocking_table.get("or_group")
+        or_groups[or_group].append(column_name)
+
+    implicit_or_groups = [[column_name] for column_name in or_groups.pop(None, [])]
+    return list(or_groups.values()) + implicit_or_groups
 
 
 class LinkStepMatch(LinkStep):
@@ -82,7 +92,7 @@ class LinkStepMatch(LinkStep):
                     config["id_column"],
                 )
 
-        t_ctx["blocking_columns"] = [[bc["column_name"]] for bc in blocking]
+        t_ctx["blocking_columns"] = extract_or_groups_from_blocking(blocking)
 
         blocking_exploded_columns = [
             bc["column_name"] for bc in blocking if "explode" in bc and bc["explode"]
