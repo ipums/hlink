@@ -5,6 +5,7 @@
 
 import pytest
 import pandas as pd
+from hlink.linking.matching.link_step_match import extract_or_groups_from_blocking
 from hlink.linking.matching.link_step_score import LinkStepScore
 
 
@@ -127,3 +128,69 @@ def test_blocking_multi_layer_comparison(
 # TODO: test_step_2_has_matching_element
 
 # TODO: test_step_2_error_no_comp_type
+
+
+def test_extract_or_groups_from_blocking_empty() -> None:
+    blocking = []
+    or_groups = extract_or_groups_from_blocking(blocking)
+    assert or_groups == []
+
+
+def test_extract_or_groups_from_blocking_no_explicit_or_groups() -> None:
+    blocking = [
+        {
+            "column_name": "AGE_3",
+            "explode": True,
+            "expand_length": 3,
+            "derived_from": "AGE",
+            "dataset": "a",
+        },
+        {"column_name": "BPL"},
+        {"column_name": "SEX"},
+    ]
+    or_groups = extract_or_groups_from_blocking(blocking)
+    assert or_groups == [["AGE_3"], ["BPL"], ["SEX"]]
+
+
+def test_extract_or_groups_from_blocking_explicit_or_groups() -> None:
+    blocking = [
+        {"column_name": "BPL1", "or_group": "BPL"},
+        {
+            "column_name": "AGE_3",
+            "explode": True,
+            "expand_length": 3,
+            "derived_from": "AGE",
+            "dataset": "a",
+            "or_group": "AGE",
+        },
+        {"column_name": "BPL2", "or_group": "BPL"},
+        {"column_name": "BPL3", "or_group": "BPL"},
+    ]
+    or_groups = extract_or_groups_from_blocking(blocking)
+    assert or_groups == [["BPL1", "BPL2", "BPL3"], ["AGE_3"]]
+
+
+def test_extract_or_groups_from_blocking_or_groups_with_explode() -> None:
+    blocking = [
+        {
+            "column_name": "AGE1_3",
+            "explode": True,
+            "expand_length": 3,
+            "derived_from": "AGE1",
+            "dataset": "a",
+            "or_group": "AGE",
+        },
+        {
+            "column_name": "AGE2_3",
+            "explode": True,
+            "expand_length": 3,
+            "derived_from": "AGE2",
+            "dataset": "a",
+            "or_group": "AGE",
+        },
+        {
+            "column_name": "BPL",
+        },
+    ]
+    or_groups = extract_or_groups_from_blocking(blocking)
+    assert or_groups == [["AGE1_3", "AGE2_3"], ["BPL"]]

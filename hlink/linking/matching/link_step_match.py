@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 import logging
+from typing import Any
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.dist_table as dist_table_core
@@ -12,6 +13,41 @@ from hlink.linking.util import spark_shuffle_partitions_heuristic
 from . import _helpers as matching_helpers
 
 from hlink.linking.link_step import LinkStep
+
+
+def extract_or_groups_from_blocking(blocking: list[dict[str, Any]]) -> list[list[str]]:
+    """
+    Extract a list of "or_groups" from the blocking section of the config. Each
+    blocking table may have an or_group attribute. When two or more tables have
+    the same value for or_group, they belong to the same or_group and will be
+    connected by ORs in the potential_matches SQL query instead of by ANDs.
+    Tables without an explicit or_group belong to their own or_group.
+
+    For example, the blocking section
+
+    ```
+    [[blocking]]
+    column_name = "AGE1"
+    or_group = "AGE"
+
+    [[blocking]]
+    column_name = "AGE2"
+    or_group = "AGE"
+
+    [[blocking]]
+    column_name = "BPL"
+    ```
+
+    Would give the SQL condition
+
+    ```
+    (a.AGE1 = b.AGE1 OR a.AGE2 = b.AGE2) AND (a.BPL = b.BPL)
+    ```
+
+    This function returns a list of or_groups, each of which is a list of
+    column names.
+    """
+    raise NotImplementedError()
 
 
 class LinkStepMatch(LinkStep):
