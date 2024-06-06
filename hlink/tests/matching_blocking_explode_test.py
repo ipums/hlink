@@ -3,6 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from pyspark.sql import Row
 import pytest
 import pandas as pd
 from hlink.linking.matching.link_step_match import extract_or_groups_from_blocking
@@ -121,6 +122,42 @@ def test_blocking_multi_layer_comparison(
         assert (
             (row["namefrst_unstd_jw_x"] < 0.7) or (row["namefrst_std_jw_x"] < 0.7)
         ) or (row["namelast_jw_x"] < 0.7)
+
+
+def test_blocking_or_groups(
+    spark, blocking_or_groups_conf, matching_or_groups_test_input, matching
+):
+    """Test the blocking or_group functionality. This feature supports
+    combining some or all blocking conditions with OR instead of AND."""
+    table_a, table_b = matching_or_groups_test_input
+    table_a.createOrReplaceTempView("prepped_df_a")
+    table_b.createOrReplaceTempView("prepped_df_b")
+
+    matching.run_step(0)
+    matching.run_step(1)
+
+    potential_matches = matching.spark.table("potential_matches")
+
+    results = potential_matches.select("id_a", "id_b").collect()
+
+    assert set(results) == {
+        Row(
+            id_a="ad6442b5-42bc-4c2e-a517-5a951d989a92 ",
+            id_b="ad6442b5-42bc-4c2e-a517-5a951d989a92 ",
+        ),
+        Row(
+            id_a="a499b0dc-7ac0-4d61-b493-91a3036c712e ",
+            id_b="a499b0dc-7ac0-4d61-b493-91a3036c712e ",
+        ),
+        Row(
+            id_a="7fb55d25-2a7d-486d-9efa-27b9d7e60c24 ",
+            id_b="7fb55d25-2a7d-486d-9efa-27b9d7e60c24 ",
+        ),
+        Row(
+            id_a="a0f33b36-cef7-4949-a031-22b90f1055d4 ",
+            id_b="a0f33b36-cef7-4949-a031-22b90f1055d4 ",
+        ),
+    }
 
 
 # TODO: test_step_2_length_b
