@@ -1161,6 +1161,63 @@ def blocking_explode_conf(spark, conf):
 
 
 @pytest.fixture(scope="function")
+def blocking_or_groups_conf(spark, conf):
+    """
+    For testing the or_groups blocking functionality.
+    """
+    conf["column_mappings"] = [
+        {"column_name": "namefrst"},
+        {"column_name": "namelast"},
+        {"column_name": "birthyr"},
+        {"column_name": "sex"},
+        {"column_name": "bpl1"},
+        {"column_name": "bpl2"},
+        {"column_name": "bpl3"},
+    ]
+
+    conf["blocking"] = [
+        {
+            "column_name": "birthyr_3",
+            "dataset": "a",
+            "derived_from": "birthyr",
+            "expand_length": 3,
+            "explode": True,
+            "or_group": "birthyr",
+        },
+        {"column_name": "sex"},
+        {"column_name": "bpl1", "or_group": "bpl"},
+        {"column_name": "bpl2", "or_group": "bpl"},
+        {"column_name": "bpl3", "or_group": "bpl"},
+    ]
+    conf["comparison_features"] = [
+        {
+            "alias": "namefrst_jw",
+            "column_name": "namefrst",
+            "comparison_type": "jaro_winkler",
+        },
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast",
+            "comparison_type": "jaro_winkler",
+        },
+    ]
+    conf["comparisons"] = {
+        "comp_a": {
+            "feature_name": "namefrst_jw",
+            "threshold": 0.8,
+            "comparison_type": "threshold",
+        },
+        "comp_b": {
+            "feature_name": "namelast_jw",
+            "threshold": 0.8,
+            "comparison_type": "threshold",
+        },
+        "operator": "AND",
+    }
+    return conf
+
+
+@pytest.fixture(scope="function")
 def matching_household_conf(
     spark, conf, datasource_real_households, preprocessing, matching
 ):

@@ -3,11 +3,13 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from typing import Any
+
+from pyspark.sql import Column, DataFrame
 from pyspark.sql.functions import array, explode, col
 
 import hlink.linking.core.comparison as comparison_core
 from . import _helpers as matching_helpers
-
 from hlink.linking.link_step import LinkStep
 
 
@@ -64,7 +66,15 @@ class LinkStepExplode(LinkStep):
             ),
         )
 
-    def _explode(self, df, comparisons, comparison_features, blocking, id_column, is_a):
+    def _explode(
+        self,
+        df: DataFrame,
+        comparisons: dict[str, Any],
+        comparison_features: list[dict[str, Any]],
+        blocking: list[dict[str, Any]],
+        id_column: str,
+        is_a: bool,
+    ) -> DataFrame:
         # comp_feature_names, dist_features_to_run, feature_columns = comparison_core.get_feature_specs_from_comp(
         #     comparisons, comparison_features
         # )
@@ -159,7 +169,7 @@ class LinkStepExplode(LinkStep):
                 exploded_df = exploded_df.select(explode_selects)
         return exploded_df
 
-    def _expand(self, column_name, expand_length):
+    def _expand(self, column_name: str, expand_length: int) -> Column:
         return array(
             [
                 col(column_name).cast("int") + i

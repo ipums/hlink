@@ -15,8 +15,8 @@ SELECT DISTINCT
 {% endif %}
 FROM exploded_df_a a
 JOIN exploded_df_b b ON 
-{% for col in blocking_columns %}
-a.{{ col }} = b.{{ col }} {{ "AND" if not loop.last }}
+{% for or_group in blocking_columns %}
+    ({% for col in or_group %}a.{{ col }} = b.{{ col }}{{ " OR " if not loop.last }}{% endfor %}) {{ "AND" if not loop.last }}
 {% endfor %}
 {% if distance_table %}
   {% for d in distance_table %}

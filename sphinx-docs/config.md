@@ -568,6 +568,18 @@ expression = "sex == 1"
   * `dataset` -- Type: `string`. Optional. Must be `a` or `b` and used in conjuction with `explode`. Will only explode the column from the `a` or `b` dataset when specified.
   * `derived_from` -- Type: `string`. Used in conjunction with `explode = true`.  Specifies an input column from the existing dataset to be exploded. 
   * `expand_length` -- Type: `integer`. When `explode` is used on a column that is an integer, this can be specified to create an array with a range of integer values from (`expand_length` minus `original_value`) to (`expand_length` plus `original_value`).  For example, if the input column value for birthyr is 1870, explode is true, and the expand_length is 3, the exploded column birthyr_3 value would be the array [1867, 1868, 1869, 1870, 1871, 1872, 1873].
+  * `or_group` -- Type: `string`. Optional. The "OR group" to which this
+    blocking table belongs. Blocking tables that belong to the same OR group
+    are joined by OR in the blocking condition instead of AND. By default each
+    blocking table belongs to a different OR group. For example, suppose that
+    your dataset has 3 possible birthplaces BPL1, BPL2, and BPL3 for each
+    record. If you don't provide OR groups when blocking on each BPL variable,
+    then you will get a blocking condition like `(a.BPL1 = b.BPL1) AND (a.BPL2
+    = b.BPL2) AND (a.BPL3 = b.BPL3)`. But if you set `or_group = "BPL"` for
+    each of the 3 variables, then you will get a blocking condition like this
+    instead: `(a.BPL1 = b.BPL1 OR a.BPL2 = b.BPL2 OR a.BPL3 = b.BPL3)`. Note
+    the parentheses around the entire OR group condition. Other OR groups would
+    be connected to the BPL OR group with an AND condition.
 
 
 ```
