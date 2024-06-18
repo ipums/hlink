@@ -19,10 +19,6 @@ def test_do_get_steps(capsys, main, spark):
         main.do_get_steps("")
         output = capsys.readouterr().out
         for step in steps:
-            if str(step) not in output:
-                print(type(step))
-                print(step)
-                print(output)
             assert str(step) in output
 
 

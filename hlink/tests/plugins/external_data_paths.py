@@ -148,15 +148,18 @@ def potential_matches_path_ids_only(spark):
 
 
 @pytest.fixture(scope="module")
-def potential_matches_agg_path(spark):
-    """Create a fixture with the path to the test potential_matches csv file"""
-
-    path = "input_data/potential_matches_agg.csv"
+def agg_features_datasources() -> tuple[str, str, str]:
+    """Return the path to the potential_matches, prepped_df_a, and prepped_df_b csv data files."""
+    potential_matches_path = "input_data/potential_matches_agg.csv"
+    prepped_df_a_path = "input_data/prepped_df_a_agg.csv"
+    prepped_df_b_path = "input_data/prepped_df_b_agg.csv"
 
     package_path = os.path.dirname(hlink.tests.__file__)
-    full_path = os.path.join(package_path, path)
+    full_pm_path = os.path.join(package_path, potential_matches_path)
+    full_prepped_a_path = os.path.join(package_path, prepped_df_a_path)
+    full_prepped_b_path = os.path.join(package_path, prepped_df_b_path)
 
-    return full_path
+    return full_pm_path, full_prepped_a_path, full_prepped_b_path
 
 
 @pytest.fixture(scope="module")

@@ -3,84 +3,13 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-import hlink.tests
 import pandas as pd
-import pytest
 import hlink.linking.core.threshold as threshold_core
 from hlink.linking.matching.link_step_score import LinkStepScore
 
 
-@pytest.mark.skip(
-    reason="We still want to test that whatever 'secondary_threshold' became is being applied correctly, but we need to refactor this test to account for the fact that this was totally renamed and is now being carried out in a different step (step 3 doesn't exist anymore)."
-)
-def test_step_3_uniq_and_secondary_threshold(spark, matching_conf, matching):
-    """Test a secondary threshold with uniqueness"""
-    matching_conf["comparison_features"] = [
-        {
-            "alias": "namefrst_jw",
-            "column_name": "namefrst",
-            "comparison_type": "jaro_winkler",
-        },
-        {
-            "alias": "namelast_jw",
-            "column_name": "namelast",
-            "comparison_type": "jaro_winkler",
-        },
-    ]
-
-    matching_conf["comparisons"] = {
-        "comp_a": {
-            "feature_name": "namefrst_jw",
-            "threshold": 0.8,
-            "comparison_type": "threshold",
-        },
-        "comp_b": {
-            "feature_name": "namelast_jw",
-            "comparison_type": "threshold",
-            "threshold": 0.8,
-        },
-        "operator": "AND",
-    }
-
-    matching_conf["secondary_threshold"] = {
-        "threshold_a": {
-            "feature_name": "namefrst_jw",
-            "comparison_type": "threshold",
-            "threshold": 0.9,
-        },
-        "threshold_b": {
-            "feature_name": "namelast_jw",
-            "comparison_type": "threshold",
-            "threshold": 0.9,
-        },
-        "unique_true": {"id_a": "id_a", "id_b": "id_b"},
-        "operator": "AND",
-        "secondary": True,
-    }
-
-    matching.step_0_explode()
-    matching.step_1_match()
-    hlink.linking.matching._step_2_score.__create_features(matching, matching_conf)
-
-    # Create pandas DFs of the step_2 potential matches table
-    potential_matches_df = spark.table("potential_matches_prepped").toPandas()
-
-    #    matching.step_3_secondary_threshold()
-    # unique_matches_df = spark.table("potential_matches").toPandas()
-    unique_high_matches_df = spark.table("potential_matches_prepped").toPandas()
-
-    assert len(potential_matches_df.id_a) == 5
-    # assert (len(unique_matches_df.id_a) == 1)
-    # assert (unique_matches_df.query("id_a == 10 and id_b == 10")["namelast_jw"].iloc[0] > 0.8)
-    # assert (unique_matches_df.query("id_a == 10 and id_b == 10")["namelast_jw"].iloc[0] < 0.9)
-    # assert (unique_matches_df.query("id_a == 10 and id_b == 10")["namefrst_jw"].iloc[0] > 0.8)
-    # assert (unique_matches_df.query("id_a == 10 and id_b == 10")["namefrst_jw"].iloc[0] > 0.9)
-    assert unique_high_matches_df.empty
-
-
-# TODO: is there a step 3 anymore?
-def test_step_3_skip_on_no_conf(spark, matching_conf, matching, capsys):
-    """Test matching step 3 doesn't run if no training config"""
+def test_step_2_skip_on_no_conf(spark, matching_conf, matching, capsys):
+    """Test matching step 2 doesn't run if no training config"""
 
     matching_conf["comparison_features"] = [
         {
@@ -102,11 +31,10 @@ def test_step_3_skip_on_no_conf(spark, matching_conf, matching, capsys):
     )
 
 
-# TODO: is there a step 3 any more?
-def test_step_3_alpha_beta_thresholds(
+def test_step_2_alpha_beta_thresholds(
     spark, matching, matching_conf, threshold_ratio_data_path_2
 ):
-    """Test matching step 3 with both probability and ratio thresholds"""
+    """Test matching step 2 with both probability and ratio thresholds"""
 
     matching.spark.read.csv(
         threshold_ratio_data_path_2, header=True, inferSchema=True
@@ -170,3 +98,74 @@ def test_step_3_alpha_beta_thresholds(
 
     assert tp.query("histid_a == '5a' and histid_b == '7b'")["prediction"].iloc[0] == 1
     assert tp.query("histid_a == '5a' and histid_b == '6b'")["prediction"].iloc[0] == 0
+
+
+def test_step_2_aggregate_features(
+    spark, matching_conf, matching, agg_features_datasources
+):
+    matching_conf["id_column"] = "histid"
+    matching_conf["comparison_features"] = [
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast",
+            "comparison_type": "jaro_winkler",
+        },
+        {
+            "alias": "exact",
+            "column_names": ["namefrst_unstd", "namelast_clean"],
+            "comparison_type": "all_equals",
+        },
+        {
+            "alias": "exact_all",
+            "column_names": ["namefrst_unstd", "namelast_clean", "bpl"],
+            "comparison_type": "all_equals",
+        },
+    ]
+    matching_conf["training"] = {
+        "independent_vars": [
+            "namelast_jw",
+            "exact",
+            "exact_all",
+            "hits",
+            "hits2",
+            "exact_mult",
+            "exact_all_mult",
+            "exact_all_mult2",
+        ],
+        "chosen_model": {
+            "type": "probit",
+            "threshold": 0.5,
+        },
+        "dependent_var": "match",
+    }
+
+    potential_matches_path, prepped_df_a_path, prepped_df_b_path = (
+        agg_features_datasources
+    )
+    spark.read.csv(potential_matches_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("potential_matches")
+
+    spark.read.csv(prepped_df_a_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("prepped_df_a")
+    spark.read.csv(prepped_df_b_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("prepped_df_b")
+
+    link_step_score = LinkStepScore(matching)
+    link_step_score._create_features(matching_conf)
+
+    pm_prepped = spark.table("potential_matches_prepped").toPandas()
+
+    filtered = pm_prepped.query(
+        "histid_a == '0202928A-AC3E-48BB-8568-3372067F35C7' and histid_b == '001B8A74-3795-4997-BC5B-2A07257668F9'"
+    )
+
+    assert filtered["exact"].item()
+    assert filtered["exact_all"].item()
+    assert filtered["hits"].item() == 3
+    assert filtered["hits2"].item() == 9
+    assert filtered["exact_mult"].item()
+    assert filtered["exact_all_mult"].item() == 3
+    assert filtered["exact_all_mult2"].item() == 9

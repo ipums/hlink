@@ -349,6 +349,89 @@ def test_step_3_interacted_categorical_features(
     )
 
 
+def test_step_3_with_probit_model(
+    spark, training_conf, training, state_dist_path, datasource_training_input
+):
+    training_data_path, prepped_df_a_path, prepped_df_b_path = datasource_training_input
+    """Run training step 3 with a probit ML model."""
+    training_conf["comparison_features"] = [
+        {
+            "alias": "regionf",
+            "column_name": "region",
+            "comparison_type": "fetch_a",
+            "categorical": True,
+        },
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast",
+            "comparison_type": "jaro_winkler",
+        },
+        {
+            "alias": "state_distance",
+            "key_count": 1,
+            "column_name": "bpl",
+            "comparison_type": "geo_distance",
+            "loc_a": "statecode1",
+            "loc_b": "statecode2",
+            "distance_col": "dist",
+            "table_name": "state_distances_lookup",
+            "distances_file": state_dist_path,
+        },
+    ]
+    training_conf["training"]["dataset"] = training_data_path
+    training_conf["training"]["dependent_var"] = "match"
+    training_conf["training"]["independent_vars"] = [
+        "namelast_jw",
+        "regionf",
+        "state_distance",
+    ]
+
+    training_conf["training"]["chosen_model"] = {"type": "probit", "threshold": 0.5}
+    training_conf["training"]["score_with_model"] = True
+    training_conf["training"]["feature_importances"] = True
+
+    spark.read.csv(prepped_df_a_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("prepped_df_a")
+    spark.read.csv(prepped_df_b_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("prepped_df_b")
+
+    training.run_step(0)
+    training.run_step(1)
+    training.run_step(2)
+    training.run_step(3)
+
+    tfi = spark.table("training_feature_importances").toPandas()
+    assert (
+        8.9
+        <= tfi.query("feature_name == 'namelast_jw'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 9.0
+    )
+    assert (
+        tfi.query("feature_name == 'regionf' and category == 0")[
+            "coefficient_or_importance"
+        ].item()
+        == 0
+    )
+    assert (
+        -7.6
+        <= tfi.query("feature_name == 'regionf' and category == 1")[
+            "coefficient_or_importance"
+        ].item()
+        <= -7.5
+    )
+    assert (
+        6.4
+        <= tfi.query("feature_name == 'regionf' and category == 99")[
+            "coefficient_or_importance"
+        ].item()
+        <= 6.5
+    )
+
+
 def test_step_3_requires_table(training_conf, training):
     training_conf["training"]["feature_importances"] = True
     with pytest.raises(RuntimeError, match="Missing input tables"):
