@@ -3,9 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-import hlink.tests
 import pandas as pd
-import pytest
 import hlink.linking.core.threshold as threshold_core
 from hlink.linking.matching.link_step_score import LinkStepScore
 
