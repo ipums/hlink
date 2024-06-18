@@ -3,7 +3,9 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from collections import defaultdict
 import logging
+from typing import Any
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.dist_table as dist_table_core
@@ -12,6 +14,50 @@ from hlink.linking.util import spark_shuffle_partitions_heuristic
 from . import _helpers as matching_helpers
 
 from hlink.linking.link_step import LinkStep
+
+
+def extract_or_groups_from_blocking(blocking: list[dict[str, Any]]) -> list[list[str]]:
+    """
+    Extract a list of "or_groups" from the blocking section of the config. Each
+    blocking table may have an or_group attribute. When two or more tables have
+    the same value for or_group, they belong to the same or_group and will be
+    connected by ORs in the potential_matches SQL query instead of by ANDs.
+    Tables without an explicit or_group belong to their own or_group.
+
+    For example, the blocking section
+
+    ```
+    [[blocking]]
+    column_name = "AGE1"
+    or_group = "AGE"
+
+    [[blocking]]
+    column_name = "AGE2"
+    or_group = "AGE"
+
+    [[blocking]]
+    column_name = "BPL"
+    ```
+
+    Would give the SQL condition
+
+    ```
+    (a.AGE1 = b.AGE1 OR a.AGE2 = b.AGE2) AND (a.BPL = b.BPL)
+    ```
+
+    This function returns a list of or_groups, each of which is a list of
+    column names. It maintains the input order except that the implicit
+    or_groups are all placed after the explicit or_groups.
+    """
+    or_groups: defaultdict[str | None, list[str]] = defaultdict(list)
+
+    for blocking_table in blocking:
+        column_name = blocking_table["column_name"]
+        or_group = blocking_table.get("or_group")
+        or_groups[or_group].append(column_name)
+
+    implicit_or_groups = [[column_name] for column_name in or_groups.pop(None, [])]
+    return list(or_groups.values()) + implicit_or_groups
 
 
 class LinkStepMatch(LinkStep):
@@ -46,7 +92,7 @@ class LinkStepMatch(LinkStep):
                     config["id_column"],
                 )
 
-        t_ctx["blocking_columns"] = [bc["column_name"] for bc in blocking]
+        t_ctx["blocking_columns"] = extract_or_groups_from_blocking(blocking)
 
         blocking_exploded_columns = [
             bc["column_name"] for bc in blocking if "explode" in bc and bc["explode"]

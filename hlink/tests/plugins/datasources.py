@@ -880,6 +880,34 @@ def matching_test_input(spark, conf, tmpdir_factory):
 
 
 @pytest.fixture(scope="function")
+def matching_or_groups_test_input(spark):
+    prepped_a_data = "input_data/matching_or_group_test_a.csv"
+    prepped_b_data = "input_data/matching_or_group_test_b.csv"
+
+    package_path = os.path.dirname(hlink.tests.__file__)
+    pa_path = os.path.join(package_path, prepped_a_data)
+    pb_path = os.path.join(package_path, prepped_b_data)
+
+    schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("namefrst", StringType(), True),
+            StructField("namelast", StringType(), True),
+            StructField("birthyr", LongType(), True),
+            StructField("sex", LongType(), True),
+            StructField("bpl1", LongType(), True),
+            StructField("bpl2", LongType(), True),
+            StructField("bpl3", LongType(), True),
+        ]
+    )
+
+    pdfa = spark.read.csv(pa_path, schema)
+    pdfb = spark.read.csv(pb_path, schema)
+
+    return pdfa, pdfb
+
+
+@pytest.fixture(scope="function")
 def datasource_mi_comparison(spark, conf):
     """Create the prepped_df_(a/b) dataframes and populate basic config values"""
 
