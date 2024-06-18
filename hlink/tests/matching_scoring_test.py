@@ -78,9 +78,8 @@ def test_step_3_uniq_and_secondary_threshold(spark, matching_conf, matching):
     assert unique_high_matches_df.empty
 
 
-# TODO: is there a step 3 anymore?
-def test_step_3_skip_on_no_conf(spark, matching_conf, matching, capsys):
-    """Test matching step 3 doesn't run if no training config"""
+def test_step_2_skip_on_no_conf(spark, matching_conf, matching, capsys):
+    """Test matching step 2 doesn't run if no training config"""
 
     matching_conf["comparison_features"] = [
         {
@@ -102,11 +101,10 @@ def test_step_3_skip_on_no_conf(spark, matching_conf, matching, capsys):
     )
 
 
-# TODO: is there a step 3 any more?
-def test_step_3_alpha_beta_thresholds(
+def test_step_2_alpha_beta_thresholds(
     spark, matching, matching_conf, threshold_ratio_data_path_2
 ):
-    """Test matching step 3 with both probability and ratio thresholds"""
+    """Test matching step 2 with both probability and ratio thresholds"""
 
     matching.spark.read.csv(
         threshold_ratio_data_path_2, header=True, inferSchema=True
