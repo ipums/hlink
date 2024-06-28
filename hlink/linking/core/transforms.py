@@ -309,9 +309,11 @@ def generate_transforms(
     for feature_selection in not_skipped_feature_selections:
         df_selected = parse_feature_selections(df_selected, feature_selection, is_a)
 
-    def get_transforms(name: str, is_a: bool) -> list[dict[str, Any]]:
+    def get_transforms(
+        feature_selections: list[dict[str, Any]], name: str, is_a: bool
+    ) -> list[dict[str, Any]]:
         to_process = []
-        for f in not_skipped_feature_selections:
+        for f in feature_selections:
             if ("override_column_a" in f) and is_a:
                 pass
             elif ("override_column_b" in f) and not is_a:
@@ -326,9 +328,9 @@ def generate_transforms(
         return to_process
 
     hh_transforms = [
-        get_transforms("attach_family_col", is_a),
-        get_transforms("related_individual_rows", is_a),
-        get_transforms("neighbor_aggregate", is_a),
+        get_transforms(not_skipped_feature_selections, "attach_family_col", is_a),
+        get_transforms(not_skipped_feature_selections, "related_individual_rows", is_a),
+        get_transforms(not_skipped_feature_selections, "neighbor_aggregate", is_a),
     ]
     if any(hh_transforms):
         attach_ts, related_ts, neighbor_ts = hh_transforms
