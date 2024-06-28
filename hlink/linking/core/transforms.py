@@ -78,7 +78,12 @@ def generate_transforms(
     ]
 
     def parse_feature_selections(
-        df_selected: DataFrame, feature_selection: dict[str, Any], is_a: bool
+        spark: SparkSession,
+        link_task,
+        df_selected: DataFrame,
+        feature_selection: dict[str, Any],
+        id_col: str,
+        is_a: bool,
     ) -> DataFrame:
         transform = feature_selection["transform"]
 
@@ -334,7 +339,9 @@ def generate_transforms(
             raise ValueError(f"Invalid transform type for {transform}")
 
     for feature_selection in not_skipped_feature_selections:
-        df_selected = parse_feature_selections(df_selected, feature_selection, is_a)
+        df_selected = parse_feature_selections(
+            spark, link_task, df_selected, feature_selection, id_col, is_a
+        )
 
     hh_transforms = [
         _get_transforms(not_skipped_feature_selections, "attach_family_col", is_a),
@@ -410,7 +417,9 @@ def generate_transforms(
         )
 
     for feature_selection in post_agg_feature_selections:
-        df_selected = parse_feature_selections(df_selected, feature_selection, is_a)
+        df_selected = parse_feature_selections(
+            spark, link_task, df_selected, feature_selection, id_col, is_a
+        )
     return df_selected
 
 
