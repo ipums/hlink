@@ -30,6 +30,33 @@ from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.ml.feature import NGram, RegexTokenizer, CountVectorizer, MinHashLSH
 
 
+def _get_transforms(
+    feature_selections: list[dict[str, Any]], name: str, is_a: bool
+) -> list[dict[str, Any]]:
+    """
+    Filter the given list of feature selections for those that have the
+    transform `name` and are active for the datasource indicated by `is_a`.
+
+    feature_selections: the list of feature selections to filter
+    name: the name of the transform to filter for, e.g. "neighbor_aggregate"
+    is_a: whether this is for datasource A (True) or datasource B (False)
+    """
+    to_process = []
+    for f in feature_selections:
+        if ("override_column_a" in f) and is_a:
+            pass
+        elif ("override_column_b" in f) and not is_a:
+            pass
+        elif ("set_value_column_a" in f) and is_a:
+            pass
+        elif ("set_value_column_b" in f) and not is_a:
+            pass
+        elif f["transform"] == name:
+            to_process.append(f)
+
+    return to_process
+
+
 def generate_transforms(
     spark: SparkSession,
     df_selected: DataFrame,
@@ -309,28 +336,12 @@ def generate_transforms(
     for feature_selection in not_skipped_feature_selections:
         df_selected = parse_feature_selections(df_selected, feature_selection, is_a)
 
-    def get_transforms(
-        feature_selections: list[dict[str, Any]], name: str, is_a: bool
-    ) -> list[dict[str, Any]]:
-        to_process = []
-        for f in feature_selections:
-            if ("override_column_a" in f) and is_a:
-                pass
-            elif ("override_column_b" in f) and not is_a:
-                pass
-            elif ("set_value_column_a" in f) and is_a:
-                pass
-            elif ("set_value_column_b" in f) and not is_a:
-                pass
-            elif f["transform"] == name:
-                to_process.append(f)
-
-        return to_process
-
     hh_transforms = [
-        get_transforms(not_skipped_feature_selections, "attach_family_col", is_a),
-        get_transforms(not_skipped_feature_selections, "related_individual_rows", is_a),
-        get_transforms(not_skipped_feature_selections, "neighbor_aggregate", is_a),
+        _get_transforms(not_skipped_feature_selections, "attach_family_col", is_a),
+        _get_transforms(
+            not_skipped_feature_selections, "related_individual_rows", is_a
+        ),
+        _get_transforms(not_skipped_feature_selections, "neighbor_aggregate", is_a),
     ]
     if any(hh_transforms):
         attach_ts, related_ts, neighbor_ts = hh_transforms
