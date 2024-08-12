@@ -127,17 +127,13 @@ class LinkStepExplode(LinkStep):
 
                 explode_col_expr = explode(
                     self._expand(derived_from_column, expand_length)
-                ).alias(exploding_column_name)
-            else:
-                explode_col_expr = explode(col(exploding_column_name)).alias(
-                    exploding_column_name
                 )
+            else:
+                explode_col_expr = explode(col(exploding_column_name))
 
             if "dataset" in exploding_column:
                 derived_from_column = exploding_column["derived_from"]
-                no_explode_col_expr = col(derived_from_column).alias(
-                    exploding_column_name
-                )
+                no_explode_col_expr = col(derived_from_column)
 
                 if exploding_column["dataset"] == "a":
                     expr = explode_col_expr if is_a else no_explode_col_expr
