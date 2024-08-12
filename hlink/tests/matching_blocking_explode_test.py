@@ -124,6 +124,44 @@ def test_blocking_multi_layer_comparison(
         ) or (row["namelast_jw_x"] < 0.7)
 
 
+def test_blocking_multiple_exploded_columns(
+    spark, blocking_explode_conf, matching_test_input, matching
+):
+    table_a, table_b = matching_test_input
+    table_a.createOrReplaceTempView("prepped_df_a")
+    table_b.createOrReplaceTempView("prepped_df_b")
+
+    blocking_explode_conf["blocking"] = [
+        {
+            "column_name": "birthyr_3",
+            "dataset": "a",
+            "derived_from": "birthyr",
+            "expand_length": 3,
+            "explode": True,
+        },
+        {
+            "column_name": "birthyr_4",
+            "dataset": "a",
+            "derived_from": "birthyr",
+            "expand_length": 4,
+            "explode": True,
+        },
+        {"column_name": "sex"},
+    ]
+
+    matching.run_step(0)
+
+    exploded_a = spark.table("exploded_df_a").toPandas()
+    exploded_b = spark.table("exploded_df_b").toPandas()
+
+    assert "sex" in exploded_a.columns
+    assert "birthyr_3" in exploded_a.columns
+    assert "birthyr_4" in exploded_a.columns
+    assert "sex" in exploded_b.columns
+    assert "birthyr_3" in exploded_b.columns
+    assert "birthyr_4" in exploded_b.columns
+
+
 def test_blocking_or_groups(
     spark, blocking_or_groups_conf, matching_or_groups_test_input, matching
 ):
