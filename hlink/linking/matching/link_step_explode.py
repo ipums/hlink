@@ -153,7 +153,7 @@ class LinkStepExplode(LinkStep):
         # be a breaking change to remove this. We'd have to look into the
         # ramifications.
         if len(all_exploding_columns) > 0:
-            exploded_df = exploded_df.select(*all_column_names)
+            exploded_df = exploded_df.select(sorted(all_column_names))
 
         return exploded_df
 
