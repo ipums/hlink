@@ -127,6 +127,10 @@ def test_blocking_multi_layer_comparison(
 def test_blocking_multiple_exploded_columns(
     spark, blocking_explode_conf, matching_test_input, matching
 ):
+    """
+    Matching supports multiple exploded blocking columns. Each column is
+    exploded independently. See GitHub issue #142.
+    """
     table_a, table_b = matching_test_input
     table_a.createOrReplaceTempView("prepped_df_a")
     table_b.createOrReplaceTempView("prepped_df_b")
@@ -154,12 +158,23 @@ def test_blocking_multiple_exploded_columns(
     exploded_a = spark.table("exploded_df_a").toPandas()
     exploded_b = spark.table("exploded_df_b").toPandas()
 
+    input_size_a = spark.table("prepped_df_a").count()
+    input_size_b = spark.table("prepped_df_b").count()
+    output_size_a = len(exploded_a)
+    output_size_b = len(exploded_b)
+
     assert "sex" in exploded_a.columns
     assert "birthyr_3" in exploded_a.columns
     assert "birthyr_4" in exploded_a.columns
     assert "sex" in exploded_b.columns
     assert "birthyr_3" in exploded_b.columns
     assert "birthyr_4" in exploded_b.columns
+
+    # birthyr_3 multiplies the number of columns by 2 * 3 + 1 = 7
+    # birthyr_4 multiplies the number of columns by 2 * 4 + 1 = 9
+    assert input_size_a * 63 == output_size_a
+    # Both columns are only exploded in dataset A
+    assert input_size_b == output_size_b
 
 
 def test_blocking_or_groups(
