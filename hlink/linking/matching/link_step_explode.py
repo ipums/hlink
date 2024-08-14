@@ -124,49 +124,37 @@ class LinkStepExplode(LinkStep):
             if exploding_column.get("expand_length", False):
                 expand_length = exploding_column["expand_length"]
                 derived_from_column = exploding_column["derived_from"]
-                explode_selects = [
-                    (
-                        explode(self._expand(derived_from_column, expand_length)).alias(
-                            exploding_column_name
-                        )
-                        if exploding_column_name == column
-                        else column
-                    )
-                    for column in all_column_names
-                ]
+
+                explode_col_expr = explode(
+                    self._expand(derived_from_column, expand_length)
+                )
             else:
-                explode_selects = [
-                    (
-                        explode(col(exploding_column_name)).alias(exploding_column_name)
-                        if exploding_column_name == c
-                        else c
-                    )
-                    for c in all_column_names
-                ]
+                explode_col_expr = explode(col(exploding_column_name))
+
             if "dataset" in exploding_column:
                 derived_from_column = exploding_column["derived_from"]
-                explode_selects_with_derived_column = [
-                    (
-                        col(derived_from_column).alias(exploding_column_name)
-                        if exploding_column_name == column
-                        else column
-                    )
-                    for column in all_column_names
-                ]
+                no_explode_col_expr = col(derived_from_column)
+
                 if exploding_column["dataset"] == "a":
-                    exploded_df = (
-                        exploded_df.select(explode_selects)
-                        if is_a
-                        else exploded_df.select(explode_selects_with_derived_column)
-                    )
+                    expr = explode_col_expr if is_a else no_explode_col_expr
+                    exploded_df = exploded_df.withColumn(exploding_column_name, expr)
                 elif exploding_column["dataset"] == "b":
-                    exploded_df = (
-                        exploded_df.select(explode_selects)
-                        if not (is_a)
-                        else exploded_df.select(explode_selects_with_derived_column)
-                    )
+                    expr = explode_col_expr if not is_a else no_explode_col_expr
+                    exploded_df = exploded_df.withColumn(exploding_column_name, expr)
             else:
-                exploded_df = exploded_df.select(explode_selects)
+                exploded_df = exploded_df.withColumn(
+                    exploding_column_name, explode_col_expr
+                )
+
+        # If there are exploding columns, then select out "all_column_names".
+        # Otherwise, just let all of the columns through without selecting
+        # specific ones. I believe this is an artifact of a previous
+        # implementation, but the tests currently enforce it. It may or may not
+        # be a breaking change to remove this. We'd have to look into the
+        # ramifications.
+        if len(all_exploding_columns) > 0:
+            exploded_df = exploded_df.select(sorted(all_column_names))
+
         return exploded_df
 
     def _expand(self, column_name: str, expand_length: int) -> Column:
