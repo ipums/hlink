@@ -2,6 +2,7 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+import pytest
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.pipeline as pipeline_core
@@ -374,3 +375,9 @@ def test_multi_jaro_winkler_search_column_templating():
     assert "static_column" in sql_expr
     assert "static_column1" not in sql_expr
     assert "static_colum1" not in sql_expr
+
+
+def test_generate_comparison_feature_error_on_unknown_comparison_type() -> None:
+    comparison_feature = {"comparison_type": "not_supported"}
+    with pytest.raises(ValueError, match="No comparison type"):
+        comparison_feature_core.generate_comparison_feature(comparison_feature, "id")
