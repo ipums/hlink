@@ -1,16 +1,26 @@
-# Feature Selection transforms
+# Feature Selection Transforms
 
-Each header below represents a feature selection transform.  These transforms are used in the context of `feature_selections`.
+Each feature selection in the `[[feature_selections]]` list must have a
+`transform` attribute which tells hlink which transform it uses. The available
+feature selection transforms are listed below. The attributes of the feature
+selection often vary with the feature selection transform. However, there are a
+few utility attributes which are available for all transforms:
 
-```
-[[feature_selections]]
-input_column = "clean_birthyr"
-output_column = "replaced_birthyr"
-condition = "case when clean_birthyr is null or clean_birthyr == '' then year - age else clean_birthyr end"
-transform = "sql_condition"
-```
-
-There are some additional attributes available for all transforms: `checkpoint`, `override_column_a`, `override_column_b`, `set_value_column_a`, `set_value_column_b`.
+- `override_column_a` - Type: `string`. Optional. Given the name of a column in
+  dataset A, copy that column into the output column instead of computing the
+  feature selection for dataset A. This does not affect dataset B.
+- `override_column_b` - Type: `string`. Optional. Given the name of a column in
+  dataset B, copy that column into the output column instead of computing the
+  feature selection for dataset B. This does not affect dataset A.
+- `set_value_column_a` - Type: any. Optional. Instead of computing the feature
+  selection for dataset A, use the given value for every row in the output
+  column. This does not affect dataset B.
+- `set_value_column_b` - Type: any. Optional. Instead of computing the feature
+  selection for dataset B, use the given value for every row in the output
+  column. This does not affect dataset A.
+- `checkpoint` - Type: `boolean`. Optional. If set to true, checkpoint the
+  dataset in Spark before computing the feature selection. This can reduce some
+  resource usage for very complex workflows, but should not be necessary.
 
 ## bigrams
 
