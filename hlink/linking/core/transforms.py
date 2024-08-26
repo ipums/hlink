@@ -405,12 +405,15 @@ def generate_transforms(
 def apply_transform(
     column_select: Column, transform: dict[str, Any], is_a: bool
 ) -> Column:
-    """Given a dataframe select string return a new string having applied the given transform.
-    column_select: A PySpark column type
-    transform: The transform info from the current config
-    is_a: Is running on dataset 'a' or 'b ?
+    """Return a new column that is the result of applying the given transform
+    to the given input column (column_select). The is_a parameter controls the
+    behavior of the transforms like "add_to_a" which act differently on
+    datasets A and B.
 
-    See the json_schema config file in config_schemas/config.json for definitions on each transform type.
+    Args:
+    column_select: a PySpark Column
+    transform: the transform to apply
+    is_a: whether this is dataset A (True) or B (False)
     """
     transform_type = transform["type"]
     if transform_type == "add_to_a":
