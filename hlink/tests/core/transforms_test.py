@@ -142,3 +142,53 @@ def test_generate_transforms_override_column_a(
         Row(id=2, mother_nativity=0, test_override_column=-1, mbpl_range=0),
         Row(id=3, mother_nativity=6, test_override_column=-1, mbpl_range=0),
     ]
+
+
+def test_generate_transforms_override_column_b(
+    spark: SparkSession, preprocessing: LinkTask
+) -> None:
+    """
+    In a feature selection, you can set the `override_column_b` attribute to
+    copy that column in dataset B as the feature selection instead of computing
+    the feature selection like normal. This does not affect dataset A.
+    """
+    feature_selections = [
+        {
+            "output_column": "mbpl_range",
+            "transform": "sql_condition",
+            "input_column": "mother_nativity",
+            "condition": "CASE WHEN mother_nativity = 0 THEN 0 WHEN mother_nativity > 0 AND mother_nativity < 5 THEN 1 WHEN mother_nativity = 5 THEN 2 ELSE 0 END",
+            "override_column_b": "test_override_column",
+        }
+    ]
+    df_a = spark.createDataFrame(
+        [[0, 2, -1], [1, 5, -1], [2, 0, -1], [3, 6, -1]],
+        "id:integer, mother_nativity:integer, test_override_column:integer",
+    )
+    df_b = spark.createDataFrame(
+        [[0, 2, -1], [1, 5, -1], [2, 0, -1], [3, 6, -1]],
+        "id:integer, mother_nativity:integer, test_override_column:integer",
+    )
+
+    # mbpl_range should be computed with the SQL condition in dataset A
+    df_result_a = generate_transforms(
+        spark, df_a, feature_selections, preprocessing, is_a=True, id_col="id"
+    ).sort("id")
+    result_a = df_result_a.collect()
+    assert result_a == [
+        Row(id=0, mother_nativity=2, test_override_column=-1, mbpl_range=1),
+        Row(id=1, mother_nativity=5, test_override_column=-1, mbpl_range=2),
+        Row(id=2, mother_nativity=0, test_override_column=-1, mbpl_range=0),
+        Row(id=3, mother_nativity=6, test_override_column=-1, mbpl_range=0),
+    ]
+
+    df_result_b = generate_transforms(
+        spark, df_b, feature_selections, preprocessing, is_a=False, id_col="id"
+    ).sort("id")
+    result_b = df_result_b.collect()
+    assert result_b == [
+        Row(id=0, mother_nativity=2, test_override_column=-1, mbpl_range=-1),
+        Row(id=1, mother_nativity=5, test_override_column=-1, mbpl_range=-1),
+        Row(id=2, mother_nativity=0, test_override_column=-1, mbpl_range=-1),
+        Row(id=3, mother_nativity=6, test_override_column=-1, mbpl_range=-1),
+    ]
