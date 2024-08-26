@@ -210,6 +210,13 @@ def test_generate_transforms_error_when_unrecognized_transform(
 
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
+    """The when_value transform supports simple if-then-otherwise logic on
+    columns:
+
+    if the column is equal to "when_value"
+    then return "if_value"
+    otherwise return "else_value"
+    """
     transform = {"type": "when_value", "value": 6, "if_value": 0, "else_value": 1}
     column_select = col("marst")
     output_col = apply_transform(column_select, transform, is_a)
@@ -225,3 +232,11 @@ def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
         Row(marst=6, output=0),
         Row(marst=1, output=1),
     ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> None:
+    column_select = col("test")
+    transform = {"type": "not_supported"}
+    with pytest.raises(ValueError, match="Invalid transform type"):
+        apply_transform(column_select, transform, is_a)
