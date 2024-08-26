@@ -1,7 +1,8 @@
 from pyspark.sql import Row, SparkSession
+from pyspark.sql.functions import col
 import pytest
 
-from hlink.linking.core.transforms import generate_transforms
+from hlink.linking.core.transforms import apply_transform, generate_transforms
 from hlink.linking.link_task import LinkTask
 
 
@@ -205,3 +206,22 @@ def test_generate_transforms_error_when_unrecognized_transform(
 
     with pytest.raises(ValueError, match="Invalid transform type"):
         generate_transforms(spark, df, feature_selections, preprocessing, is_a, "id")
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
+    transform = {"type": "when_value", "value": 6, "if_value": 0, "else_value": 1}
+    column_select = col("marst")
+    output_col = apply_transform(column_select, transform, is_a)
+
+    df = spark.createDataFrame([[3], [6], [2], [6], [1]], "marst:integer")
+    transformed = df.select("marst", output_col.alias("output"))
+    result = transformed.collect()
+
+    assert result == [
+        Row(marst=3, output=1),
+        Row(marst=6, output=0),
+        Row(marst=2, output=1),
+        Row(marst=6, output=0),
+        Row(marst=1, output=1),
+    ]
