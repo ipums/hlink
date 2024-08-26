@@ -26,7 +26,7 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql.types import ArrayType, LongType, StringType
 from pyspark.ml import Pipeline
-from pyspark.sql import DataFrame, SparkSession, Window
+from pyspark.sql import Column, DataFrame, SparkSession, Window
 from pyspark.ml.feature import NGram, RegexTokenizer, CountVectorizer, MinHashLSH
 
 
@@ -402,7 +402,9 @@ def generate_transforms(
 
 
 #  These apply to the column mappings in the current config
-def apply_transform(column_select, transform, is_a):
+def apply_transform(
+    column_select: Column, transform: dict[str, Any], is_a: bool
+) -> Column:
     """Given a dataframe select string return a new string having applied the given transform.
     column_select: A PySpark column type
     transform: The transform info from the current config
