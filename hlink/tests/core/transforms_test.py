@@ -192,3 +192,16 @@ def test_generate_transforms_override_column_b(
         Row(id=2, mother_nativity=0, test_override_column=-1, mbpl_range=-1),
         Row(id=3, mother_nativity=6, test_override_column=-1, mbpl_range=-1),
     ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_generate_transforms_error_when_unrecognized_transform(
+    spark: SparkSession, preprocessing: LinkTask, is_a: bool
+) -> None:
+    feature_selections = [
+        {"input_column": "age", "output_column": "age2", "transform": "not_supported"}
+    ]
+    df = spark.createDataFrame([], "id:integer, age:integer")
+
+    with pytest.raises(ValueError, match="Invalid transform type"):
+        generate_transforms(spark, df, feature_selections, preprocessing, is_a, "id")
