@@ -235,6 +235,32 @@ def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
 
 
 @pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_remove_punctuation(spark: SparkSession, is_a: bool) -> None:
+    transform = {"type": "remove_punctuation"}
+    input_col = col("input")
+    output_col = apply_transform(input_col, transform, is_a)
+
+    df = spark.createDataFrame(
+        [
+            # All of these characters are considered punctuation and should be removed
+            ["?-\\/\"':,.[]{}"],
+            ["abcdefghijklmnop"],
+            # The address of the Minnesota state capitol
+            ["75 Rev. Dr. Martin Luther King, Jr. Blvd. Saint Paul, MN 55155"],
+        ],
+        "input:string",
+    )
+    transformed = df.select(output_col.alias("output"))
+    result = transformed.collect()
+
+    assert result == [
+        Row(output=""),
+        Row(output="abcdefghijklmnop"),
+        Row(output="75 Rev Dr Martin Luther King Jr Blvd Saint Paul MN 55155"),
+    ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> None:
     column_select = col("test")
     transform = {"type": "not_supported"}
