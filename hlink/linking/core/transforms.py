@@ -336,6 +336,16 @@ def generate_transforms(
     is_a: bool,
     id_col: str,
 ) -> DataFrame:
+    """Generate feature selection columns and return the input dataframe with these new columns attached.
+
+    Args:
+    spark: the Spark session
+    df_selected: the input Spark DataFrame
+    feature_selections: a list of feature selections to compute
+    link_task: the current LinkTask
+    is_a: whether this is dataset A (True) or dataset B (False)
+    id_col: the name of the identifier column in the input data frame
+    """
     not_skipped_feature_selections = [
         c
         for c in feature_selections
