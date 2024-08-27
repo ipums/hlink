@@ -55,6 +55,9 @@ column. This does not affect dataset A.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> - Type: <code class="docutils literal notranslate"><span class="pre">boolean</span></code>. Optional. If set to true, checkpoint the
 dataset in Spark before computing the feature selection. This can reduce some
 resource usage for very complex workflows, but should not be necessary.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">skip</span></code> - Type: <code class="docutils literal notranslate"><span class="pre">boolean</span></code>. Optional. If set to true, don’t compute this
+feature selection. This has the same effect as commenting the feature
+selection out of your config file.</p></li>
 </ul>
 <section id="bigrams">
 <h2>bigrams<a class="headerlink" href="#bigrams" title="Link to this heading">¶</a></h2>

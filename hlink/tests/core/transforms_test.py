@@ -196,6 +196,54 @@ def test_generate_transforms_override_column_b(
 
 
 @pytest.mark.parametrize("is_a", [True, False])
+def test_generate_transforms_skip_attribute_skips_transform(
+    spark: SparkSession, preprocessing: LinkTask, is_a: bool
+) -> None:
+    """When a feature selection has an attribute "skip" set to True,
+    generate_transforms() ignores it and doesn't include it in the output data
+    frame.
+    """
+    feature_selections = [
+        {
+            "input_column": "name",
+            "output_column": "name_bigrams",
+            "transform": "bigrams",
+            "skip": True,
+        }
+    ]
+
+    df = spark.createDataFrame([[0, "martin"]], "id:integer, name:string")
+    df_result = generate_transforms(
+        spark, df, feature_selections, preprocessing, is_a, "id"
+    )
+    # There's no output "name_bigrams" column because the feature selection was skipped
+    assert df_result.columns == ["id", "name"]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_generate_transforms_skip_attribute_does_not_skip_if_false(
+    spark: SparkSession, preprocessing: LinkTask, is_a: bool
+) -> None:
+    """When a feature selection has an attribute "skip", but it's set to False,
+    generate_transforms() computes the feature selection as normal.
+    """
+    feature_selections = [
+        {
+            "input_column": "name",
+            "output_column": "name_bigrams",
+            "transform": "bigrams",
+            "skip": False,
+        }
+    ]
+
+    df = spark.createDataFrame([[0, "martin"]], "id:integer, name:string")
+    df_result = generate_transforms(
+        spark, df, feature_selections, preprocessing, is_a, "id"
+    )
+    assert "name_bigrams" in df_result.columns
+
+
+@pytest.mark.parametrize("is_a", [True, False])
 def test_generate_transforms_error_when_unrecognized_transform(
     spark: SparkSession, preprocessing: LinkTask, is_a: bool
 ) -> None:
