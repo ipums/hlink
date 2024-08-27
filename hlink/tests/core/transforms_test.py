@@ -260,6 +260,35 @@ def test_apply_transform_remove_punctuation(spark: SparkSession, is_a: bool) -> 
     ]
 
 
+@pytest.mark.parametrize("values", [[1], [1, 2, 3]])
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_substring_error_when_not_exactly_2_values(
+    values: list[int], is_a: bool
+) -> None:
+    """
+    The substring transform takes a list of exactly two values, which are the
+    start position of the substring and its length. If the list has the wrong
+    number of values, then apply_transform() raises an error.
+
+    TODO: It would be simpler to have two separate attributes for the substring
+    start and length, like this:
+
+    {
+        "type": "substring",
+        "start_index": 0,
+        "length": 4,
+    }
+
+    See issue #146. Making these changes would eliminate the need for this
+    test.
+    """
+    input_col = col("input")
+    transform = {"type": "substring", "values": values}
+
+    with pytest.raises(ValueError, match="Length of substr transform should be 2"):
+        apply_transform(input_col, transform, is_a)
+
+
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> None:
     column_select = col("test")
