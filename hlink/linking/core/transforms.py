@@ -42,17 +42,17 @@ def _get_transforms(
     is_a: whether this is for datasource A (True) or datasource B (False)
     """
     to_process = []
-    for f in feature_selections:
-        if ("override_column_a" in f) and is_a:
+    for feature_selection in feature_selections:
+        if ("override_column_a" in feature_selection) and is_a:
             pass
-        elif ("override_column_b" in f) and not is_a:
+        elif ("override_column_b" in feature_selection) and not is_a:
             pass
-        elif ("set_value_column_a" in f) and is_a:
+        elif ("set_value_column_a" in feature_selection) and is_a:
             pass
-        elif ("set_value_column_b" in f) and not is_a:
+        elif ("set_value_column_b" in feature_selection) and not is_a:
             pass
-        elif f["transform"] == name:
-            to_process.append(f)
+        elif feature_selection["transform"] == name:
+            to_process.append(feature_selection)
 
     return to_process
 
