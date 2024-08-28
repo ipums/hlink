@@ -21,6 +21,9 @@ few utility attributes which are available for all transforms:
 - `checkpoint` - Type: `boolean`. Optional. If set to true, checkpoint the
   dataset in Spark before computing the feature selection. This can reduce some
   resource usage for very complex workflows, but should not be necessary.
+- `skip` - Type: `boolean`. Optional. If set to true, don't compute this
+  feature selection. This has the same effect as commenting the feature
+  selection out of your config file.
 
 ## bigrams
 
