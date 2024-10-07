@@ -12,6 +12,8 @@ from pyspark.sql.functions import col
 from hlink.errors import DataError
 from hlink.linking.link_step import LinkStep
 
+logger = logging.getLogger(__name__)
+
 
 def handle_paths(datasource, a_or_b):
     if "parquet_file" in datasource:
@@ -56,7 +58,7 @@ class LinkStepRegisterRawDfs(LinkStep):
         df_b_filtered = self._filter_dataframe(config, "b")
 
         if config["datasource_a"].get("convert_ints_to_longs", False):
-            logging.debug(
+            logger.debug(
                 "Converting all columns in datasource_a with type 'int' to type 'long'"
             )
             df_a = self._convert_ints_to_longs(df_a_filtered)
@@ -64,7 +66,7 @@ class LinkStepRegisterRawDfs(LinkStep):
             df_a = df_a_filtered
 
         if config["datasource_b"].get("convert_ints_to_longs", False):
-            logging.debug(
+            logger.debug(
                 "Converting all columns in datasource_b with type 'int' to type 'long'"
             )
             df_b = self._convert_ints_to_longs(df_b_filtered)

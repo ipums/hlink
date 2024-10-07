@@ -6,6 +6,8 @@
 import itertools
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 def create_feature_tables(
     link_task, t_ctx_def, advanced_comp_features, hh_comp_features, id_col, table_name
@@ -518,7 +520,7 @@ def generate_comparison_feature(feature, id_col, include_as=False):
         col_range = list(range(1, num_cols + 1))
         tuples = list(itertools.product(col_range, col_range))
 
-        logging.debug(
+        logger.debug(
             f"multi_jaro_winkler_search with alias {feature.get('alias')}: there are {len(tuples)} subcomparisons"
         )
         sub_exprs = []

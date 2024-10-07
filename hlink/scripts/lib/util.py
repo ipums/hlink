@@ -7,6 +7,8 @@ import sys
 import logging
 import traceback
 
+logger = logging.getLogger(__name__)
+
 
 def report_and_log_error(message: str, err: Exception):
     print(f"An error occured: {message}")
@@ -19,7 +21,7 @@ def report_and_log_error(message: str, err: Exception):
     # traceback.print_exception("",err,i[2])
     multi_line = "\n==========\n"
 
-    logging.error(
+    logger.error(
         str(i[0])
         + " : "
         + str(i[1])

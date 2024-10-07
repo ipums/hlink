@@ -14,6 +14,8 @@ from pyspark.ml.feature import (
 import hlink.linking.transformers.float_cast_transformer
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 def generate_pipeline_stages(conf, ind_vars, tf, tconf):
     """Creates a Spark ML pipeline from the pipeline features.
@@ -202,8 +204,8 @@ def _calc_categorical_features(
                 "categorical", False
             ):
                 categorical_pipeline_features.append(pipeline_feature["output_column"])
-    logging.info(f"Categorical Comparison features: {categorical_comparison_features}")
-    logging.info(f"Categorical Pipeline features: {categorical_pipeline_features}")
+    logger.info(f"Categorical Comparison features: {categorical_comparison_features}")
+    logger.info(f"Categorical Pipeline features: {categorical_pipeline_features}")
 
     return categorical_comparison_features, categorical_pipeline_features
 

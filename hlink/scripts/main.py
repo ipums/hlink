@@ -25,6 +25,8 @@ from hlink.scripts.main_loop import Main
 from hlink.scripts.lib.conf_validations import analyze_conf
 from hlink.scripts.lib.table_ops import drop_all_tables
 
+logger = logging.getLogger(__name__)
+
 
 def load_conf(conf_name, user):
     """Load and return the hlink config dictionary.
@@ -103,12 +105,12 @@ def cli():
 
     _setup_logging(run_conf)
 
-    logging.info("Initializing Spark")
+    logger.info("Initializing Spark")
     spark_init_start = timer()
     spark = _get_spark(run_conf, args)
     spark_init_end = timer()
     spark_init_time = round(spark_init_end - spark_init_start, 2)
-    logging.info(f"Initialized Spark in {spark_init_time}s")
+    logger.info(f"Initialized Spark in {spark_init_time}s")
 
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
@@ -220,9 +222,9 @@ def _cli_loop(spark, args, run_conf, run_name):
     try:
         print("Analyzing config file")
         analyze_conf(LinkRun(spark, run_conf))
-        logging.info("Analyzed config file, no errors found")
+        logger.info("Analyzed config file, no errors found")
     except ValueError as err:
-        logging.error(
+        logger.error(
             "Analysis found an error in the config file. See below for details."
         )
         report_and_log_error("", err)
@@ -232,7 +234,7 @@ def _cli_loop(spark, args, run_conf, run_name):
         try:
             main.cmdloop()
             if main.lastcmd == "reload":
-                logging.info("Reloading config file")
+                logger.info("Reloading config file")
                 run_conf = load_conf(args.conf, args.user)
             else:
                 break
@@ -257,9 +259,9 @@ def _setup_logging(conf):
 
     logging.basicConfig(filename=log_file, level=logging.INFO, format=format_string)
 
-    logging.info(f"New session {session_id} by user {user}")
-    logging.info(f"Configured with {conf['conf_path']}")
-    logging.info(f"Using hlink version {hlink_version}")
-    logging.info(
+    logger.info(f"New session {session_id} by user {user}")
+    logger.info(f"Configured with {conf['conf_path']}")
+    logger.info(f"Using hlink version {hlink_version}")
+    logger.info(
         "-------------------------------------------------------------------------------------"
     )

@@ -11,6 +11,8 @@ from hlink.linking.util import spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
+logger = logging.getLogger(__name__)
+
 
 class LinkStepReportR2PercentLinked(LinkStep):
     def __init__(self, task):
@@ -34,7 +36,7 @@ class LinkStepReportR2PercentLinked(LinkStep):
         dataset_size_max = max(dataset_size1, dataset_size2, dataset_size3)
         num_partitions = spark_shuffle_partitions_heuristic(dataset_size_max)
         self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
-        logging.info(
+        logger.info(
             f"Dataset sizes are {dataset_size1}, {dataset_size2}, {dataset_size3}, so set Spark partitions to {num_partitions} for this step"
         )
 

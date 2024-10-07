@@ -15,6 +15,8 @@ from . import _helpers as matching_helpers
 
 from hlink.linking.link_step import LinkStep
 
+logger = logging.getLogger(__name__)
+
 
 def extract_or_groups_from_blocking(blocking: list[dict[str, Any]]) -> list[list[str]]:
     """
@@ -77,7 +79,7 @@ class LinkStepMatch(LinkStep):
         dataset_size_max = max(dataset_size_a, dataset_size_b)
         num_partitions = spark_shuffle_partitions_heuristic(dataset_size_max)
         self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
-        logging.info(
+        logger.info(
             f"Dataset sizes are A={dataset_size_a}, B={dataset_size_b}, so set Spark partitions to {num_partitions} for this step"
         )
 
