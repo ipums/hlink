@@ -17,10 +17,27 @@ hlink requires
 - Python 3.10, 3.11, or 3.12
 - Java 8 or greater for integration with PySpark
 
-You can install the newest version of the python package directly from PyPI with pip:
+You can install the newest version of the Python package directly from PyPI with pip:
 ```
 pip install hlink
 ```
+
+We do our best to make hlink compatible with Python 3.10-3.12. If you have a
+problem using hlink on one of these versions of Python, please open an issue
+through GitHub. Versions of Python older than 3.10 are not supported.
+
+Note that pyspark 3.5 does not yet officially support Python 3.12. If you
+encounter pyspark-related import errors while running hlink on Python 3.12, try
+
+- Installing the setuptools package. The distutils package was deleted from the
+  standard library in Python 3.12, but some versions of pyspark still import
+  it. The setuptools package provides a hacky stand-in distutils library which
+  should fix some import errors in pyspark. We install setuptools in our
+  development and test dependencies so that our tests work on Python 3.12.
+
+- Downgrading Python to 3.10 or 3.11. Pyspark officially supports these
+  versions of Python. So you should have better chances getting pyspark to work
+  well on Python 3.10 or 3.11.
 
 ## Docs
 
