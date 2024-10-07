@@ -14,6 +14,8 @@ from hlink.linking.util import spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
+logger = logging.getLogger(__name__)
+
 
 class LinkStepScore(LinkStep):
     def __init__(self, task):
@@ -43,7 +45,7 @@ class LinkStepScore(LinkStep):
         dataset_size = self.task.spark.table(f"{table_prefix}potential_matches").count()
         num_partitions = spark_shuffle_partitions_heuristic(dataset_size)
         self.task.spark.sql(f"set spark.sql.shuffle.partitions={num_partitions}")
-        logging.info(
+        logger.info(
             f"Dataset size is {dataset_size}, so set Spark partitions to {num_partitions} for this step"
         )
 

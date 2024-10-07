@@ -19,6 +19,8 @@ from hlink.scripts.lib import io
 from hlink.scripts.lib import linking_ops
 from hlink.scripts.lib import conf_validations
 
+logger = logging.getLogger(__name__)
+
 
 def split_and_check_args(expected_count):
     """A parametrized decorator to make handling arguments easier for `Main` methods.
@@ -75,7 +77,7 @@ class Main(Cmd):
 
     def precmd(self, line: str) -> str:
         if line.strip() != "":
-            logging.info(f"[User Input] {line}")
+            logger.info(f"[User Input] {line}")
         return line
 
     def postcmd(self, stop, line):
@@ -516,7 +518,7 @@ class Main(Cmd):
         elapsed_time = round(end - start, 2)
 
         print(f"Time: {elapsed_time}s")
-        logging.info(f"Finished: hh_tfam display - {elapsed_time}")
+        logger.info(f"Finished: hh_tfam display - {elapsed_time}")
 
     @split_and_check_args(2)
     def do_x_hh_tfam(self, split_args):
@@ -535,7 +537,7 @@ class Main(Cmd):
         elapsed_time = round(end - start, 2)
 
         print(f"Time: {elapsed_time}s")
-        logging.info(f"Finished: hh_tfam display - {elapsed_time}")
+        logger.info(f"Finished: hh_tfam display - {elapsed_time}")
 
     @split_and_check_args(3)
     def do_x_hh_tfam_2a(self, split_args):

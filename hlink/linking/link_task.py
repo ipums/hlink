@@ -12,6 +12,8 @@ import pyspark
 from hlink.errors import SparkError
 from hlink.linking.link_step import LinkStep
 
+logger = logging.getLogger(__name__)
+
 
 class LinkTask:
     """Base class for link tasks.
@@ -61,16 +63,16 @@ class LinkTask:
 
     def run_all_steps(self) -> None:
         """Run all steps in order."""
-        logging.info(f"Running all steps for task {self.display_name}")
+        logger.info(f"Running all steps for task {self.display_name}")
         start_all = timer()
         for i, step in enumerate(self.get_steps()):
             print(f"Running step {i}: {step}")
-            logging.info(f"Running step {i}: {step}")
+            logger.info(f"Running step {i}: {step}")
             step.run()
         end_all = timer()
         elapsed_time_all = round(end_all - start_all, 2)
         print(f"Finished all in {elapsed_time_all}s")
-        logging.info(f"Finished all steps in {elapsed_time_all}s")
+        logger.info(f"Finished all steps in {elapsed_time_all}s")
 
     def run_step(self, step_num: int) -> None:
         """Run a particular step.
@@ -95,7 +97,7 @@ class LinkTask:
         step = steps[step_num]
         step_string = f"step {step_num}: {step}"
         print(f"Running {step_string}")
-        logging.info(f"Starting {step.task.display_name} - {step_string}")
+        logger.info(f"Starting {step.task.display_name} - {step_string}")
 
         start = timer()
         step.run()
@@ -103,7 +105,7 @@ class LinkTask:
 
         elapsed_time = round(end - start, 2)
         print(f"Finished {step_string} in {elapsed_time}s")
-        logging.info(
+        logger.info(
             f"Finished {step.task.display_name} - {step_string} in {elapsed_time}s"
         )
 
@@ -135,7 +137,7 @@ class LinkTask:
             try:
                 return func(*args)
             except Exception as err:
-                logging.error(err)
+                logger.error(err)
                 raise SparkError(str(err))
 
     def run_register_sql(
@@ -165,7 +167,7 @@ class LinkTask:
             except Exception as err:
                 print(f"Exception in Spark SQL: {sql_to_run}")
 
-                logging.error(str(err))
+                logger.error(str(err))
                 raise SparkError(str(err))
 
         return self.run_register_python(
