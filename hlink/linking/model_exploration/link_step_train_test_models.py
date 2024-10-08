@@ -74,9 +74,9 @@ class LinkStepTrainTestModels(LinkStep):
             f"each of these has {n_training_iterations} train-test splits to test on"
         )
         for run_index, run in enumerate(model_parameters, 1):
-            logger.info(
-                f"Starting run {run_index} of {len(model_parameters)} with these parameters: {run}"
-            )
+            run_start_info = f"Starting run {run_index} of {len(model_parameters)} with these parameters: {run}"
+            print(run_start_info)
+            logger.info(run_start_info)
             params = run.copy()
             model_type = params.pop("type")
 
@@ -103,9 +103,9 @@ class LinkStepTrainTestModels(LinkStep):
 
             first = True
             for split_index, (training_data, test_data) in enumerate(splits, 1):
-                logger.debug(
-                    f"Training and testing the model on train-test split {split_index} of {n_training_iterations}"
-                )
+                split_start_info = f"Training and testing the model on train-test split {split_index} of {n_training_iterations}"
+                print(split_start_info)
+                logger.debug(split_start_info)
                 training_data.cache()
                 test_data.cache()
 
@@ -139,7 +139,7 @@ class LinkStepTrainTestModels(LinkStep):
                 param_text = np.full(precision.shape, f"{model_type}_{params}")
 
                 pr_auc = auc(recall, precision)
-                print(f"Area under PR curve: {pr_auc}")
+                print(f"The area under the precision-recall curve is {pr_auc}")
 
                 if first:
                     prc = pd.DataFrame(
@@ -287,7 +287,6 @@ class LinkStepTrainTestModels(LinkStep):
     ) -> pd.DataFrame:
         table_prefix = self.task.table_prefix
 
-        print("Evaluating model performance...")
         # write to sql tables for testing
         predictions.createOrReplaceTempView(f"{table_prefix}predictions")
         predict_train.createOrReplaceTempView(f"{table_prefix}predict_train")
@@ -596,7 +595,6 @@ def _append_results(
     params: dict[str, Any],
 ) -> pd.DataFrame:
     # run.pop("type")
-    print(results_df)
 
     new_desc = pd.DataFrame(
         {
