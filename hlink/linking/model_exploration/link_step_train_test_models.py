@@ -137,18 +137,18 @@ class LinkStepTrainTestModels(LinkStep):
                     first = False
 
                 i = 0
-                for at, tr in threshold_matrix:
+                for alpha_threshold, threshold_ratio in threshold_matrix:
                     predictions = threshold_core.predict_using_thresholds(
                         predictions_tmp,
-                        at,
-                        tr,
+                        alpha_threshold,
+                        threshold_ratio,
                         config[training_conf],
                         config["id_column"],
                     )
                     predict_train = threshold_core.predict_using_thresholds(
                         predict_train_tmp,
-                        at,
-                        tr,
+                        alpha_threshold,
+                        threshold_ratio,
                         config[training_conf],
                         config["id_column"],
                     )
@@ -160,8 +160,8 @@ class LinkStepTrainTestModels(LinkStep):
                         model,
                         results_dfs[i],
                         otd_data,
-                        at,
-                        tr,
+                        alpha_threshold,
+                        threshold_ratio,
                         pr_auc,
                     )
                     i += 1
@@ -252,8 +252,8 @@ class LinkStepTrainTestModels(LinkStep):
         model: Model,
         results_df: pd.DataFrame,
         otd_data: dict[str, Any] | None,
-        at: float,
-        tr: float,
+        alpha_threshold: float,
+        threshold_ratio: float,
         pr_auc: float,
     ) -> pd.DataFrame:
         table_prefix = self.task.table_prefix
@@ -293,8 +293,8 @@ class LinkStepTrainTestModels(LinkStep):
                 "test_mcc": [test_mcc],
                 "train_mcc": [train_mcc],
                 "model_id": [model],
-                "alpha_threshold": [at],
-                "threshold_ratio": [tr],
+                "alpha_threshold": [alpha_threshold],
+                "threshold_ratio": [threshold_ratio],
             },
         )
         return pd.concat([results_df, new_results], ignore_index=True)
