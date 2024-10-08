@@ -595,6 +595,7 @@ def _append_results(
     params: dict[str, Any],
 ) -> pd.DataFrame:
     # run.pop("type")
+    print(results_df)
 
     new_desc = pd.DataFrame(
         {
