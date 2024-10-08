@@ -4,8 +4,10 @@
 #   https://github.com/ipums/hlink
 
 import itertools
+import logging
 import math
 import re
+from time import perf_counter
 from typing import Any
 import numpy as np
 import pandas as pd
@@ -18,6 +20,8 @@ import hlink.linking.core.threshold as threshold_core
 import hlink.linking.core.classifier as classifier_core
 
 from hlink.linking.link_step import LinkStep
+
+logger = logging.getLogger(__name__)
 
 
 class LinkStepTrainTestModels(LinkStep):
@@ -64,7 +68,15 @@ class LinkStepTrainTestModels(LinkStep):
         splits = self._get_splits(prepped_data, id_a, n_training_iterations, seed)
 
         model_parameters = self._get_model_parameters(config)
-        for run in model_parameters:
+
+        logger.info(
+            f"There are {len(model_parameters)} sets of model parameters to explore; "
+            f"each of these has {n_training_iterations} train-test splits to test on"
+        )
+        for run_index, run in enumerate(model_parameters, 1):
+            logger.info(
+                f"Starting run {run_index} of {len(model_parameters)} with these parameters: {run}"
+            )
             params = run.copy()
             model_type = params.pop("type")
 
@@ -83,12 +95,17 @@ class LinkStepTrainTestModels(LinkStep):
                 threshold_ratio = False
 
             threshold_matrix = _calc_threshold_matrix(alpha_threshold, threshold_ratio)
+            logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
+
             results_dfs: dict[int, pd.DataFrame] = {}
             for i in range(len(threshold_matrix)):
                 results_dfs[i] = _create_results_df()
 
             first = True
-            for training_data, test_data in splits:
+            for split_index, (training_data, test_data) in enumerate(splits, 1):
+                logger.debug(
+                    f"Training and testing the model on train-test split {split_index} of {n_training_iterations}"
+                )
                 training_data.cache()
                 test_data.cache()
 
@@ -96,7 +113,13 @@ class LinkStepTrainTestModels(LinkStep):
                     model_type, params, dep_var
                 )
 
+                logger.debug("Training the model on the training data split")
+                start_train_time = perf_counter()
                 model = classifier.fit(training_data)
+                end_train_time = perf_counter()
+                logger.debug(
+                    f"Successfully trained the model in {end_train_time - start_train_time:.2f}s"
+                )
 
                 predictions_tmp = _get_probability_and_select_pred_columns(
                     test_data, model, post_transformer, id_a, id_b, dep_var
@@ -137,7 +160,13 @@ class LinkStepTrainTestModels(LinkStep):
                     first = False
 
                 i = 0
-                for alpha_threshold, threshold_ratio in threshold_matrix:
+                for threshold_index, (alpha_threshold, threshold_ratio) in enumerate(
+                    threshold_matrix, 1
+                ):
+                    logger.debug(
+                        f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
+                        f"{alpha_threshold=} and {threshold_ratio=}"
+                    )
                     predictions = threshold_core.predict_using_thresholds(
                         predictions_tmp,
                         alpha_threshold,
