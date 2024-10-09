@@ -21,12 +21,15 @@ from pyspark.sql.types import (
 class SparkConnection:
     """Handles initialization of spark session and connection to local cluster."""
 
-    def __init__(self, derby_dir, warehouse_dir, tmp_dir, python, db_name):
+    def __init__(
+        self, derby_dir, warehouse_dir, tmp_dir, python, db_name, app_name="linking"
+    ):
         self.derby_dir = derby_dir
         self.warehouse_dir = warehouse_dir
         self.db_name = db_name
         self.tmp_dir = tmp_dir
         self.python = python
+        self.app_name = app_name
 
     def spark_conf(self, executor_cores, executor_memory, driver_memory, cores):
         spark_package_path = os.path.dirname(hlink.spark.__file__)
@@ -44,7 +47,7 @@ class SparkConnection:
             )
             .set("spark.executorEnv.SPARK_LOCAL_DIRS", self.tmp_dir)
             .set("spark.sql.legacy.allowUntypedScalaUDF", True)
-            .setAppName("linking")
+            .setAppName(self.app_name)
             # .set("spark.executor.cores", executor_cores) \
         )
         if executor_memory:
