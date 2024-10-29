@@ -2,14 +2,15 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+from typing import Any
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
 
 
-def get_comparison_leaves(comp):
+def get_comparison_leaves(comp: dict[str, Any]) -> list[dict[str, Any]]:
     comp_leaves = []
 
-    def _get_comp_leaf(comp, comp_leaves):
+    def _get_comp_leaf(comp: dict[str, Any], comp_leaves: list[dict[str, Any]]) -> None:
         if "comp_a" in comp:
             _get_comp_leaf(comp["comp_a"], comp_leaves)
             _get_comp_leaf(comp["comp_b"], comp_leaves)
