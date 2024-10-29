@@ -1,6 +1,6 @@
 import pytest
 
-from hlink.linking.core.comparison import get_comparison_leaves
+from hlink.linking.core.comparison import generate_comparisons, get_comparison_leaves
 
 
 def test_get_comparison_leaves_base_case() -> None:
@@ -76,3 +76,34 @@ def test_get_comparison_leaves_nested(operator1: str, operator2: str) -> None:
 
     leaves = get_comparison_leaves(comparisons)
     assert leaves == [comparison_a, comparison_b_a, comparison_b_b]
+
+
+def test_generate_comparisons_empty_input() -> None:
+    """
+    generate_comparisons() returns an empty string for empty input.
+    """
+    comparisons = {}
+    features = {}
+    id_col = ""
+    assert generate_comparisons(comparisons, features, id_col) == ""
+
+
+def test_generate_comparisons_base_case() -> None:
+    """
+    When there are no nested comp_a and comp_b comparisons, generate_comparisons()
+    generates SQL just for the given comparison.
+    """
+    comparison = {
+        "comparison_type": "threshold",
+        "feature_name": "namefrst_jw",
+        "threshold": 0.79,
+    }
+    features = [
+        {
+            "alias": "namefrst_jw",
+            "column_name": "namefrst",
+            "comparison_type": "jaro_winkler",
+        }
+    ]
+    sql = generate_comparisons(comparison, features, "id")
+    assert sql == "jw(nvl(a.namefrst, ''), nvl(b.namefrst, '')) >= 0.79"
