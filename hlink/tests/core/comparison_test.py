@@ -83,7 +83,7 @@ def test_generate_comparisons_empty_input() -> None:
     generate_comparisons() returns an empty string for empty input.
     """
     comparisons = {}
-    features = {}
+    features = []
     id_col = ""
     assert generate_comparisons(comparisons, features, id_col) == ""
 

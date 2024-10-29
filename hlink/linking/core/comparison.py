@@ -32,22 +32,23 @@ def get_comparison_leaves(comp: dict[str, Any]) -> list[dict[str, Any]]:
     return comp_leaves
 
 
-def generate_comparisons(comp, features, id_col):
+def generate_comparisons(
+    comp: dict[str, Any], features: list[dict[str, Any]], id_col: str
+) -> str:
     """Creates the comparison SQL clause given a comparison and a list of comparison features.
 
     Parameters
     ----------
-    comp: dictionary
+    comp:
         the config dictionary containing the comparison definition
-    features: dictionary
-        the config dictionary containing the comparison features
-    id_col: string
+    features:
+        the config list containing the comparison features
+    id_col:
         the id column
 
     Returns
     -------
-    A string of the sql clause to be used for comparison
-    filtering after blocking.
+    The sql clause to be used for comparison filtering after blocking.
     """
     if comp != {}:
         if "comp_a" in comp:
