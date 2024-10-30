@@ -24,6 +24,12 @@ feature. During matching, only pairs of records with `namefrst_jw` greater than
 or equal to 0.79 will be added to the potential matches table. Pairs of records
 which do not satisfy the comparison will not be potential matches.
 
+*Note: This page focuses on the `comparisons` section in particular, but the
+household comparisons section `hh_comparisons` has the same structure. It
+defines rules which hlink uses to filter record pairs after household blocking
+in the hh_matching task. These rules are effectively filters on the output
+`hh_potential_matches` table.*
+
 ## Comparison Types
 
 Currently the only `comparison_type` supported for the `comparisons` section is

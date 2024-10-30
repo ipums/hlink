@@ -653,19 +653,19 @@ either a single comparison or another set of sub-comparisons. Please see the
 [comparisons documentation](comparisons.html#defining-multiple-comparisons) for
 more details and examples.
 
-## [Household Comparisons](comparison_types)
+## [Household Comparisons](comparisons)
 
 * Header name: `hh_comparisons`
-* Description: A list of comparisons to threshold the household potential matches on. Also referred to as post-blocking filters, as all household potential matches are created, then only potential matches that pass the post-blocking filters will be kept for scoring. See [comparison types](comparison_types) for more information.
-* Required: False
-* Type: Object
-* Attributes:
-  * `comparison_type` -- Type: `string`.  Required. See [comparison types](comparison_types) for more information.
-  * `feature_name` -- Type: `string`. Required. The `comparison_feature` to use for the comparison threshold. A `comparison_feature` column by this name must be specified in the `comparison_features` section.
-  
+* Description: A set of comparisons which filter the household potential
+  matches. `hh_comparisons` has the same configuration structure as
+  `comparisons` and works in a similar way, except that it applies during the
+  `hh_matching` task instead of `matching`. You can read more about comparisons
+  [here](comparisons).
+
 ```
+# Only household record pairs with an age difference <= 10 can be
+# household potential matches.
 [hh_comparisons]
-# only keep household potential matches with an age difference less than or equal than ten years
 comparison_type = "threshold"
 feature_name = "byrdiff"
 threshold_expr = "<= 10"
