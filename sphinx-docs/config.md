@@ -671,18 +671,18 @@ feature_name = "byrdiff"
 threshold_expr = "<= 10"
 ```
 
-## [Comparison Features](comparison_types)
+## [Comparison Features](comparison_features)
 
 * Header name: `comparison_features`
-* Description: A list of comparison features to create when comparing records. Comparisons for individual and household linking rounds are both represented here -- no need to duplicate comparisons if used in both rounds, simply specify the `column_name` in the appropriate `training` or `hh_training` section of the config.  See the [comparison types](comparison_types) section for more information.
+* Description: A list of comparison features to create when comparing records. Comparisons for individual and household linking rounds are both represented here -- no need to duplicate comparisons if used in both rounds, simply specify the `column_name` in the appropriate `training` or `hh_training` section of the config.  See the [comparison features documentation page](comparison_features) for more information.
 * Required: True
 * Type: List
 * Attributes:
   * `alias` -- Type: `string`. Optional. The name of the comparison feature column to be generated.  If not specified, the output column will default to `column_name`.
   * `column_name` -- Type: `string`. The name of the columns to compare.
-  * `comparison_type` -- Type: `string`. The name of the comparison type to use. See the [comparison types](comparison_types) section for more information.
+  * `comparison_type` -- Type: `string`. The name of the comparison type to use.
   * `categorical` -- Type: `boolean`.  Optional.  Whether the output data should be treated as categorical data (important information used during one-hot encoding and vectorizing in the machine learning pipeline stage).
-  * Other attributes may be included as well depending on `comparison_type`.  See the [comparison types](comparison_types) section for details on each comparison type.
+  * Other attributes may be included as well depending on `comparison_type`.  See the [comparison features page](comparison_features) for details on each comparison type.
 
 ```
 [[comparison_features]]
