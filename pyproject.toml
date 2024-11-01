@@ -43,7 +43,7 @@ dev = [
     # So if you use a different version, it creates a huge diff in the docs.
     # TODO: auto-generate docs on push to GitHub instead of committing them to the
     # repo.
-    "sphinx==7.2.6",
+    "sphinx==8.1.3",
     "recommonmark==0.7.1",
 ]
 

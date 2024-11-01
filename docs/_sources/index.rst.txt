@@ -24,7 +24,8 @@ Configuration API
    :caption: Configuration API
 
    Column Mappings <column_mappings.md>
-   Comparison Types <comparison_types.md>
+   comparisons
+   Comparison Features <comparison_features.md>
    Feature Selection <feature_selection_transforms.md>
    Pipeline Features <pipeline_features.md>
    substitutions
