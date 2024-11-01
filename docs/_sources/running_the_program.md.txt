@@ -187,7 +187,7 @@ hlink $ list
 
 To see information about the steps of the task you are currently on, run `get_steps`. You should see something that looks like this:
 
-```txt
+```text
 Link task: Preprocessing
 step 0: register raw dataframes
         Tables used:
