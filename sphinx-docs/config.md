@@ -594,61 +594,95 @@ expand_length = 3
 explode = true
 ```
 
-## [Comparisons](comparison_types)
+## [Comparisons](comparisons)
 
 * Header name: `comparisons`
-* Description: A list of comparisons to threshold the potential matches on. Only potential matches that pass the thresholds will be created. See [comparison types](comparison_types) for more information.
+* Description: A set of comparisons which filter the potential matches.
+  Only record pairs which satisfy the comparisons qualify as potential matches.
+  See [comparisons](comparisons) for some more information.
 * Required: True
 * Type: Object
+
+There are two different forms that the comparisons table may take. It may either
+be a single comparison definition, or it may be a nested comparison definition
+with multiple sub-comparisons.
+
+### Single Comparison
+
+  * Attributes:
+    * `comparison_type` -- Type: `string`. Required. The type of the comparison.
+    Currently the only supported comparison type is `"threshold"`, which compares
+    a comparison feature to a given value.
+    * `feature_name` -- Type: `string`. Required. The comparison feature to compare
+    against.
+    * `threshold` -- Type: `Any`. Optional. The value to compare against.
+    * `threshold_expr` -- Type: `string`. Optional. A SQL condition which defines
+    the comparison on the comparison feature named by `feature_name`.
+
+  The comparison definition must contain either `threshold` or `threshold_expr`,
+  but not both. Providing `threshold = X` is equivalent to the threshold
+  expression `threshold_expr >= X`.
+
+  ```
+  # Only record pairs with namefrst_jw >= 0.79 can be
+  # potential matches.
+  [comparisons]
+  comparison_type = "threshold"
+  feature_name = "namefrst_jw"
+  threshold = 0.79
+  ```
+
+  ```
+  # Only record pairs with flag < 0.5 can be potential matches.
+  [comparisons]
+  comparison_type = "threshold"
+  feature_name = "flag"
+  threshold_expr = "< 0.5"
+  ```
+
+### Multiple Comparisons
+
 * Attributes:
-  * `comparison_type` -- Type: `string`. Required. See [comparison types](comparison_types) for more information.
-  * `feature_name` -- Type: `string`. Required. The `comparison_feature` to use for the comparison threshold.  A `comparison_feature` column by this name must be specified in the `comparison_features` section.
+  * `operator` -- Type: `string`. Required. The logical operator which connects
+  the two sub-comparisons. May be `"AND"` or `"OR"`.
+  * `comp_a` -- Type: `object`. Required. The first sub-comparison.
+  * `comp_b` -- Type: `object`. Required. The second sub-comparison.
 
-```
-[comparisons]
-operator = "AND"
+Both `comp_a` and `comp_b` are recursive comparison sections and may contain
+either a single comparison or another set of sub-comparisons. Please see the
+[comparisons documentation](comparisons.html#defining-multiple-comparisons) for
+more details and examples.
 
-[comparisons.comp_a]
-comparison_type = "threshold"
-feature_name = "namefrst_jw"
-threshold = 0.79
-
-[comparisons.comp_b]
-comparison_type = "threshold"
-feature_name = "namelast_jw"
-threshold = 0.79
-```
-
-## [Household Comparisons](comparison_types)
+## [Household Comparisons](comparisons)
 
 * Header name: `hh_comparisons`
-* Description: A list of comparisons to threshold the household potential matches on. Also referred to as post-blocking filters, as all household potential matches are created, then only potential matches that pass the post-blocking filters will be kept for scoring. See [comparison types](comparison_types) for more information.
-* Required: False
-* Type: Object
-* Attributes:
-  * `comparison_type` -- Type: `string`.  Required. See [comparison types](comparison_types) for more information.
-  * `feature_name` -- Type: `string`. Required. The `comparison_feature` to use for the comparison threshold. A `comparison_feature` column by this name must be specified in the `comparison_features` section.
-  
+* Description: A set of comparisons which filter the household potential
+  matches. `hh_comparisons` has the same configuration structure as
+  `comparisons` and works in a similar way, except that it applies during the
+  `hh_matching` task instead of `matching`. You can read more about comparisons
+  [here](comparisons).
+
 ```
+# Only household record pairs with an age difference <= 10 can be
+# household potential matches.
 [hh_comparisons]
-# only keep household potential matches with an age difference less than or equal than ten years
 comparison_type = "threshold"
 feature_name = "byrdiff"
 threshold_expr = "<= 10"
 ```
 
-## [Comparison Features](comparison_types)
+## [Comparison Features](comparison_features)
 
 * Header name: `comparison_features`
-* Description: A list of comparison features to create when comparing records. Comparisons for individual and household linking rounds are both represented here -- no need to duplicate comparisons if used in both rounds, simply specify the `column_name` in the appropriate `training` or `hh_training` section of the config.  See the [comparison types](comparison_types) section for more information.
+* Description: A list of comparison features to create when comparing records. Comparisons for individual and household linking rounds are both represented here -- no need to duplicate comparisons if used in both rounds, simply specify the `column_name` in the appropriate `training` or `hh_training` section of the config.  See the [comparison features documentation page](comparison_features) for more information.
 * Required: True
 * Type: List
 * Attributes:
   * `alias` -- Type: `string`. Optional. The name of the comparison feature column to be generated.  If not specified, the output column will default to `column_name`.
   * `column_name` -- Type: `string`. The name of the columns to compare.
-  * `comparison_type` -- Type: `string`. The name of the comparison type to use. See the [comparison types](comparison_types) section for more information.
+  * `comparison_type` -- Type: `string`. The name of the comparison type to use.
   * `categorical` -- Type: `boolean`.  Optional.  Whether the output data should be treated as categorical data (important information used during one-hot encoding and vectorizing in the machine learning pipeline stage).
-  * Other attributes may be included as well depending on `comparison_type`.  See the [comparison types](comparison_types) section for details on each comparison type.
+  * Other attributes may be included as well depending on `comparison_type`.  See the [comparison features page](comparison_features) for details on each comparison type.
 
 ```
 [[comparison_features]]

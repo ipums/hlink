@@ -84,7 +84,7 @@ are grouped into the same blocking bucket.
 on each record. These features may be passed to a machine learning model through the
 [`training`](config.html#training-and-models) section and/or passed to deterministic
 rules with the [`comparisons`](config.html#comparisons) section. There are many
-different [comparison types](comparison_types) available for use with
+different [comparison types](comparison_features) available for use with
 `comparison_features`.
 * [`pipeline_features`](pipeline_features.html#pipeline-generated-features) are machine learning transformations
 useful for reshaping and interacting data before they are fed to the machine learning

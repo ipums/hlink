@@ -2,14 +2,15 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+from typing import Any
 
 import hlink.linking.core.comparison_feature as comparison_feature_core
 
 
-def get_comparison_leaves(comp):
+def get_comparison_leaves(comp: dict[str, Any]) -> list[dict[str, Any]]:
     comp_leaves = []
 
-    def _get_comp_leaf(comp, comp_leaves):
+    def _get_comp_leaf(comp: dict[str, Any], comp_leaves: list[dict[str, Any]]) -> None:
         if "comp_a" in comp:
             _get_comp_leaf(comp["comp_a"], comp_leaves)
             _get_comp_leaf(comp["comp_b"], comp_leaves)
@@ -31,22 +32,23 @@ def get_comparison_leaves(comp):
     return comp_leaves
 
 
-def generate_comparisons(comp, features, id_col):
+def generate_comparisons(
+    comp: dict[str, Any], features: list[dict[str, Any]], id_col: str
+) -> str:
     """Creates the comparison SQL clause given a comparison and a list of comparison features.
 
     Parameters
     ----------
-    comp: dictionary
+    comp:
         the config dictionary containing the comparison definition
-    features: dictionary
-        the config dictionary containing the comparison features
-    id_col: string
+    features:
+        the config list containing the comparison features
+    id_col:
         the id column
 
     Returns
     -------
-    A string of the sql clause to be used for comparison
-    filtering after blocking.
+    The sql clause to be used for comparison filtering after blocking.
     """
     if comp != {}:
         if "comp_a" in comp:
