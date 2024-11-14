@@ -13,6 +13,13 @@ from pyspark.ml.classification import (
 )
 import hlink.linking.transformers.rename_prob_column
 
+try:
+    import xgboost.spark
+except ModuleNotFoundError:
+    _xgboost_available = False
+else:
+    _xgboost_available = True
+
 
 def choose_classifier(model_type, params, dep_var):
     """Returns a classifier and a post_classification transformer given model type and params.
@@ -96,7 +103,21 @@ def choose_classifier(model_type, params, dep_var):
         post_transformer = (
             hlink.linking.transformers.rename_prob_column.RenameProbColumn()
         )
-
+    elif model_type == "xgboost":
+        if not _xgboost_available:
+            raise ModuleNotFoundError(
+                "model_type 'xgboost' requires the xgboost library"
+            )
+        params_without_threshold = {
+            key: val
+            for key, val in params.items()
+            if key not in {"threshold", "threshold_ratio"}
+        }
+        classifier = xgboost.spark.SparkXGBClassifier(
+            **params_without_threshold,
+            features_col=features_vector,
+            label_col=dep_var,
+        )
     else:
         raise ValueError(
             "Model type not recognized! Please check your config, reload, and try again."

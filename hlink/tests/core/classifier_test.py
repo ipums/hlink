@@ -20,5 +20,5 @@ def test_choose_classifier_supports_xgboost():
         "max_depth": 2,
         "eta": 0.5,
     }
-    classifier = choose_classifier("xgboost", params, "match")
+    classifier, _post_transformer = choose_classifier("xgboost", params, "match")
     assert classifier.getLabelCol() == "match"
