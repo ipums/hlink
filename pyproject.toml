@@ -46,6 +46,7 @@ dev = [
     "sphinx==8.1.3",
     "recommonmark==0.7.1",
 ]
+xgboost = ["xgboost>=2.0"]
 
 [project.scripts]
 hlink = "hlink.scripts.main:cli"
