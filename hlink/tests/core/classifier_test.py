@@ -9,6 +9,7 @@ except ModuleNotFoundError:
 else:
     xgboost_available = True
 
+
 @pytest.mark.skipif(not xgboost_available, reason="requires the xgboost library")
 def test_choose_classifier_supports_xgboost():
     """
