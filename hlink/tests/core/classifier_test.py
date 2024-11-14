@@ -3,7 +3,7 @@ import pytest
 from hlink.linking.core.classifier import choose_classifier
 
 try:
-    import xgboost
+    import xgboost  # noqa: F401
 except ModuleNotFoundError:
     xgboost_available = False
 else:
