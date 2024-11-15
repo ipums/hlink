@@ -12,12 +12,13 @@ jobs:
       fail-fast: false
       matrix:
         python_version: ["3.10", "3.11", "3.12"]
+        hlink_extras: ["dev", "dev,xgboost"]
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag $HLINK_TAG-${{ matrix.python_version}} --build-arg PYTHON_VERSION=${{ matrix.python_version }}
+      run: docker build . --file Dockerfile --tag $HLINK_TAG-${{ matrix.python_version}} --build-arg PYTHON_VERSION=${{ matrix.python_version }} --build-arg HLINK_EXTRAS=${{ matrix.hlink_extras }}
 
     - name: Check dependency versions
       run: |
@@ -32,7 +33,7 @@ jobs:
       run: docker run $HLINK_TAG-${{ matrix.python_version}} flake8 --count .
       
     - name: Test
-      run: docker run $HLINK_TAG-${{ matrix.python_version}} pytest
+      run: docker run $HLINK_TAG-${{ matrix.python_version}} pytest -v
     
     - name: Build sdist and wheel
       run: docker run $HLINK_TAG-${{ matrix.python_version}} python -m build
