@@ -173,13 +173,15 @@ class LinkStepTrainTestModels(LinkStep):
                 training_data.unpersist()
                 test_data.unpersist()
 
+            print(f"split_results: {len(splits_results)}")
             # pluck out predictions_tmp, predict_train_tmp associated with highest pr_auc
             best_pr_auc = 0.0
             best_predictions_tmp = None
             best_predict_train_tmp = None
             for a in splits_results:
                 if a["auc"] > best_pr_auc:
-                    best_prediction_tmp = a["predictions_tmp"]
+                    best_pr_auc = a["auc"]
+                    best_predictions_tmp = a["predictions_tmp"]
                     best_predict_train_tmp = a["predict_train_tmp"]
 
             i = 0
