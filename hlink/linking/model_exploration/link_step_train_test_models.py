@@ -181,6 +181,7 @@ class LinkStepTrainTestModels(LinkStep):
             }
             print(f"PR AUC for splits on current model and params: {pr_auc_dict}")
             this_model_results = pd.DataFrame(pr_auc_dict)
+            # I'm not sure what this dataframe is for
             probability_metrics_df = pd.concat(
                 [probability_metrics_df, this_model_results]
             )
@@ -205,7 +206,7 @@ class LinkStepTrainTestModels(LinkStep):
                 id_a,
                 id_b,
                 dep_var,
-            ).cache()
+            )
             thresholding_predict_train = _get_probability_and_select_pred_columns(
                 thresholding_training_data,
                 thresholding_model,
@@ -213,7 +214,7 @@ class LinkStepTrainTestModels(LinkStep):
                 id_a,
                 id_b,
                 dep_var,
-            ).cache()
+            )
 
             i = 0
             for threshold_index, (alpha_threshold, threshold_ratio) in enumerate(
@@ -486,7 +487,7 @@ class LinkStepTrainTestModels(LinkStep):
             print("There were no true negatives recorded.")
 
     def _create_otd_data(self, id_a: str, id_b: str) -> dict[str, Any] | None:
-        """Output Suspicous Data (OTD): used to check config to see if you should find sketchy training data that the models routinely mis-classify"""
+        """Output Suspicious Data (OTD): used to check config to see if you should find sketchy training data that the models routinely mis-classify"""
         training_conf = str(self.task.training_conf)
         config = self.task.link_run.config
 
