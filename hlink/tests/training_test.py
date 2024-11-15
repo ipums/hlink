@@ -6,13 +6,7 @@
 import pytest
 from pyspark.ml import Pipeline
 import hlink.linking.core.pipeline as pipeline_core
-
-try:
-    import xgboost  # noqa: F401
-except ModuleNotFoundError:
-    xgboost_available = False
-else:
-    xgboost_available = True
+from hlink.tests.markers import requires_xgboost
 
 
 @pytest.mark.quickcheck
@@ -439,7 +433,7 @@ def test_step_3_with_probit_model(
     )
 
 
-@pytest.mark.skipif(not xgboost_available, reason="requires the xgboost library")
+@requires_xgboost
 def test_step_3_with_xgboost_model(
     spark, training, training_conf, datasource_training_input
 ):

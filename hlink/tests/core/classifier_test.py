@@ -1,16 +1,8 @@
-import pytest
-
 from hlink.linking.core.classifier import choose_classifier
-
-try:
-    import xgboost  # noqa: F401
-except ModuleNotFoundError:
-    xgboost_available = False
-else:
-    xgboost_available = True
+from hlink.tests.markers import requires_xgboost
 
 
-@pytest.mark.skipif(not xgboost_available, reason="requires the xgboost library")
+@requires_xgboost
 def test_choose_classifier_supports_xgboost():
     """
     If the xgboost module is installed, then choose_classifier() supports a model
