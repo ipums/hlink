@@ -297,16 +297,16 @@ class LinkStepTrainTestModels(LinkStep):
         #splits_for_thresholding_eval = splits[0]
         #thresholding_training_data = splits_for_thresholding_eval[0].cache()
         #thresholding_test_data = splits_for_thresholding_eval[1].cache()
+        threshold_matrix = best_results.make_threshold_matrix()
+        logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
+        results_dfs: dict[int, pd.DataFrame] = {}
+        for i in range(len(threshold_matrix)):
+            results_dfs[i] = _create_results_df()
+
         for split_index, (thresholding_training_data, thresholding_test_data) in enumerate(splits, 1):
             cached_training_data = thresholding_training_data.cache()
             cached_test_data = thresholding_test_data.cache()
 
-            threshold_matrix = best_results.make_threshold_matrix()
-
-            logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
-            results_dfs: dict[int, pd.DataFrame] = {}
-            for i in range(len(threshold_matrix)):
-                results_dfs[i] = _create_results_df()
 
             thresholding_classifier, thresholding_post_transformer = (
                 classifier_core.choose_classifier(
