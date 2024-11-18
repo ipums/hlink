@@ -100,12 +100,15 @@ def test_all(
 
     preds = spark.table("model_eval_predictions").toPandas()
     assert (
+        preds.query("id_a == 20 and id_b == 30")["probability"].round(2).iloc[0] > 0.5
+    )
+
+
+    assert (
         preds.query("id_a == 20 and id_b == 30")["second_best_prob"].round(2).iloc[0]
         >= 0.6
     )
-    assert (
-        preds.query("id_a == 20 and id_b == 30")["probability"].round(2).iloc[0] > 0.5
-    )
+    
     assert preds.query("id_a == 30 and id_b == 30")["prediction"].iloc[0] == 0
     assert pd.isnull(
         preds.query("id_a == 10 and id_b == 30")["second_best_prob"].iloc[0]
@@ -365,6 +368,12 @@ def test_step_2_train_gradient_boosted_trees_spark(
     preds = spark.table("model_eval_predictions").toPandas()
 
     assert "probability_array" in list(preds.columns)
+    
+    #import pdb
+    #pdb.set_trace()
+
+    training_results = tr.query("model == 'gradient_boosted_trees'")
+    print(f"XX training_results: {training_results}")
 
     # assert tr.shape == (1, 18)
     assert (

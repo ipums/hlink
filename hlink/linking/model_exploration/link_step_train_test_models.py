@@ -261,6 +261,7 @@ class LinkStepTrainTestModels(LinkStep):
         thresholded_metrics_df = _load_thresholded_metrics_df_params(
             thresholded_metrics_df
         )
+            
         _print_thresholded_metrics_df(thresholded_metrics_df)
         self._save_training_results(thresholded_metrics_df, self.task.spark)
         self._save_otd_data(otd_data, self.task.spark)
@@ -744,7 +745,7 @@ def _create_thresholded_metrics_df() -> pd.DataFrame:
     return pd.DataFrame(
         columns=[
             "model",
-            "pa rameters",
+            "parameters",
             "alpha_threshold",
             "threshold_ratio",
             "precision_test_mean",
