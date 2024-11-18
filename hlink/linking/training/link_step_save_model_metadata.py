@@ -86,35 +86,52 @@ class LinkStepSaveModelMetadata(LinkStep):
                 base_col = col.removesuffix("_imp")
                 true_cols.append((base_col, None))
 
-        print("Retrieving model feature importances or coefficients...")
-        try:
-            feature_imp = classifier.coefficients
-        except:
-            try:
-                feature_imp = classifier.featureImportances
-            except:
-                print(
-                    "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
-                )
-                return
-            else:
-                label = "Feature importances"
-        else:
-            label = "Coefficients"
-
-        # We need to convert from numpy float64s to Python floats to avoid type
-        # issues when creating the DataFrame below.
-        feature_importances = [
-            float(importance) for importance in feature_imp.toArray()
-        ]
-
         true_column_names = [column_name for (column_name, _) in true_cols]
         true_categories = [category for (_, category) in true_cols]
+        model_type = config[training_conf]["chosen_model"]["type"]
 
-        features_df = self.task.spark.createDataFrame(
-            zip(true_column_names, true_categories, feature_importances, strict=True),
-            "feature_name: string, category: int, coefficient_or_importance: double",
-        ).sort("feature_name", "category")
+        print("Retrieving model feature importances or coefficients...")
+
+        if model_type == "xgboost":
+            raw_weights = classifier.get_feature_importances("weight")
+            raw_gains = classifier.get_feature_importances("gain")
+            keys = [f"f{index}" for index in range(len(true_cols))]
+
+            weights = [raw_weights.get(key, 0.0) for key in keys]
+            gains = [raw_gains.get(key, 0.0) for key in keys]
+            label = "Feature importances (weights and gain)"
+
+            features_df = self.task.spark.createDataFrame(
+                zip(true_column_names, true_categories, weights, gains),
+                "feature_name: string, category: int, weight: double, average_gain_per_split: double",
+            ).sort("feature_name", "category")
+        else:
+            try:
+                feature_imp = classifier.coefficients
+            except:
+                try:
+                    feature_imp = classifier.featureImportances
+                except:
+                    print(
+                        "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
+                    )
+                    return
+                else:
+                    label = "Feature importances"
+            else:
+                label = "Coefficients"
+
+            # We need to convert from numpy float64s to Python floats to avoid type
+            # issues when creating the DataFrame below.
+            feature_importances = [
+                float(importance) for importance in feature_imp.toArray()
+            ]
+            features_df = self.task.spark.createDataFrame(
+                zip(
+                    true_column_names, true_categories, feature_importances, strict=True
+                ),
+                "feature_name: string, category: int, coefficient_or_importance: double",
+            ).sort("feature_name", "category")
 
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"
