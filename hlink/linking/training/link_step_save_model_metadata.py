@@ -63,29 +63,7 @@ class LinkStepSaveModelMetadata(LinkStep):
         vector_assembler = pipeline_model.stages[0]
         classifier = pipeline_model.stages[1]
 
-        print("Retrieving model feature importances or coefficients...")
-        try:
-            feature_imp = classifier.coefficients
-        except:
-            try:
-                feature_imp = classifier.featureImportances
-            except:
-                print(
-                    "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
-                )
-                return
-            else:
-                label = "Feature importances"
-        else:
-            label = "Coefficients"
-
         column_names = vector_assembler.getInputCols()
-        # We need to convert from numpy float64s to Python floats to avoid type
-        # issues when creating the DataFrame below.
-        feature_importances = [
-            float(importance) for importance in feature_imp.toArray()
-        ]
-
         tf_prepped = self.task.spark.table(f"{table_prefix}training_features_prepped")
         tf_prepped_schema = dict(tf_prepped.dtypes)
         tf_prepped_row = tf_prepped.head()
@@ -107,6 +85,28 @@ class LinkStepSaveModelMetadata(LinkStep):
             else:
                 base_col = col.removesuffix("_imp")
                 true_cols.append((base_col, None))
+
+        print("Retrieving model feature importances or coefficients...")
+        try:
+            feature_imp = classifier.coefficients
+        except:
+            try:
+                feature_imp = classifier.featureImportances
+            except:
+                print(
+                    "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
+                )
+                return
+            else:
+                label = "Feature importances"
+        else:
+            label = "Coefficients"
+
+        # We need to convert from numpy float64s to Python floats to avoid type
+        # issues when creating the DataFrame below.
+        feature_importances = [
+            float(importance) for importance in feature_imp.toArray()
+        ]
 
         true_column_names = [column_name for (column_name, _) in true_cols]
         true_categories = [category for (_, category) in true_cols]
