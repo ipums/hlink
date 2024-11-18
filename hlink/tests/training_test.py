@@ -476,6 +476,14 @@ def test_step_3_with_xgboost_model(
     training.run_step(2)
     training.run_step(3)
 
+    importances_df = spark.table("training_feature_importances")
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "weight",
+        "average_gain_per_split",
+    ]
+
 
 def test_step_3_requires_table(training_conf, training):
     training_conf["training"]["feature_importances"] = True
