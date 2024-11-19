@@ -107,7 +107,7 @@ class LinkStepTrainTestModels(LinkStep):
             cached_training_data = training_data.cache()
             cached_test_data = test_data.cache()
 
-            split_start_info = f"Training and testing the model on train-test split {split_index} of {n_training_iterations}"
+            split_start_info = f"Training and testing the model on train-test split {split_index} of {len(splits)}"
             print(split_start_info)
             logger.debug(split_start_info)
             prauc = self._train_model(
@@ -128,8 +128,8 @@ class LinkStepTrainTestModels(LinkStep):
     # This connects a score to each hyper-parameter combination. and the thresholds  listed with it in the config.
     def _evaluate_hyperparam_combinations(
         self,
-        splits,
         all_model_parameter_combos,
+        splits,
         dep_var,
         id_a,
         id_b,
@@ -356,7 +356,7 @@ class LinkStepTrainTestModels(LinkStep):
             model_parameters, splits, dep_var, id_a, id_b, config, training_conf
         )
 
-        thresholded_metrics_df = self._evaluate_thresholds_combinations(
+        thresholded_metrics_df = self._evaluate_threshold_combinations(
             hyperparam_evaluation_results, splits, dep_var, id_a, id_b
         )
 
