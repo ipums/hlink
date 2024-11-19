@@ -13,6 +13,13 @@ from pyspark.ml.classification import (
 )
 import hlink.linking.transformers.rename_prob_column
 
+try:
+    import synapse.ml.lightgbm
+except ModuleNotFoundError:
+    _lightgbm_available = False
+else:
+    _lightgbm_available = True
+
 
 def choose_classifier(model_type, params, dep_var):
     """Returns a classifier and a post_classification transformer given model type and params.
@@ -96,7 +103,21 @@ def choose_classifier(model_type, params, dep_var):
         post_transformer = (
             hlink.linking.transformers.rename_prob_column.RenameProbColumn()
         )
-
+    elif model_type == "lightgbm":
+        if not _lightgbm_available:
+            raise ModuleNotFoundError(
+                "model_type 'lightgbm' requires the synapseml python package for LightGBM-Spark integration"
+            )
+        params_without_threshold = {
+            key: val
+            for key, val in params.items()
+            if key not in {"threshold", "threshold_ratio"}
+        }
+        classifier = synapse.ml.lightgbm.LightGBMClassifier(
+            **params_without_threshold,
+            featuresCol=features_vector,
+            labelCol=dep_var,
+        )
     else:
         raise ValueError(
             "Model type not recognized! Please check your config, reload, and try again."

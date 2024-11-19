@@ -9,5 +9,5 @@ def test_choose_classifier_supports_lightgbm() -> None:
         "numIterations": 5,
     }
 
-    classifier = choose_classifier("lightgbm", params, "match")
+    classifier, _post_transformer = choose_classifier("lightgbm", params, "match")
     assert classifier.getLabelCol() == "match"

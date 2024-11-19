@@ -17,6 +17,17 @@ from pyspark.sql.types import (
     StructType,
 )
 
+# SynapseML is a package which provides LightGBM-Spark integration for hlink.
+# It's an optional dependency. When it is installed, we need to download an
+# additional Scala library by setting some Spark configurations. When it's not
+# installed, we avoid downloading the extra library since it won't be useful.
+try:
+    import synapse.ml
+except ModuleNotFoundError:
+    _synapse_ml_available = False
+else:
+    _synapse_ml_available = True
+
 
 class SparkConnection:
     """Handles initialization of spark session and connection to local cluster."""
@@ -59,6 +70,16 @@ class SparkConnection:
 
         if os.path.isfile(jar_path):
             conf = conf.set("spark.jars", jar_path)
+
+        # If the SynapseML Python package is available, include the Scala
+        # package as well. Note that we have to pin to a particular version of
+        # the Scala package here.
+        #
+        # SynapseML used to be named MMLSpark.
+        if _synapse_ml_available:
+            conf.set("spark.jars.packages", "com.microsoft.azure:synapseml_2.12:1.0.8")
+            conf.set("spark.jars.repositories", "https://mmlspark.azureedge.net/maven")
+
         return conf
 
     def local(self, cores=1, executor_memory="10G"):
