@@ -22,7 +22,7 @@ from pyspark.sql.types import (
 # additional Scala library by setting some Spark configurations. When it's not
 # installed, we avoid downloading the extra library since it won't be useful.
 try:
-    import synapse.ml
+    import synapse.ml  # noqa: F401
 except ModuleNotFoundError:
     _synapse_ml_available = False
 else:
