@@ -9,6 +9,7 @@ import logging
 import math
 import re
 from time import perf_counter
+from dataclasses import dataclass
 from typing import Any
 import numpy as np
 import pandas as pd
@@ -23,6 +24,19 @@ import hlink.linking.core.classifier as classifier_core
 from hlink.linking.link_step import LinkStep
 
 logger = logging.getLogger(__name__)
+
+
+# Model evaluation score with the inputs that produced the score.
+@dataclass(kw_only=True)
+class ModelEval:
+    model_type: str
+    score: float
+    hyperparams: dict[str, Any]
+    threshold: float | list[float]
+    threshold_ratio: float | list[float] | bool
+
+    def make_threshold_matrix(self) -> list[list[float]]:
+        return _calc_threshold_matrix(self.threshold, self.threshold_ratio)
 
 
 class LinkStepTrainTestModels(LinkStep):
@@ -53,10 +67,10 @@ class LinkStepTrainTestModels(LinkStep):
             raise RuntimeError(f"strategy {score_strategy} not implemented.")
 
     def _train_model(
-        self, training_data, test_data, model_type, params, dep_var, id_a, id_b
+        self, training_data, test_data, model_type, hyperparams, dep_var, id_a, id_b
     ) -> float:
         classifier, post_transformer = classifier_core.choose_classifier(
-            model_type, params, dep_var
+            model_type, hyperparams, dep_var
         )
 
         logger.debug("Training the model on the training data split")
@@ -85,56 +99,83 @@ class LinkStepTrainTestModels(LinkStep):
 
     # Returns a PR AUC list computation for each split of training and test data run through the model using model params
     def _collect_train_test_splits(
-        self, splits, model_type, params, dep_var, id_a, id_b
+        self, splits, model_type, hyperparams, dep_var, id_a, id_b
     ) -> list[float]:
         # Collect auc values so we can pull out the highest
         splits_results = []
         for split_index, (training_data, test_data) in enumerate(splits, 1):
+            cached_training_data = training_data.cache()
+            cached_test_data = test_data.cache()
+
             split_start_info = f"Training and testing the model on train-test split {split_index} of {n_training_iterations}"
             print(split_start_info)
             logger.debug(split_start_info)
             prauc = self._train_model(
-                training_data, test_data, model_type, params, dep_var, id_a, id_b
+                cached_training_data,
+                cached_test_data,
+                model_type,
+                hyperparams,
+                dep_var,
+                id_a,
+                id_b,
             )
+            training_data.unpersist()
+            test_data.unpersist()
             splits_results.append(prauc)
         return splits_results
 
-    # Returns a list of  dicts like {"score": 0.5, "params": {...}, "threshold": 0.8, "threshold_ratio": 3.3}
+    # Returns a list of  ModelEval instances.
     # This connects a score to each hyper-parameter combination. and the thresholds  listed with it in the config.
     def _evaluate_hyperparam_combinations(
-        self, splits, model_parameters, dep_var, id_a, id_b, config, training_conf
-    ) -> list[dict[str, Any]]:
+        self,
+        splits,
+        all_model_parameter_combos,
+        dep_var,
+        id_a,
+        id_b,
+        config,
+        training_conf,
+    ) -> list[ModelEval]:
         results = []
-        for index, params_combo in enumerate(model_parameters, 1):
-            eval_start_info = f"Starting run {index} of {len(model_parameters)} with these parameters: {params_combo}"
+        for index, params_combo in enumerate(all_model_parameter_combos, 1):
+            eval_start_info = f"Starting run {index} of {len(all_model_parameter_combos)} with these parameters: {params_combo}"
             print(eval_start_info)
             logger.info(eval_start_info)
-            params = params_combo.copy()
+            # Copy because the params combo will get stripped of extra key-values
+            # so only the hyperparams remain.
+            hyperparams = params_combo.copy()
 
-            # These are mixed in with the hyper-parameters, we only need the model type at this stage,
-            # but the threshold info needs to go away.
-            model_type = params.pop("type")
+            model_type = hyperparams.pop("type")
+
+            # While we're not using thresholds in this function, we need to capture them here
+            # since they can be different for different model types and
+            # we need to use model_type, params, score and thresholds to
+            # do the next step using thresholds.
             threshold, threshold_ratio = self._get_thresholds(
-                params, config, training_conf
+                hyperparams, config, training_conf
             )
-            params.pop("threshold", None)
-            params.pop("threshold_ratio", None)
+            # thresholds and model_type  are mixed in with the model hyper-parameters
+            # in the config; this removes them before passing to the model training.
+            hyperparams.pop("threshold", None)
+            hyperparams.pop("threshold_ratio", None)
 
             pr_auc_values = self._collect_train_test_splits(
-                splits, model_type, params, dep_var, id_a, id_b
+                splits, model_type, hyperparams, dep_var, id_a, id_b
             )
             score = self._score_train_test_results(pr_auc_values, "mean")
-            results.append(
-                {
-                    "score": score,
-                    "params": params,
-                    "threshold": threshold,
-                    "threshold_ratio": threshold_ratio,
-                }
-            )
 
+            model_eval = ModelEval(
+                model_type=model_type,
+                score=score,
+                hyperparams=hyperparams,
+                threshold=threshold,
+                threshold_ratio=threshold_ratio,
+            )
+            results.append(model_eval)
         return results
 
+    # Grabs the threshold settings from a single model parameter combination row (after all combinations
+    # are exploded.) Does not alter the params structure.)
     def _get_thresholds(
         self, model_parameters, config, training_conf
     ) -> tuple[Any, Any]:
@@ -147,12 +188,135 @@ class LinkStepTrainTestModels(LinkStep):
         ):
             threshold_ratio = model_parameters.get(
                 "threshold_ratio",
-                threshold_core.get_threshold_ratio(config[training_conf], params),
+                threshold_core.get_threshold_ratio(
+                    config[training_conf], model_parameters
+                ),
             )
         else:
             threshold_ratio = False
 
         return alpha_threshold, threshold_ratio
+
+    # Note: Returns only one model training session; if
+    # your config specified more than one model type and thresholds, you'll get
+    # the best result according to the scoring system, not the best for each
+    # model type.
+    def _choose_best_training_results(self, evals: list[ModelEval]) -> ModelEval:
+        if len(evals) == 0:
+            raise RuntimeError(
+                "No model evaluations provided, cannot choose the best one."
+            )
+        best_eval = evals[0]
+        for e in evals:
+            if best_eval.score < e.score:
+                best_eval = e
+        return best_eval
+
+    def _evaluate_threshold_combinations(
+        self,
+        hyperparam_evaluation_results: list[ModelEval],
+        splits: list[list[pyspark.sql.DataFrame]],
+        dep_var: str,
+        id_a: str,
+        id_b: str,
+    ) -> dict[str, Any]:
+        training_conf = str(self.task.training_conf)
+        config = self.task.link_run.config
+
+        # Stores suspicious data
+        otd_data = self._create_otd_data(id_a, id_b)
+
+        thresholded_metrics_df = _create_thresholded_metrics_df()
+
+        # Note: We may change this to contain a list of best per model or something else
+        # but for now it's a single ModelEval instance -- the one with the highest score.
+        best_results = self._choose_best_training_results(hyperparam_evaluation_results)
+
+        # TODO check if we should make a different split, like starting from a different seed?
+        # or just not re-using one we used in making the PR_AUC mean value?
+        splits_for_thresholding_eval = splits[0]
+        thresholding_training_data = splits_for_thresholding_eval[0].cache()
+        thresholding_test_data = splits_for_thresholding_eval[1].cache()
+
+        threshold_matrix = best_results.make_threshold_matrix()
+
+        logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
+        results_dfs: dict[int, pd.DataFrame] = {}
+        for i in range(len(threshold_matrix)):
+            results_dfs[i] = _create_results_df()
+
+        thresholding_classifier, thresholding_post_transformer = (
+            classifier_core.choose_classifier(
+                best_results.model_type, best_results.hyperparams, dep_var
+            )
+        )
+        thresholding_model = thresholding_classifier.fit(thresholding_training_data)
+
+        thresholding_predictions = _get_probability_and_select_pred_columns(
+            thresholding_test_data,
+            thresholding_model,
+            thresholding_post_transformer,
+            id_a,
+            id_b,
+            dep_var,
+        )
+        thresholding_predict_train = _get_probability_and_select_pred_columns(
+            thresholding_training_data,
+            thresholding_model,
+            thresholding_post_transformer,
+            id_a,
+            id_b,
+            dep_var,
+        )
+
+        i = 0
+        for threshold_index, (
+            this_alpha_threshold,
+            this_threshold_ratio,
+        ) in enumerate(threshold_matrix, 1):
+            logger.debug(
+                f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
+                f"{this_alpha_threshold=} and {this_threshold_ratio=}"
+            )
+            predictions = threshold_core.predict_using_thresholds(
+                thresholding_predictions,
+                this_alpha_threshold,
+                this_threshold_ratio,
+                config[training_conf],
+                config["id_column"],
+            )
+            predict_train = threshold_core.predict_using_thresholds(
+                thresholding_predict_train,
+                this_alpha_threshold,
+                this_threshold_ratio,
+                config[training_conf],
+                config["id_column"],
+            )
+
+            results_dfs[i] = self._capture_results(
+                predictions,
+                predict_train,
+                dep_var,
+                thresholding_model,
+                results_dfs[i],
+                otd_data,
+                this_alpha_threshold,
+                this_threshold_ratio,
+                best_results.score,
+            )
+            i += 1
+        thresholding_test_data.unpersist()
+        thresholding_training_data.unpersist()
+
+        for i in range(len(threshold_matrix)):
+            thresholded_metrics_df = _append_results(
+                thresholded_metrics_df,
+                results_dfs[i],
+                best_results.model_type,
+                best_results.hyperparams,
+            )
+
+        return thresholded_metrics_df
 
     def _run(self) -> None:
         training_conf = str(self.task.training_conf)
@@ -164,7 +328,7 @@ class LinkStepTrainTestModels(LinkStep):
         dep_var = config[training_conf]["dependent_var"]
         id_a = config["id_column"] + "_a"
         id_b = config["id_column"] + "_b"
-        thresholded_metrics_df = _create_thresholded_metrics_df()
+
         columns_to_keep = [id_a, id_b, "features_vector", dep_var]
         prepped_data = (
             self.task.spark.table(f"{table_prefix}training_vectorized")
@@ -188,91 +352,13 @@ class LinkStepTrainTestModels(LinkStep):
             f"each of these has {n_training_iterations} train-test splits to test on"
         )
 
-        param_evalulation_results = self._evaluate_hyperparam_combinations(
+        hyperparam_evaluation_results = self._evaluate_hyperparam_combinations(
             model_parameters, splits, dep_var, id_a, id_b, config, training_conf
         )
 
-        for eval in param_evalulation_results:
-            alpha_threshold = eval["threshold"]
-            threshold_ratio = eval["threshold_ratio"]
-
-            threshold_matrix = _calc_threshold_matrix(alpha_threshold, threshold_ratio)
-            logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
-            results_dfs: dict[int, pd.DataFrame] = {}
-            for i in range(len(threshold_matrix)):
-                results_dfs[i] = _create_results_df()
-
-            # TODO check if we should make a different split, like starting from a different seed?
-            # or just not re-using one we used in making the PR_AUC mean value?
-            splits_for_thresholding_eval = splits[0]
-            thresholding_training_data = splits_for_thresholding_eval[0]
-            thresholding_test_data = splits_for_thresholding_eval[1]
-
-            thresholding_classifier, thresholding_post_transformer = (
-                classifier_core.choose_classifier(
-                    pr_auc_dict["model"], pr_auc_dict["params"], dep_var
-                )
-            )
-            thresholding_model = classifier.fit(thresholding_training_data)
-
-            thresholding_predictions = _get_probability_and_select_pred_columns(
-                thresholding_test_data,
-                thresholding_model,
-                thresholding_post_transformer,
-                id_a,
-                id_b,
-                dep_var,
-            )
-            thresholding_predict_train = _get_probability_and_select_pred_columns(
-                thresholding_training_data,
-                thresholding_model,
-                thresholding_post_transformer,
-                id_a,
-                id_b,
-                dep_var,
-            )
-
-            i = 0
-            for threshold_index, (
-                this_alpha_threshold,
-                this_threshold_ratio,
-            ) in enumerate(threshold_matrix, 1):
-                logger.debug(
-                    f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
-                    f"{this_alpha_threshold=} and {this_threshold_ratio=}"
-                )
-                predictions = threshold_core.predict_using_thresholds(
-                    thresholding_predictions,
-                    this_alpha_threshold,
-                    this_threshold_ratio,
-                    config[training_conf],
-                    config["id_column"],
-                )
-                predict_train = threshold_core.predict_using_thresholds(
-                    thresholding_predict_train,
-                    this_alpha_threshold,
-                    this_threshold_ratio,
-                    config[training_conf],
-                    config["id_column"],
-                )
-
-                results_dfs[i] = self._capture_results(
-                    predictions,
-                    predict_train,
-                    dep_var,
-                    thresholding_model,
-                    results_dfs[i],
-                    otd_data,
-                    this_alpha_threshold,
-                    this_threshold_ratio,
-                    pr_auc_dict["auc_mean"],
-                )
-                i += 1
-
-            for i in range(len(threshold_matrix)):
-                thresholded_metrics_df = _append_results(
-                    thresholded_metrics_df, results_dfs[i], model_type, params
-                )
+        thresholded_metrics_df = self._evaluate_thresholds_combinations(
+            hyperparam_evaluation_results, splits, dep_var, id_a, id_b
+        )
 
         thresholded_metrics_df = _load_thresholded_metrics_df_params(
             thresholded_metrics_df
