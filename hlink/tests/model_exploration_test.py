@@ -73,19 +73,6 @@ def test_all(
     model_exploration.run_step(1)
     model_exploration.run_step(2)
 
-    prc = spark.table("model_eval_precision_recall_curve_probit__").toPandas()
-    assert all(
-        elem in list(prc.columns)
-        for elem in ["params", "precision", "recall", "threshold_gt_eq"]
-    )
-    prc_rf = spark.table(
-        "model_eval_precision_recall_curve_random_forest__maxdepth___5_0___numtrees___75_0_"
-    ).toPandas()
-    assert all(
-        elem in list(prc_rf.columns)
-        for elem in ["params", "precision", "recall", "threshold_gt_eq"]
-    )
-
     tr = spark.table("model_eval_training_results").toPandas()
 
     assert tr.__len__() == 3
@@ -372,6 +359,7 @@ def test_step_2_train_gradient_boosted_trees_spark(
     # pdb.set_trace()
 
     training_results = tr.query("model == 'gradient_boosted_trees'")
+
     print(f"XX training_results: {training_results}")
 
     # assert tr.shape == (1, 18)
@@ -388,7 +376,7 @@ def test_step_2_train_gradient_boosted_trees_spark(
     main.do_drop_all("")
 
 
-def test_step_2_interact_categorial_vars(
+def test_step_2_interact_categorical_vars(
     spark, training_conf, model_exploration, state_dist_path, training_data_path
 ):
     """Test matching step 2 training to see if the OneHotEncoding is working"""

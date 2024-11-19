@@ -215,16 +215,14 @@ class LinkStepTrainTestModels(LinkStep):
     def _evaluate_threshold_combinations(
         self,
         hyperparam_evaluation_results: list[ModelEval],
+        suspicious_data: Any,
         splits: list[list[pyspark.sql.DataFrame]],
         dep_var: str,
         id_a: str,
         id_b: str,
-    ) -> dict[str, Any]:
+    ) -> tuple[dict[str, Any], Any]:
         training_conf = str(self.task.training_conf)
-        config = self.task.link_run.config
-
-        # Stores suspicious data
-        otd_data = self._create_otd_data(id_a, id_b)
+        config = self.task.link_run.config                
 
         thresholded_metrics_df = _create_thresholded_metrics_df()
 
@@ -299,7 +297,7 @@ class LinkStepTrainTestModels(LinkStep):
                 dep_var,
                 thresholding_model,
                 results_dfs[i],
-                otd_data,
+                suspicious_data,
                 this_alpha_threshold,
                 this_threshold_ratio,
                 best_results.score,
@@ -316,7 +314,7 @@ class LinkStepTrainTestModels(LinkStep):
                 best_results.hyperparams,
             )
 
-        return thresholded_metrics_df
+        return thresholded_metrics_df, suspicious_data
 
     def _run(self) -> None:
         training_conf = str(self.task.training_conf)
@@ -356,8 +354,8 @@ class LinkStepTrainTestModels(LinkStep):
             model_parameters, splits, dep_var, id_a, id_b, config, training_conf
         )
 
-        thresholded_metrics_df = self._evaluate_threshold_combinations(
-            hyperparam_evaluation_results, splits, dep_var, id_a, id_b
+        thresholded_metrics_df, suspicious_data = self._evaluate_threshold_combinations(
+            hyperparam_evaluation_results, otd_data, splits, dep_var, id_a, id_b
         )
 
         thresholded_metrics_df = _load_thresholded_metrics_df_params(
@@ -366,7 +364,7 @@ class LinkStepTrainTestModels(LinkStep):
 
         _print_thresholded_metrics_df(thresholded_metrics_df)
         self._save_training_results(thresholded_metrics_df, self.task.spark)
-        self._save_otd_data(otd_data, self.task.spark)
+        self._save_otd_data(suspicious_data, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
     def _get_splits(
@@ -538,6 +536,7 @@ class LinkStepTrainTestModels(LinkStep):
         table_prefix = self.task.table_prefix
 
         if otd_data is None:
+            print("OTD suspicious data is None, not saving.")
             return
         id_a = otd_data["id_a"]
         id_b = otd_data["id_b"]
