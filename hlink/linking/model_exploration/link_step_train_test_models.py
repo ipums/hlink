@@ -220,9 +220,9 @@ class LinkStepTrainTestModels(LinkStep):
         dep_var: str,
         id_a: str,
         id_b: str,
-    ) -> tuple[dict[str, Any], Any]:
+    ) -> tuple[pd.DataFrame, Any]:
         training_conf = str(self.task.training_conf)
-        config = self.task.link_run.config                
+        config = self.task.link_run.config
 
         thresholded_metrics_df = _create_thresholded_metrics_df()
 
@@ -272,10 +272,13 @@ class LinkStepTrainTestModels(LinkStep):
             this_alpha_threshold,
             this_threshold_ratio,
         ) in enumerate(threshold_matrix, 1):
-            logger.debug(
+
+            diag = (
                 f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
                 f"{this_alpha_threshold=} and {this_threshold_ratio=}"
             )
+            logger.debug(diag)
+            print(diag)
             predictions = threshold_core.predict_using_thresholds(
                 thresholding_predictions,
                 this_alpha_threshold,
@@ -671,17 +674,23 @@ def _get_probability_and_select_pred_columns(
 def _get_confusion_matrix(
     predictions: pyspark.sql.DataFrame, dep_var: str, otd_data: dict[str, Any] | None
 ) -> tuple[int, int, int, int]:
+    print(f"XX get confusion matrix for predictions: {predictions}")
+    print(f"XX OTD data {otd_data}")
     TP = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 1))
     TP_count = TP.count()
 
     FP = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 1))
     FP_count = FP.count()
 
+    print(f"TP {TP_count} FP {FP_count}")
+
     FN = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 0))
     FN_count = FN.count()
 
     TN = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 0))
     TN_count = TN.count()
+
+    print(f"FN {FN_count}  TN {TN_count}")
 
     if otd_data:
         id_a = otd_data["id_a"]
@@ -714,7 +723,7 @@ def _get_aggregate_metrics(
     TP_count: int, FP_count: int, FN_count: int, TN_count: int
 ) -> tuple[float, float, float]:
     """
-    Given the counts of true positives, false positivies, false negatives, and
+    Given the counts of true positives, false positives, false negatives, and
     true negatives for a model run, compute several metrics to evaluate the
     model's quality.
 
@@ -729,6 +738,7 @@ def _get_aggregate_metrics(
     else:
         recall = TP_count / (TP_count + FN_count)
     mcc = _calc_mcc(TP_count, TN_count, FP_count, FN_count)
+    print(f"XX Aggregates precision {precision} recall {recall}")
     return precision, recall, mcc
 
 
@@ -756,7 +766,7 @@ def _append_results(
     params: dict[str, Any],
 ) -> pd.DataFrame:
     # run.pop("type")
-    print(results_df)
+    print(f"appending results_df : {results_df}")
 
     new_desc = pd.DataFrame(
         {
