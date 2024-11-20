@@ -1,15 +1,24 @@
+# This file is part of the ISRDI's hlink.
+# For copyright and licensing information, see the NOTICE and LICENSE files
+# in this project's top-level directory, and also on-line at:
+#   https://github.com/ipums/hlink
+
+import logging
+
 from pyspark import keyword_only
 from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, Param, Params, TypeConverters
 from pyspark.sql import DataFrame
+
+logger = logging.getLogger(__name__)
 
 
 class RenameVectorAttributes(Transformer, HasInputCol):
     """
     A custom transformer which renames the attributes or "slot names" of a
     given input column of type vector. This is helpful when you don't have
-    complete control over the names of the attributes, but you need them to
-    look a certain way.
+    complete control over the names of the attributes when they are created,
+    but you still need them to look a certain way.
 
     For example, LightGBM can't handle vector attributes with colons in their
     names. But the Spark Interaction class creates vector attributes named with
@@ -60,6 +69,11 @@ class RenameVectorAttributes(Transformer, HasInputCol):
         replacement_str = self.getOrDefault("replaceWith")
         metadata = dataset.schema[input_col].metadata
         attributes_by_type = metadata["ml_attr"]["attrs"]
+
+        logger.debug(
+            f"Renaming the attributes of vector column '{input_col}': "
+            f"replacing {to_replace} with '{replacement_str}'"
+        )
 
         # The attributes are grouped by type, which may be numeric, binary, or
         # nominal. We don't care about the type here; we'll just rename all of
