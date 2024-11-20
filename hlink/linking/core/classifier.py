@@ -117,6 +117,10 @@ def choose_classifier(model_type, params, dep_var):
             **params_without_threshold,
             featuresCol=features_vector,
             labelCol=dep_var,
+            probabilityCol="probability_array",
+        )
+        post_transformer = SQLTransformer(
+            statement="SELECT *, parseProbVector(probability_array, 1) as probability FROM __THIS__"
         )
     else:
         raise ValueError(
