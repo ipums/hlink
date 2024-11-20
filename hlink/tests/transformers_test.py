@@ -12,7 +12,7 @@ def test_rename_vector_attributes(spark: SparkSession) -> None:
     assembler = VectorAssembler(
         inputCols=["A", "regionf_0:namelast_jw"], outputCol="vectorized"
     )
-    remove_colons = RenameVectorAttributes()
+    remove_colons = RenameVectorAttributes(inputCol="vectorized")
     transformed = remove_colons.transform(assembler.transform(df))
 
     attrs = transformed.schema["vectorized"].metadata["ml_attr"]["attrs"]["numeric"]
