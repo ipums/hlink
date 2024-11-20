@@ -55,10 +55,11 @@ class RenameVectorAttributes(Transformer, HasInputCol):
         return self._set(**kwargs)
 
     def _transform(self, dataset: DataFrame) -> DataFrame:
-        metadata = dataset.schema[self.getInputCol()].metadata
-        attributes_by_type = metadata["ml_attr"]["attrs"]
+        input_col = self.getInputCol()
         to_replace = self.getOrDefault("strsToReplace")
         replacement_str = self.getOrDefault("replaceWith")
+        metadata = dataset.schema[input_col].metadata
+        attributes_by_type = metadata["ml_attr"]["attrs"]
 
         # The attributes are grouped by type, which may be numeric, binary, or
         # nominal. We don't care about the type here; we'll just rename all of
@@ -70,4 +71,4 @@ class RenameVectorAttributes(Transformer, HasInputCol):
                         substring, replacement_str
                     )
 
-        return dataset
+        return dataset.withMetadata(input_col, metadata)

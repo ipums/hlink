@@ -17,7 +17,11 @@ def test_rename_vector_attributes(spark: SparkSession) -> None:
     )
     transformed = remove_colons.transform(assembler.transform(df))
 
-    attrs = transformed.schema["vectorized"].metadata["ml_attr"]["attrs"]["numeric"]
+    # Save to Java, then reload to confirm that the metadata changes are persistent
+    transformed.write.mode("overwrite").saveAsTable("transformed")
+    df = spark.table("transformed")
+
+    attrs = df.schema["vectorized"].metadata["ml_attr"]["attrs"]["numeric"]
     attr_names = [attr["name"] for attr in attrs]
     assert attr_names == ["A", "regionf_0_namelast_jw"]
 
@@ -35,6 +39,10 @@ def test_rename_vector_attributes_multiple_replacements(spark: SparkSession) -> 
     )
     transformed = rename_attrs.transform(assembler.transform(df))
 
-    attrs = transformed.schema["vector"].metadata["ml_attr"]["attrs"]["numeric"]
+    # Save to Java, then reload to confirm that the metadata changes are persistent
+    transformed.write.mode("overwrite").saveAsTable("transformed")
+    df = spark.table("transformed")
+
+    attrs = df.schema["vector"].metadata["ml_attr"]["attrs"]["numeric"]
     attr_names = [attr["name"] for attr in attrs]
     assert attr_names == ["column1hasstars", "column2multiplesymbols"]
