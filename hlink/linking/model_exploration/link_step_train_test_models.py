@@ -156,7 +156,6 @@ class LinkStepTrainTestModels(LinkStep):
             pos_label=1,
         )
         pr_auc = auc(recall, precision)
-        print(f"The area under the precision-recall curve is {pr_auc}")
         return pr_auc
 
     # Returns a PR AUC list computation for each split of training and test data run through the model using model params
@@ -342,8 +341,7 @@ class LinkStepTrainTestModels(LinkStep):
                     f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
                     f"{this_alpha_threshold=} and {this_threshold_ratio=}"
                 )
-                logger.debug(diag)
-                print(diag)
+                logger.debug(diag)                
                 predictions = threshold_core.predict_using_thresholds(
                     thresholding_predictions,
                     this_alpha_threshold,
@@ -358,6 +356,8 @@ class LinkStepTrainTestModels(LinkStep):
                     config[training_conf],
                     config["id_column"],
                 )
+
+                print(f"Capture results for threshold matrix entry {threshold_index} and split index {split_index}")
 
                 results_dfs[i] = self._capture_results(
                     predictions,
@@ -406,6 +406,7 @@ class LinkStepTrainTestModels(LinkStep):
         otd_data = self._create_otd_data(id_a, id_b)
 
         n_training_iterations = config[training_conf].get("n_training_iterations", 10)
+        
         seed = config[training_conf].get("seed", 2133)
 
         splits = self._get_splits(prepped_data, id_a, n_training_iterations, seed)
@@ -430,6 +431,7 @@ class LinkStepTrainTestModels(LinkStep):
             thresholded_metrics_df
         )
 
+        print("***   Final thresholded metrics ***")
         _print_thresholded_metrics_df(thresholded_metrics_df)
         self._save_training_results(thresholded_metrics_df, self.task.spark)
         self._save_otd_data(suspicious_data, self.task.spark)
@@ -518,6 +520,12 @@ class LinkStepTrainTestModels(LinkStep):
         # write to sql tables for testing
         predictions.createOrReplaceTempView(f"{table_prefix}predictions")
         predict_train.createOrReplaceTempView(f"{table_prefix}predict_train")
+        print("------------------------------------------------------------")
+        print(f"Capturing predictions:")
+        predictions.show()
+        print(f"Capturing predict_train:")
+        predict_train.show()
+        print("------------------------------------------------------------")
 
         (
             test_TP_count,
@@ -579,9 +587,9 @@ class LinkStepTrainTestModels(LinkStep):
             spark.createDataFrame(desc_df, samplingRatio=1).write.mode(
                 "overwrite"
             ).saveAsTable(f"{table_prefix}training_results")
-            print(
-                f"Training results saved to Spark table '{table_prefix}training_results'."
-            )
+            #print(
+            #    f"Training results saved to Spark table '{table_prefix}training_results'."
+            #)
 
     def _prepare_otd_table(
         self, spark: pyspark.sql.SparkSession, df: pd.DataFrame, id_a: str, id_b: str
@@ -739,15 +747,14 @@ def _get_probability_and_select_pred_columns(
 def _get_confusion_matrix(
     predictions: pyspark.sql.DataFrame, dep_var: str, otd_data: dict[str, Any] | None
 ) -> tuple[int, int, int, int]:
-    print(f"XX get confusion matrix for predictions: {predictions}")
-    print(f"XX OTD data {otd_data}")
+
     TP = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 1))
     TP_count = TP.count()
 
     FP = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 1))
     FP_count = FP.count()
 
-    print(f"TP {TP_count} FP {FP_count}")
+    print(f"Confusion matrix -- true positives and false positivesTP {TP_count} FP {FP_count}")
 
     FN = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 0))
     FN_count = FN.count()
@@ -755,7 +762,7 @@ def _get_confusion_matrix(
     TN = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 0))
     TN_count = TN.count()
 
-    print(f"FN {FN_count}  TN {TN_count}")
+    print(f"Confusion matrix -- true negatives and false negatives: FN {FN_count}  TN {TN_count}")
 
     if otd_data:
         id_a = otd_data["id_a"]
@@ -831,7 +838,7 @@ def _append_results(
     params: dict[str, Any],
 ) -> pd.DataFrame:
     # run.pop("type")
-    print(f"appending results_df : {results_df}")
+#    print(f"appending results_df : {results_df}")
 
     new_desc = pd.DataFrame(
         {
@@ -859,7 +866,7 @@ def _append_results(
     thresholded_metrics_df = pd.concat(
         [thresholded_metrics_df, new_desc], ignore_index=True
     )
-    _print_thresholded_metrics_df(thresholded_metrics_df)
+    #_print_thresholded_metrics_df(thresholded_metrics_df)
     return thresholded_metrics_df
 
 

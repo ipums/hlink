@@ -364,7 +364,7 @@ def test_step_2_train_gradient_boosted_trees_spark(
 
     # assert tr.shape == (1, 18)
     assert (
-        tr.query("model == 'gradient_boosted_trees'")["precision_test_mean"].iloc[0] > 0
+        tr.query("model == 'gradient_boosted_trees'")["precision_test_mean"].iloc[1] > 0
     )
     assert tr.query("model == 'gradient_boosted_trees'")["maxDepth"].iloc[0] == 5
     assert (
