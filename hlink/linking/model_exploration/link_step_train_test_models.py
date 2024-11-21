@@ -84,7 +84,6 @@ complexity = p * s * t  ->  O(n^3)
 """
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -267,10 +266,15 @@ class LinkStepTrainTestModels(LinkStep):
             raise RuntimeError(
                 "No model evaluations provided, cannot choose the best one."
             )
+        print("\n**************************************************")
+        print("    All Model - hyper-parameter combinations")
+        print("**************************************************\n")
         best_eval = evals[0]
         for e in evals:
+            print(e)
             if best_eval.score < e.score:
                 best_eval = e
+        print("--------------------------------------------------\n")
         return best_eval
 
     def _evaluate_threshold_combinations(
@@ -291,21 +295,27 @@ class LinkStepTrainTestModels(LinkStep):
         # but for now it's a single ModelEval instance -- the one with the highest score.
         best_results = self._choose_best_training_results(hyperparam_evaluation_results)
 
+        print(f"======== Best Model and Parameters =========")
+        print(f"{best_results}")
+        print("==============================================================")
+
         # TODO check if we should make a different split, like starting from a different seed?
         # or just not re-using one we used in making the PR_AUC mean value?
-        #splits_for_thresholding_eval = splits[0]
-        #thresholding_training_data = splits_for_thresholding_eval[0].cache()
-        #thresholding_test_data = splits_for_thresholding_eval[1].cache()
+        # splits_for_thresholding_eval = splits[0]
+        # thresholding_training_data = splits_for_thresholding_eval[0].cache()
+        # thresholding_test_data = splits_for_thresholding_eval[1].cache()
         threshold_matrix = best_results.make_threshold_matrix()
         logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
         results_dfs: dict[int, pd.DataFrame] = {}
         for i in range(len(threshold_matrix)):
             results_dfs[i] = _create_results_df()
 
-        for split_index, (thresholding_training_data, thresholding_test_data) in enumerate(splits, 1):
+        for split_index, (
+            thresholding_training_data,
+            thresholding_test_data,
+        ) in enumerate(splits, 1):
             cached_training_data = thresholding_training_data.cache()
             cached_test_data = thresholding_test_data.cache()
-
 
             thresholding_classifier, thresholding_post_transformer = (
                 classifier_core.choose_classifier(
@@ -341,7 +351,7 @@ class LinkStepTrainTestModels(LinkStep):
                     f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
                     f"{this_alpha_threshold=} and {this_threshold_ratio=}"
                 )
-                logger.debug(diag)                
+                logger.debug(diag)
                 predictions = threshold_core.predict_using_thresholds(
                     thresholding_predictions,
                     this_alpha_threshold,
@@ -357,7 +367,9 @@ class LinkStepTrainTestModels(LinkStep):
                     config["id_column"],
                 )
 
-                print(f"Capture results for threshold matrix entry {threshold_index} and split index {split_index}")
+                print(
+                    f"Capture results for threshold matrix entry {threshold_index} and split index {split_index}"
+                )
 
                 results_dfs[i] = self._capture_results(
                     predictions,
@@ -406,7 +418,7 @@ class LinkStepTrainTestModels(LinkStep):
         otd_data = self._create_otd_data(id_a, id_b)
 
         n_training_iterations = config[training_conf].get("n_training_iterations", 10)
-        
+
         seed = config[training_conf].get("seed", 2133)
 
         splits = self._get_splits(prepped_data, id_a, n_training_iterations, seed)
@@ -423,10 +435,13 @@ class LinkStepTrainTestModels(LinkStep):
             model_parameters, splits, dep_var, id_a, id_b, config, training_conf
         )
 
+        # TODO: We may want to recreate a new split or set of splits rather than reuse existing splits.
         thresholded_metrics_df, suspicious_data = self._evaluate_threshold_combinations(
             hyperparam_evaluation_results, otd_data, splits, dep_var, id_a, id_b
         )
 
+        # TODO: thresholded_metrics_df has one row per split currently and we may want to
+        # crunch that set down to get the mean or median of some measures across all the splits.
         thresholded_metrics_df = _load_thresholded_metrics_df_params(
             thresholded_metrics_df
         )
@@ -587,9 +602,9 @@ class LinkStepTrainTestModels(LinkStep):
             spark.createDataFrame(desc_df, samplingRatio=1).write.mode(
                 "overwrite"
             ).saveAsTable(f"{table_prefix}training_results")
-            #print(
+            # print(
             #    f"Training results saved to Spark table '{table_prefix}training_results'."
-            #)
+            # )
 
     def _prepare_otd_table(
         self, spark: pyspark.sql.SparkSession, df: pd.DataFrame, id_a: str, id_b: str
@@ -754,7 +769,9 @@ def _get_confusion_matrix(
     FP = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 1))
     FP_count = FP.count()
 
-    print(f"Confusion matrix -- true positives and false positivesTP {TP_count} FP {FP_count}")
+    print(
+        f"Confusion matrix -- true positives and false positivesTP {TP_count} FP {FP_count}"
+    )
 
     FN = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 0))
     FN_count = FN.count()
@@ -762,7 +779,9 @@ def _get_confusion_matrix(
     TN = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 0))
     TN_count = TN.count()
 
-    print(f"Confusion matrix -- true negatives and false negatives: FN {FN_count}  TN {TN_count}")
+    print(
+        f"Confusion matrix -- true negatives and false negatives: FN {FN_count}  TN {TN_count}"
+    )
 
     if otd_data:
         id_a = otd_data["id_a"]
@@ -838,7 +857,7 @@ def _append_results(
     params: dict[str, Any],
 ) -> pd.DataFrame:
     # run.pop("type")
-#    print(f"appending results_df : {results_df}")
+    #    print(f"appending results_df : {results_df}")
 
     new_desc = pd.DataFrame(
         {
@@ -866,7 +885,7 @@ def _append_results(
     thresholded_metrics_df = pd.concat(
         [thresholded_metrics_df, new_desc], ignore_index=True
     )
-    #_print_thresholded_metrics_df(thresholded_metrics_df)
+    # _print_thresholded_metrics_df(thresholded_metrics_df)
     return thresholded_metrics_df
 
 
