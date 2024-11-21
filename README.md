@@ -26,18 +26,51 @@ We do our best to make hlink compatible with Python 3.10-3.12. If you have a
 problem using hlink on one of these versions of Python, please open an issue
 through GitHub. Versions of Python older than 3.10 are not supported.
 
-Note that pyspark 3.5 does not yet officially support Python 3.12. If you
-encounter pyspark-related import errors while running hlink on Python 3.12, try
+Note that PySpark 3.5 does not yet officially support Python 3.12. If you
+encounter PySpark-related import errors while running hlink on Python 3.12, try
 
 - Installing the setuptools package. The distutils package was deleted from the
-  standard library in Python 3.12, but some versions of pyspark still import
+  standard library in Python 3.12, but some versions of PySpark still import
   it. The setuptools package provides a hacky stand-in distutils library which
-  should fix some import errors in pyspark. We install setuptools in our
+  should fix some import errors in PySpark. We install setuptools in our
   development and test dependencies so that our tests work on Python 3.12.
 
-- Downgrading Python to 3.10 or 3.11. Pyspark officially supports these
-  versions of Python. So you should have better chances getting pyspark to work
+- Downgrading Python to 3.10 or 3.11. PySpark officially supports these
+  versions of Python. So you should have better chances getting PySpark to work
   well on Python 3.10 or 3.11.
+
+### XGBoost Support
+
+[XGBoost](https://xgboost.readthedocs.io/en/stable/index.html) is a highly
+performant gradient boosting machine learning library. hlink includes optional
+support for XGBoost through the xgboost Python package. This support is
+experimental and may change since the XGBoost-PySpark integration provided by
+the xgboost package is currently unstable.
+
+To install the xgboost package and its Python dependencies, run `pip install
+hlink[xgboost]`. This may be enough to get xgboost running on some machines. If
+you run into further errors, you might need to install the libomp package,
+which xgboost requires.
+
+After installing xgboost, you can use it as a model type in training and model
+exploration. xgboost has a large list of available parameters, which you can
+check out [here](https://xgboost.readthedocs.io/en/latest/parameter.html).
+hlink passes parameters defined in your config file through to the xgboost
+library.
+
+```toml
+# max_depth, eta, and gamma are parameters for xgboost. threshold and
+# threshold_ratio are hlink-specific configurations universal to all model types.
+chosen_model = {
+    type = "xgboost",
+    max_depth = 5,
+    eta = 0.5,
+    gamma = 0.05,
+    threshold = 0.5,
+    threshold_ratio = 2.0
+}
+```
+
 
 ## Docs
 

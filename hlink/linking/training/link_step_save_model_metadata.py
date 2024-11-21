@@ -58,34 +58,11 @@ class LinkStepSaveModelMetadata(LinkStep):
 
             raise new_error from e
 
-        # The pipeline model has three stages: vector assembler, classifier, post
-        # transformer.
+        # The pipeline model has three stages: vector assembler, model, and post transformer.
         vector_assembler = pipeline_model.stages[0]
-        classifier = pipeline_model.stages[1]
-
-        print("Retrieving model feature importances or coefficients...")
-        try:
-            feature_imp = classifier.coefficients
-        except:
-            try:
-                feature_imp = classifier.featureImportances
-            except:
-                print(
-                    "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
-                )
-                return
-            else:
-                label = "Feature importances"
-        else:
-            label = "Coefficients"
+        model = pipeline_model.stages[1]
 
         column_names = vector_assembler.getInputCols()
-        # We need to convert from numpy float64s to Python floats to avoid type
-        # issues when creating the DataFrame below.
-        feature_importances = [
-            float(importance) for importance in feature_imp.toArray()
-        ]
-
         tf_prepped = self.task.spark.table(f"{table_prefix}training_features_prepped")
         tf_prepped_schema = dict(tf_prepped.dtypes)
         tf_prepped_row = tf_prepped.head()
@@ -110,11 +87,50 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         true_column_names = [column_name for (column_name, _) in true_cols]
         true_categories = [category for (_, category) in true_cols]
+        model_type = config[training_conf]["chosen_model"]["type"]
 
-        features_df = self.task.spark.createDataFrame(
-            zip(true_column_names, true_categories, feature_importances, strict=True),
-            "feature_name: string, category: int, coefficient_or_importance: double",
-        ).sort("feature_name", "category")
+        print("Retrieving model feature importances or coefficients...")
+
+        if model_type == "xgboost":
+            raw_weights = model.get_feature_importances("weight")
+            raw_gains = model.get_feature_importances("gain")
+            keys = [f"f{index}" for index in range(len(true_cols))]
+
+            weights = [raw_weights.get(key, 0.0) for key in keys]
+            gains = [raw_gains.get(key, 0.0) for key in keys]
+            label = "Feature importances (weights and gains)"
+
+            features_df = self.task.spark.createDataFrame(
+                zip(true_column_names, true_categories, weights, gains),
+                "feature_name: string, category: int, weight: double, average_gain_per_split: double",
+            ).sort("feature_name", "category")
+        else:
+            try:
+                feature_imp = model.coefficients
+            except:
+                try:
+                    feature_imp = model.featureImportances
+                except:
+                    print(
+                        "This model doesn't contain a coefficient or feature importances parameter -- check chosen model type."
+                    )
+                    return
+                else:
+                    label = "Feature importances"
+            else:
+                label = "Coefficients"
+
+            # We need to convert from numpy float64s to Python floats to avoid type
+            # issues when creating the DataFrame below.
+            feature_importances = [
+                float(importance) for importance in feature_imp.toArray()
+            ]
+            features_df = self.task.spark.createDataFrame(
+                zip(
+                    true_column_names, true_categories, feature_importances, strict=True
+                ),
+                "feature_name: string, category: int, coefficient_or_importance: double",
+            ).sort("feature_name", "category")
 
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"

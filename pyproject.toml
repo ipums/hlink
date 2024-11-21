@@ -49,6 +49,10 @@ dev = [
 lightgbm = [
     "synapseml>=1.0"
 ]
+xgboost = [
+    "xgboost>=2.0",
+    "pyarrow>=4.0",
+]
 
 [project.scripts]
 hlink = "hlink.scripts.main:cli"

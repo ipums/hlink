@@ -20,6 +20,13 @@ except ModuleNotFoundError:
 else:
     _lightgbm_available = True
 
+try:
+    import xgboost.spark
+except ModuleNotFoundError:
+    _xgboost_available = False
+else:
+    _xgboost_available = True
+
 
 def choose_classifier(model_type, params, dep_var):
     """Returns a classifier and a post_classification transformer given model type and params.
@@ -118,6 +125,27 @@ def choose_classifier(model_type, params, dep_var):
             featuresCol=features_vector,
             labelCol=dep_var,
             probabilityCol="probability_array",
+        )
+        post_transformer = SQLTransformer(
+            statement="SELECT *, parseProbVector(probability_array, 1) as probability FROM __THIS__"
+        )
+    elif model_type == "xgboost":
+        if not _xgboost_available:
+            raise ModuleNotFoundError(
+                "To use the experimental 'xgboost' model type, you need to install "
+                "the xgboost library and its dependencies. Try installing hlink with "
+                "the xgboost extra: 'pip install hlink[xgboost]'."
+            )
+        params_without_threshold = {
+            key: val
+            for key, val in params.items()
+            if key not in {"threshold", "threshold_ratio"}
+        }
+        classifier = xgboost.spark.SparkXGBClassifier(
+            **params_without_threshold,
+            features_col=features_vector,
+            label_col=dep_var,
+            probability_col="probability_array",
         )
         post_transformer = SQLTransformer(
             statement="SELECT *, parseProbVector(probability_array, 1) as probability FROM __THIS__"

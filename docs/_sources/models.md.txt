@@ -87,3 +87,38 @@ chosen_model = {
     threshold_ratio = 1.3
 }
 ```
+
+## xgboost
+
+*Added in version 3.8.0.*
+
+This is an alternate, high-performance implementation of gradient boosting.
+It uses [xgboost.spark.SparkXGBClassifier](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.spark.SparkXGBClassifier).
+Since the XGBoost-PySpark integration which the xgboost Python package provides
+is currently unstable, support for the xgboost model type is disabled in hlink
+by default. hlink will stop with an error if you try to use this model type
+without enabling support for it. To enable support for xgboost, install hlink
+with the `xgboost` extra.
+
+```
+pip install hlink[xgboost]
+```
+
+This installs the xgboost package and its Python dependencies. Depending on
+your machine and operating system, you may also need to install the libomp
+library, which is another dependency of xgboost. xgboost should raise a helpful
+error if it detects that you need to install libomp.
+
+You can view a list of xgboost's parameters
+[here](https://xgboost.readthedocs.io/en/latest/parameter.html).
+
+```
+chosen_model = {
+    type = "xgboost",
+    max_depth = 5,
+    eta = 0.5,
+    gamma = 0.05,
+    threshold = 0.8,
+    threshold_ratio = 1.5
+}
+```
