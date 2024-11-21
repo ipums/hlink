@@ -19,9 +19,23 @@ To set up a copy of this project for development,
 
 ## Running Tests
 
-To run the project's test suite, run `pytest` in the root project directory. Running all of the tests
-can take a while, depending on your computer's hardware and setup. To run a subset of tests that test some but not
-all of the core features, try `pytest -m quickcheck`. These tests should run much more quickly.
+To run the project's test suite, run `pytest` in the root project directory.
+Running all of the tests can take a while, depending on your computer's
+hardware and setup. If you are working on a particular bug or feature, there
+are several good ways to filter the tests to run just tests that interest you.
+Check out the pytest documentation
+[here](https://docs.pytest.org/en/latest/how-to/usage.html#specifying-which-tests-to-run).
+
+In particular, the `-k` argument is helpful for running only tests with names
+that match the topics you are interested in, like this:
+
+```
+pytest -k "lightgbm or xgboost"
+```
+
+The GitHub Actions workflow runs all of the tests on each push or PR to the
+main branch. It runs the tests on several versions of Python and in several
+different Python environments.
 
 ## Building the Scala Jar
 

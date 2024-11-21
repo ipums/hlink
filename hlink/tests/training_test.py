@@ -9,7 +9,6 @@ import hlink.linking.core.pipeline as pipeline_core
 from hlink.tests.markers import requires_lightgbm, requires_xgboost
 
 
-@pytest.mark.quickcheck
 def test_all_steps(
     spark,
     training_conf,
