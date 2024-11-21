@@ -1,8 +1,6 @@
-import pytest
 import hlink.linking.core.pipeline as pipeline_core
 
 
-@pytest.mark.quickcheck
 def test_categorical_comparison_features():
     """Catches a bug where comparison features marked as categorical = false
     were still included as categorical. See Issue #81.
