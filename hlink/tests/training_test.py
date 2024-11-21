@@ -490,8 +490,8 @@ def test_step_3_with_lightgbm_model(
     assert importances_df.columns == [
         "feature_name",
         "category",
-        "num_splits",
-        "total_gain",
+        "weight",
+        "gain",
     ]
 
 
@@ -548,8 +548,8 @@ def test_lightgbm_with_interacted_features(
     assert importances_df.columns == [
         "feature_name",
         "category",
-        "num_splits",
-        "total_gain",
+        "weight",
+        "gain",
     ]
 
 
@@ -601,7 +601,7 @@ def test_step_3_with_xgboost_model(
         "feature_name",
         "category",
         "weight",
-        "average_gain_per_split",
+        "gain",
     ]
 
 

@@ -93,7 +93,7 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         if model_type == "xgboost":
             raw_weights = model.get_feature_importances("weight")
-            raw_gains = model.get_feature_importances("gain")
+            raw_gains = model.get_feature_importances("total_gain")
             keys = [f"f{index}" for index in range(len(true_cols))]
 
             weights = [raw_weights.get(key, 0.0) for key in keys]
@@ -102,16 +102,17 @@ class LinkStepSaveModelMetadata(LinkStep):
 
             features_df = self.task.spark.createDataFrame(
                 zip(true_column_names, true_categories, weights, gains),
-                "feature_name: string, category: int, weight: double, average_gain_per_split: double",
+                "feature_name: string, category: int, weight: double, gain: double",
             ).sort("feature_name", "category")
         elif model_type == "lightgbm":
-            num_splits = model.getFeatureImportances("split")
-            total_gains = model.getFeatureImportances("gain")
-            label = "Feature importances (number of splits and total gains)"
+            # The "weight" of a feature is the number of splits it causes.
+            weights = model.getFeatureImportances("split")
+            gains = model.getFeatureImportances("gain")
+            label = "Feature importances (weights and gains)"
 
             features_df = self.task.spark.createDataFrame(
-                zip(true_column_names, true_categories, num_splits, total_gains),
-                "feature_name: string, category: int, num_splits: double, total_gain: double",
+                zip(true_column_names, true_categories, weights, gains),
+                "feature_name: string, category: int, weight: double, gain: double",
             ).sort("feature_name", "category")
         else:
             try:
