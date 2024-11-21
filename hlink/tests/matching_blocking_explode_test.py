@@ -4,13 +4,11 @@
 #   https://github.com/ipums/hlink
 
 from pyspark.sql import Row
-import pytest
 import pandas as pd
 from hlink.linking.matching.link_step_match import extract_or_groups_from_blocking
 from hlink.linking.matching.link_step_score import LinkStepScore
 
 
-@pytest.mark.quickcheck
 def test_steps_1_2_matching(
     spark, blocking_explode_conf, matching_test_input, matching, main
 ):
