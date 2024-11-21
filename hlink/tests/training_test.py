@@ -486,6 +486,14 @@ def test_step_3_with_lightgbm_model(
 
     training.run_all_steps()
 
+    importances_df = spark.table("training_feature_importances")
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "num_splits",
+        "total_gain",
+    ]
+
 
 @requires_lightgbm
 def test_lightgbm_with_interacted_features(
@@ -535,6 +543,14 @@ def test_lightgbm_with_interacted_features(
     prepped_df_b.write.mode("overwrite").saveAsTable("prepped_df_b")
 
     training.run_all_steps()
+
+    importances_df = spark.table("training_feature_importances")
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "num_splits",
+        "total_gain",
+    ]
 
 
 @requires_xgboost

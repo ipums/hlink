@@ -104,6 +104,15 @@ class LinkStepSaveModelMetadata(LinkStep):
                 zip(true_column_names, true_categories, weights, gains),
                 "feature_name: string, category: int, weight: double, average_gain_per_split: double",
             ).sort("feature_name", "category")
+        elif model_type == "lightgbm":
+            num_splits = model.getFeatureImportances("split")
+            total_gains = model.getFeatureImportances("gain")
+            label = "Feature importances (number of splits and total gains)"
+
+            features_df = self.task.spark.createDataFrame(
+                zip(true_column_names, true_categories, num_splits, total_gains),
+                "feature_name: string, category: int, num_splits: double, total_gain: double",
+            ).sort("feature_name", "category")
         else:
             try:
                 feature_imp = model.coefficients
