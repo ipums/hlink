@@ -3,6 +3,14 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from pyspark.sql.types import (
+    FloatType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
+
 from hlink.linking.link_step import LinkStep
 
 
@@ -100,20 +108,20 @@ class LinkStepSaveModelMetadata(LinkStep):
             gains = [raw_gains.get(key, 0.0) for key in keys]
             label = "Feature importances (weights and gains)"
 
-            features_df = self.task.spark.createDataFrame(
-                zip(true_column_names, true_categories, weights, gains),
-                "feature_name: string, category: int, weight: double, gain: double",
-            ).sort("feature_name", "category")
+            importance_columns = [
+                (StructField("weight", FloatType(), nullable=False), weights),
+                (StructField("gain", FloatType(), nullable=False), gains),
+            ]
         elif model_type == "lightgbm":
             # The "weight" of a feature is the number of splits it causes.
             weights = model.getFeatureImportances("split")
             gains = model.getFeatureImportances("gain")
             label = "Feature importances (weights and gains)"
 
-            features_df = self.task.spark.createDataFrame(
-                zip(true_column_names, true_categories, weights, gains),
-                "feature_name: string, category: int, weight: double, gain: double",
-            ).sort("feature_name", "category")
+            importance_columns = [
+                (StructField("weight", FloatType(), nullable=False), weights),
+                (StructField("gain", FloatType(), nullable=False), gains),
+            ]
         else:
             try:
                 feature_imp = model.coefficients
@@ -135,13 +143,27 @@ class LinkStepSaveModelMetadata(LinkStep):
             feature_importances = [
                 float(importance) for importance in feature_imp.toArray()
             ]
-            features_df = self.task.spark.createDataFrame(
-                zip(
-                    true_column_names, true_categories, feature_importances, strict=True
-                ),
-                "feature_name: string, category: int, coefficient_or_importance: double",
-            ).sort("feature_name", "category")
 
+            importance_columns = [
+                (
+                    StructField(
+                        "coefficient_or_importance", FloatType(), nullable=False
+                    ),
+                    feature_importances,
+                ),
+            ]
+
+        importance_schema, importance_data = zip(*importance_columns)
+        features_df = self.task.spark.createDataFrame(
+            zip(true_column_names, true_categories, *importance_data, strict=True),
+            StructType(
+                [
+                    StructField("feature_name", StringType(), nullable=False),
+                    StructField("category", IntegerType(), nullable=True),
+                    *importance_schema,
+                ]
+            ),
+        ).sort("feature_name", "category")
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"
         )
