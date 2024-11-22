@@ -113,7 +113,10 @@ def choose_classifier(model_type, params, dep_var):
     elif model_type == "lightgbm":
         if not _lightgbm_available:
             raise ModuleNotFoundError(
-                "model_type 'lightgbm' requires the synapseml python package for LightGBM-Spark integration"
+                "To use the 'lightgbm' model type, you need to install the synapseml "
+                "Python package, which provides LightGBM-Spark integration, and "
+                "its dependencies. Try installing hlink with the lightgbm extra: "
+                "\n\n    pip install hlink[lightgbm]"
             )
         params_without_threshold = {
             key: val
@@ -134,7 +137,7 @@ def choose_classifier(model_type, params, dep_var):
             raise ModuleNotFoundError(
                 "To use the experimental 'xgboost' model type, you need to install "
                 "the xgboost library and its dependencies. Try installing hlink with "
-                "the xgboost extra: 'pip install hlink[xgboost]'."
+                "the xgboost extra:\n\n    pip install hlink[xgboost]"
             )
         params_without_threshold = {
             key: val
