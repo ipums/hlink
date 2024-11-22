@@ -1,0 +1,2 @@
+2024.11.22 16:26:12 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /Users/rileyh/projects/hlink/sphinx-docs/.metals/lsp.trace.json or /Users/rileyh/Library/Caches/org.scalameta.metals/lsp.trace.json[0m
+2024.11.22 16:26:13 INFO  logging to file /Users/rileyh/projects/hlink/.metals/metals.log[0m

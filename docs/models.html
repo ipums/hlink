@@ -136,7 +136,7 @@
 <section id="xgboost">
 <h2>xgboost<a class="headerlink" href="#xgboost" title="Link to this heading">¶</a></h2>
 <p><em>Added in version 3.8.0.</em></p>
-<p>This is an alternate, high-performance implementation of gradient boosting.
+<p>XGBoost is an alternate, high-performance implementation of gradient boosting.
 It uses <a class="reference external" href="https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.spark.SparkXGBClassifier">xgboost.spark.SparkXGBClassifier</a>.
 Since the XGBoost-PySpark integration which the xgboost Python package provides
 is currently unstable, support for the xgboost model type is disabled in hlink
@@ -159,6 +159,49 @@ error if it detects that you need to install libomp.</p>
     <span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
     <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
     <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="lightgbm">
+<h2>lightgbm<a class="headerlink" href="#lightgbm" title="Link to this heading">¶</a></h2>
+<p><em>Added in version 3.8.0.</em></p>
+<p>LightGBM is another alternate, high-performance implementation of gradient
+boosting. It uses
+<a class="reference external" href="https://mmlspark.blob.core.windows.net/docs/1.0.8/pyspark/synapse.ml.lightgbm.html#module-synapse.ml.lightgbm.LightGBMClassifier">synapse.ml.lightgbm.LightGBMClassifier</a>.
+<code class="docutils literal notranslate"><span class="pre">synapse.ml</span></code> is a library which provides various integrations with PySpark,
+including integrations between the C++ LightGBM library and PySpark.</p>
+<p>LightGBM requires some additional Scala libraries that hlink does not usually
+install, so support for the lightgbm model is disabled in hlink by default.
+hlink will stop with an error if you try to use this model type without
+enabling support for it. To enable support for lightgbm, install hlink with the
+<code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> extra.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hlink</span><span class="p">[</span><span class="n">lightgbm</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This installs the lightgbm package and its Python dependencies. Depending on
+your machine and operating system, you may also need to install the libomp
+library, which is another dependency of lightgbm. If you encounter errors when
+training a lightgbm model, please try installing libomp if you do not have it
+installed.</p>
+<p>lightgbm has an enormous number of available parameters. Many of these are
+available as normal in hlink, via the <a class="reference external" href="https://mmlspark.blob.core.windows.net/docs/1.0.8/pyspark/synapse.ml.lightgbm.html#module-synapse.ml.lightgbm.LightGBMClassifier">LightGBMClassifier
+class</a>.
+Others are available through the special <code class="docutils literal notranslate"><span class="pre">passThroughArgs</span></code> parameter, which
+passes additional parameters through to the C++ library. You can see a full
+list of the supported parameters
+<a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/Parameters.html">here</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_model</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;lightgbm&quot;</span><span class="p">,</span>
+    <span class="c1"># LightGBMClassifier supports these parameters (and many more).</span>
+    <span class="n">maxDepth</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">learningRate</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="c1"># LightGBMClassifier does not directly support this parameter,</span>
+    <span class="c1"># so we have to send it to the C++ library with passThroughArgs.</span>
+    <span class="n">passThroughArgs</span> <span class="o">=</span> <span class="s2">&quot;force_row_wise=true&quot;</span><span class="p">,</span>
+    <span class="c1"># hlink&#39;s threshold and threshold_ratio</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -214,6 +257,7 @@ error if it detects that you need to install libomp.</p>
 <li class="toctree-l2"><a class="reference internal" href="#decision-tree">decision_tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gradient-boosted-trees">gradient_boosted_trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#xgboost">xgboost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lightgbm">lightgbm</a></li>
 </ul>
 </li>
 </ul>

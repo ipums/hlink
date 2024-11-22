@@ -92,7 +92,7 @@ chosen_model = {
 
 *Added in version 3.8.0.*
 
-This is an alternate, high-performance implementation of gradient boosting.
+XGBoost is an alternate, high-performance implementation of gradient boosting.
 It uses [xgboost.spark.SparkXGBClassifier](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.spark.SparkXGBClassifier).
 Since the XGBoost-PySpark integration which the xgboost Python package provides
 is currently unstable, support for the xgboost model type is disabled in hlink
@@ -120,5 +120,54 @@ chosen_model = {
     gamma = 0.05,
     threshold = 0.8,
     threshold_ratio = 1.5
+}
+```
+
+## lightgbm
+
+*Added in version 3.8.0.*
+
+LightGBM is another alternate, high-performance implementation of gradient
+boosting. It uses
+[synapse.ml.lightgbm.LightGBMClassifier](https://mmlspark.blob.core.windows.net/docs/1.0.8/pyspark/synapse.ml.lightgbm.html#module-synapse.ml.lightgbm.LightGBMClassifier).
+`synapse.ml` is a library which provides various integrations with PySpark,
+including integrations between the C++ LightGBM library and PySpark.
+
+LightGBM requires some additional Scala libraries that hlink does not usually
+install, so support for the lightgbm model is disabled in hlink by default.
+hlink will stop with an error if you try to use this model type without
+enabling support for it. To enable support for lightgbm, install hlink with the
+`lightgbm` extra.
+
+```
+pip install hlink[lightgbm]
+```
+
+This installs the lightgbm package and its Python dependencies. Depending on
+your machine and operating system, you may also need to install the libomp
+library, which is another dependency of lightgbm. If you encounter errors when
+training a lightgbm model, please try installing libomp if you do not have it
+installed.
+
+lightgbm has an enormous number of available parameters. Many of these are
+available as normal in hlink, via the [LightGBMClassifier
+class](https://mmlspark.blob.core.windows.net/docs/1.0.8/pyspark/synapse.ml.lightgbm.html#module-synapse.ml.lightgbm.LightGBMClassifier).
+Others are available through the special `passThroughArgs` parameter, which
+passes additional parameters through to the C++ library. You can see a full
+list of the supported parameters
+[here](https://lightgbm.readthedocs.io/en/latest/Parameters.html).
+
+```
+chosen_model = {
+    type = "lightgbm",
+    # LightGBMClassifier supports these parameters (and many more).
+    maxDepth = 5,
+    learningRate = 0.5,
+    # LightGBMClassifier does not directly support this parameter,
+    # so we have to send it to the C++ library with passThroughArgs.
+    passThroughArgs = "force_row_wise=true",
+    # hlink's threshold and threshold_ratio
+    threshold = 0.8,
+    threshold_ratio = 1.5,
 }
 ```
