@@ -71,13 +71,13 @@ class SparkConnection:
         if os.path.isfile(jar_path):
             conf = conf.set("spark.jars", jar_path)
 
-        # If the SynapseML Python package is available, include the Scala
-        # package as well. Note that we have to pin to a particular version of
-        # the Scala package here.
+        # A bit of a kludge. We set spark.jars.repositories here in the configuration,
+        # but then we actually download the SynapseML Scala jar later in connect().
+        # See the comment on the ADD JAR SQL statement in connect() for some more
+        # context.
         #
-        # SynapseML used to be named MMLSpark.
+        # SynapseML used to be named MMLSpark, thus the URL.
         if _synapse_ml_available:
-            conf.set("spark.jars.packages", "com.microsoft.azure:synapseml_2.12:1.0.8")
             conf.set("spark.jars.repositories", "https://mmlspark.azureedge.net/maven")
 
         return conf
@@ -117,6 +117,18 @@ class SparkConnection:
         session.catalog.setCurrentDatabase(self.db_name)
         session.sparkContext.setCheckpointDir(str(self.tmp_dir))
         self._register_udfs(session)
+
+        # If the SynapseML Python package is available, include the Scala
+        # package as well. Note that we have to pin to a particular version of
+        # the Scala package here.
+        #
+        # Despite what the documentation for the spark.jars.packages config setting
+        # says, this is the only way that I have found to include this jar for both
+        # the driver and the executors. Setting spark.jars.packages caused errors
+        # because the executors could not find the jar.
+        if _synapse_ml_available:
+            session.sql("ADD JAR ivy://com.microsoft.azure:synapseml_2.12:1.0.8")
+
         return session
 
     def _register_udfs(self, session):
