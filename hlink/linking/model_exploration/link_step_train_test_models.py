@@ -426,14 +426,16 @@ class LinkStepTrainTestModels(LinkStep):
         outer_fold_count = config[training_conf].get("n_training_iterations", 10)
         inner_fold_count = 3
 
-        if outer_fold_count < 2:
+        if outer_fold_count < 3:
             raise RuntimeError("You must use at least two training iterations.")
 
         seed = config[training_conf].get("seed", 2133)
 
         outer_folds = self._get_outer_folds(prepped_data, id_a, outer_fold_count, seed)
 
+
         for test_data_index, outer_test_data in enumerate(outer_folds):
+            print(f"\nTesting fold {test_data_index}} -------------------------------------------------\n")
             # Explode params into all the combinations we want to test with the current model.
             # This may use a grid search or a random search or exactly the parameters in the config.
             model_parameters = self._get_model_parameters(config)
@@ -499,11 +501,12 @@ class LinkStepTrainTestModels(LinkStep):
         self, prepped_data: pyspark.sql.DataFrame, id_a: str, k_folds: int, seed: int
     ) -> list[pyspark.sql.DataFrame]:
 
-        print(f"Create {k_folds} from {prepped_data.count()} training records.")
+        print(f"Create {k_folds} outer folds from {prepped_data.count()} training records.")
 
         weights = [1.0 / k_folds for i in range(k_folds)]
+        print(f"Split into folds using weights {weights}")
         fold_ids_list = (
-            prepped_data.select(id_a).distinct().randomSplit(weights, seed=seed)
+            prepped_data.select(id_a).distinct().randomSplit(weights, seed=seed+1)
         )
         outer_folds = [
             prepped_data.join(f_ids, on=id_a, how="inner") for f_ids in fold_ids_list
