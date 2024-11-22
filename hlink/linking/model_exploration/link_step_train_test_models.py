@@ -16,8 +16,9 @@ import pandas as pd
 from sklearn.metrics import precision_recall_curve, auc
 from pyspark.ml import Model, Transformer
 import pyspark.sql
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import count, mean
-
+from functools import reduce
 import hlink.linking.core.threshold as threshold_core
 import hlink.linking.core.classifier as classifier_core
 
@@ -119,7 +120,7 @@ class LinkStepTrainTestModels(LinkStep):
         )
 
     # Takes a list of the PRAUC (Precision / Recall area under the curve) and the scoring strategy to use
-    def _score_train_test_results(
+    def _score_inner_kfold_cv_results(
         self, areas: list[float], score_strategy: str = "mean"
     ) -> float:
         if score_strategy == "mean":
@@ -157,22 +158,29 @@ class LinkStepTrainTestModels(LinkStep):
         pr_auc = auc(recall, precision)
         return pr_auc
 
-    # Returns a PR AUC list computation for each split of training and test data run through the model using model params
-    def _collect_train_test_splits(
-        self, splits, model_type, hyperparams, dep_var, id_a, id_b
+    # Returns a PR AUC list computation for inner training data on the given model
+    def _collect_inner_kfold_cv(
+        self,
+        inner_folds: list[pyspark.sql.DataFrame],
+        model_type: str,
+        hyperparams: dict[str, Any],
+        dep_var: str,
+        id_a: str,
+        id_b: str,
     ) -> list[float]:
         # Collect auc values so we can pull out the highest
-        splits_results = []
-        for split_index, (training_data, test_data) in enumerate(splits, 1):
-            cached_training_data = training_data.cache()
-            cached_test_data = test_data.cache()
+        validation_results = []
+        for validation_index in range(len(inner_folds)):
+            validation_data = inner_folds[validation_index]
+            training_data = self._combine_folds(inner_folds, ignore=validation_index)
 
-            split_start_info = f"Training and testing the model on train-test split {split_index} of {len(splits)}"
-            # print(split_start_info)
-            logger.debug(split_start_info)
+            cached_training_data = training_data.cache()
+            cached_validation_data = validation_data.cache()
+
+            # PRAUC = Precision Recall under the curve
             prauc = self._train_model(
                 cached_training_data,
-                cached_test_data,
+                cached_validation_data,
                 model_type,
                 hyperparams,
                 dep_var,
@@ -180,19 +188,19 @@ class LinkStepTrainTestModels(LinkStep):
                 id_b,
             )
             training_data.unpersist()
-            test_data.unpersist()
-            splits_results.append(prauc)
-        return splits_results
+            validation_data.unpersist()
+            validation_results.append(prauc)
+        return validation_results
 
     # Returns a list of  ModelEval instances.
     # This connects a score to each hyper-parameter combination. and the thresholds  listed with it in the config.
     def _evaluate_hyperparam_combinations(
         self,
         all_model_parameter_combos,
-        splits,
-        dep_var,
-        id_a,
-        id_b,
+        inner_folds: list[pyspark.sql.DataFrame],
+        dep_var: str,
+        id_a: str,
+        id_b: str,
         config,
         training_conf,
     ) -> list[ModelEval]:
@@ -219,10 +227,10 @@ class LinkStepTrainTestModels(LinkStep):
             hyperparams.pop("threshold", None)
             hyperparams.pop("threshold_ratio", None)
 
-            pr_auc_values = self._collect_train_test_splits(
-                splits, model_type, hyperparams, dep_var, id_a, id_b
+            pr_auc_values = self._collect_inner_kfold_cv(
+                inner_folds, model_type, hyperparams, dep_var, id_a, id_b
             )
-            score = self._score_train_test_results(pr_auc_values, "mean")
+            score = self._score_inner_kfold_cv_results(pr_auc_values, "mean")
 
             model_eval = ModelEval(
                 model_type=model_type,
@@ -281,7 +289,7 @@ class LinkStepTrainTestModels(LinkStep):
         self,
         hyperparam_evaluation_results: list[ModelEval],
         suspicious_data: Any,
-        split: list[pyspark.sql.DataFrame],
+        split: dict[str : pyspark.sql.DataFrame],
         dep_var: str,
         id_a: str,
         id_b: str,
@@ -290,6 +298,13 @@ class LinkStepTrainTestModels(LinkStep):
         config = self.task.link_run.config
 
         thresholded_metrics_df = _create_thresholded_metrics_df()
+
+        thresholding_training_data = split.get("training")
+        thresholding_test_data = split.get("test")
+        if thresholding_training_data is None:
+            raise RuntimeError("Must give some data with the 'training' key.")
+        if thresholding_test_data is None:
+            raise RuntimeError("Must give some data with the 'test' key.")
 
         # Note: We may change this to contain a list of best per model or something else
         # but for now it's a single ModelEval instance -- the one with the highest score.
@@ -307,9 +322,6 @@ class LinkStepTrainTestModels(LinkStep):
         results_dfs: dict[int, pd.DataFrame] = {}
         for i in range(len(threshold_matrix)):
             results_dfs[i] = _create_results_df()
-
-        thresholding_training_data = split[0]
-        thresholding_test_data = split[1]
 
         cached_training_data = thresholding_training_data.cache()
         cached_test_data = thresholding_test_data.cache()
@@ -411,7 +423,7 @@ class LinkStepTrainTestModels(LinkStep):
         # Stores suspicious data
         otd_data = self._create_otd_data(id_a, id_b)
 
-        outer_fold_count= config[training_conf].get("n_training_iterations", 10)
+        outer_fold_count = config[training_conf].get("n_training_iterations", 10)
         inner_fold_count = 3
 
         if outer_fold_count < 2:
@@ -419,18 +431,22 @@ class LinkStepTrainTestModels(LinkStep):
 
         seed = config[training_conf].get("seed", 2133)
 
-        outer_folds = self._get_outer_folds(
-            prepped_data, id_a, outer_fold_count, seed
-        )
+        outer_folds = self._get_outer_folds(prepped_data, id_a, outer_fold_count, seed)
 
-        for test_data_index, thresholding_test_data in enumerate(outer_folds):             
+        for test_data_index, outer_test_data in enumerate(outer_folds):
             # Explode params into all the combinations we want to test with the current model.
+            # This may use a grid search or a random search or exactly the parameters in the config.
             model_parameters = self._get_model_parameters(config)
-            combined_training_data = _combine(outer_folds, ignore=test_data_index)
+
+            outer_training_data = self._combine_folds(
+                outer_folds, ignore=test_data_index
+            )
+
+            inner_folds = self._split_into_folds(outer_training_data, inner_fold_count)
 
             hyperparam_evaluation_results = self._evaluate_hyperparam_combinations(
                 model_parameters,
-                combined_training_data,
+                inner_folds,
                 dep_var,
                 id_a,
                 id_b,
@@ -438,20 +454,21 @@ class LinkStepTrainTestModels(LinkStep):
                 training_conf,
             )
 
-        # TODO: We may want to recreate a new split or set of splits rather than reuse existing splits.
-        thresholded_metrics_df, suspicious_data = self._evaluate_threshold_combinations(
-            hyperparam_evaluation_results,
-            otd_data,
-            thresholding_split,
-            dep_var,
-            id_a,
-            id_b,
-        )
+            thresholded_metrics_df, suspicious_data = (
+                self._evaluate_threshold_combinations(
+                    hyperparam_evaluation_results,
+                    otd_data,
+                    {"test": outer_test_data, "training": outer_training_data},
+                    dep_var,
+                    id_a,
+                    id_b,
+                )
+            )
 
-        # thresholded_metrics_df has one row per threshold combination.
-        thresholded_metrics_df = _load_thresholded_metrics_df_params(
-            thresholded_metrics_df
-        )
+            # thresholded_metrics_df has one row per threshold combination. and each outer fold
+            thresholded_metrics_df = _load_thresholded_metrics_df_params(
+                thresholded_metrics_df
+            )
 
         print("***   Final thresholded metrics ***")
 
@@ -462,29 +479,40 @@ class LinkStepTrainTestModels(LinkStep):
         self._save_otd_data(suspicious_data, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
-    def _get_outer_folds(
-            self,
-            prepped_data: pyspark.sql.DataFrame,
-            id_a: str,
-            k_folds: int,
-            seed: int) -> list[list[pyspark.sql.DataFrame]]:
-        
-        weights = [1.0/k_folds for i in k_folds]
-        split_ids = prepped_data.select(id_a).distinct().randomSplit(weights, seed=seed)
-            
-        splits = []
-        for ids_a, ids_b in split_ids:
-            split_a = prepped_data.join(ids_a, on=id_a, how="inner")
-            split_b = prepped_data.join(ids_b, on=id_a, how="inner")
-            splits.append([split_a, split_b])
-        for index, s in enumerate(splits, 1):
-            training_data = s[0]
-            test_data = s[1]
+    def _split_into_folds(
+        self, data: pyspark.sql.DataFrame, fold_count: int
+    ) -> list[pyspark.sql.DataFrame]:
+        weights = [1.0 / fold_count for i in range(fold_count)]
+        return data.randomSplit(weights)
 
-            print(
-                f"Split {index}: training rows {training_data.count()} test rows: {test_data.count()}"
-            )
-        return splits
+    def _combine_folds(
+        self, folds: list[pyspark.sql.DataFrame], ignore=None
+    ) -> pyspark.sql.DataFrame:
+        folds_to_combine = []
+        for fold_number, fold in enumerate(folds, 0):
+            if fold_number != ignore:
+                folds_to_combine.append(fold)
+
+        return reduce(DataFrame.unionAll, folds_to_combine)
+
+    def _get_outer_folds(
+        self, prepped_data: pyspark.sql.DataFrame, id_a: str, k_folds: int, seed: int
+    ) -> list[pyspark.sql.DataFrame]:
+
+        print(f"Create {k_folds} from {prepped_data.count()} training records.")
+
+        weights = [1.0 / k_folds for i in range(k_folds)]
+        fold_ids_list = (
+            prepped_data.select(id_a).distinct().randomSplit(weights, seed=seed)
+        )
+        outer_folds = [
+            prepped_data.join(f_ids, on=id_a, how="inner") for f_ids in fold_ids_list
+        ]
+        print(f"There are {len(outer_folds)} outer folds")
+        for i, f in enumerate(outer_folds, 0):
+            print(f"Fold {i} has {f.count()} records.")
+
+        return outer_folds
 
     def _get_splits(
         self,
@@ -499,9 +527,11 @@ class LinkStepTrainTestModels(LinkStep):
         itself a list of two DataFrames which are the splits of prepped_data.
         The split DataFrames are roughly equal in size.
         """
-        print(f"Splitting prepped data that starts with  {prepped_data.count()} total rows.")
+        print(
+            f"Splitting prepped data that starts with  {prepped_data.count()} total rows."
+        )
         if self.task.link_run.config[f"{self.task.training_conf}"].get(
-             "split_by_id_a", False
+            "split_by_id_a", False
         ):
             print("Get distinct id_a for training")
             split_ids = [
