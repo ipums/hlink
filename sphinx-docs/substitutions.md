@@ -9,7 +9,11 @@ You must supply a substitution file and either specify `regex_word_replace=true`
 
 ## 1:1 substitution by data table
 
-Performs a 1:1 replacement on a filtered subset of the data table.  If the input column data equals a value in the first column of the substitution file, it is replaced with the data in the second column of the substitution file.  Used to replace variant name forms with standardized name forms, filtering on sex.
+Performs a 1:1 replacement on a filtered subset of the data table.  If the
+input column data equals a value in the second column of the substitution file,
+it is replaced with the data in the first column of the substitution file.
+Used to replace variant name forms with standardized name forms, filtering on
+a column like sex which may affect common names.
 
 * Attributes:
   * `join_column` -- Type: `string`.  Column to filter input data on.
