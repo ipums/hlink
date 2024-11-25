@@ -168,7 +168,7 @@ class LinkStepTrainTestModels(LinkStep):
             cached_test_data = test_data.cache()
 
             split_start_info = f"Training and testing the model on train-test split {split_index} of {len(splits)}"
-            print(split_start_info)
+            # print(split_start_info)
             logger.debug(split_start_info)
             prauc = self._train_model(
                 cached_training_data,
@@ -199,7 +199,7 @@ class LinkStepTrainTestModels(LinkStep):
         results = []
         for index, params_combo in enumerate(all_model_parameter_combos, 1):
             eval_start_info = f"Starting run {index} of {len(all_model_parameter_combos)} with these parameters: {params_combo}"
-            print(eval_start_info)
+            # print(eval_start_info)
             logger.info(eval_start_info)
             # Copy because the params combo will get stripped of extra key-values
             # so only the hyperparams remain.
@@ -266,7 +266,7 @@ class LinkStepTrainTestModels(LinkStep):
             raise RuntimeError(
                 "No model evaluations provided, cannot choose the best one."
             )
-        print("\n**************************************************")
+        print("\n\n**************************************************")
         print("    All Model - hyper-parameter combinations")
         print("**************************************************\n")
         best_eval = evals[0]
@@ -274,7 +274,7 @@ class LinkStepTrainTestModels(LinkStep):
             print(e)
             if best_eval.score < e.score:
                 best_eval = e
-        print("--------------------------------------------------\n")
+        print("--------------------------------------------------\n\n")
         return best_eval
 
     def _evaluate_threshold_combinations(
@@ -295,9 +295,9 @@ class LinkStepTrainTestModels(LinkStep):
         # but for now it's a single ModelEval instance -- the one with the highest score.
         best_results = self._choose_best_training_results(hyperparam_evaluation_results)
 
-        print(f"======== Best Model and Parameters =========")
-        print(f"{best_results}")
-        print("==============================================================")
+        print(f"\n======== Best Model and Parameters ========\n")
+        print(f"\t{best_results}\n")
+        print("=============================================\n]\n")
 
         # TODO check if we should make a different split, like starting from a different seed?
         # or just not re-using one we used in making the PR_AUC mean value?
@@ -306,6 +306,9 @@ class LinkStepTrainTestModels(LinkStep):
         # thresholding_test_data = splits_for_thresholding_eval[1].cache()
         threshold_matrix = best_results.make_threshold_matrix()
         logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
+        print(
+            f"Testing the best model + parameters against all {len(threshold_matrix)} threshold combinations."
+        )
         results_dfs: dict[int, pd.DataFrame] = {}
         for i in range(len(threshold_matrix)):
             results_dfs[i] = _create_results_df()
@@ -365,10 +368,6 @@ class LinkStepTrainTestModels(LinkStep):
                     this_threshold_ratio,
                     config[training_conf],
                     config["id_column"],
-                )
-
-                print(
-                    f"Capture results for threshold matrix entry {threshold_index} and split index {split_index}"
                 )
 
                 results_dfs[i] = self._capture_results(
@@ -535,12 +534,12 @@ class LinkStepTrainTestModels(LinkStep):
         # write to sql tables for testing
         predictions.createOrReplaceTempView(f"{table_prefix}predictions")
         predict_train.createOrReplaceTempView(f"{table_prefix}predict_train")
-        print("------------------------------------------------------------")
-        print(f"Capturing predictions:")
-        predictions.show()
-        print(f"Capturing predict_train:")
-        predict_train.show()
-        print("------------------------------------------------------------")
+        # print("------------------------------------------------------------")
+        # print(f"Capturing predictions:")
+        # predictions.show()
+        # print(f"Capturing predict_train:")
+        # predict_train.show()
+        # print("------------------------------------------------------------")
 
         (
             test_TP_count,
@@ -769,9 +768,9 @@ def _get_confusion_matrix(
     FP = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 1))
     FP_count = FP.count()
 
-    print(
-        f"Confusion matrix -- true positives and false positivesTP {TP_count} FP {FP_count}"
-    )
+    # print(
+    #   f"Confusion matrix -- true positives and false positivesTP {TP_count} FP {FP_count}"
+    # )
 
     FN = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 0))
     FN_count = FN.count()
@@ -779,9 +778,9 @@ def _get_confusion_matrix(
     TN = predictions.filter((predictions[dep_var] == 0) & (predictions.prediction == 0))
     TN_count = TN.count()
 
-    print(
-        f"Confusion matrix -- true negatives and false negatives: FN {FN_count}  TN {TN_count}"
-    )
+    # print(
+    #   f"Confusion matrix -- true negatives and false negatives: FN {FN_count}  TN {TN_count}"
+    # )
 
     if otd_data:
         id_a = otd_data["id_a"]
@@ -829,7 +828,7 @@ def _get_aggregate_metrics(
     else:
         recall = TP_count / (TP_count + FN_count)
     mcc = _calc_mcc(TP_count, TN_count, FP_count, FN_count)
-    print(f"XX Aggregates precision {precision} recall {recall}")
+    # print(f"XX Aggregates precision {precision} recall {recall}")
     return precision, recall, mcc
 
 
