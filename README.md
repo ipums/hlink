@@ -39,38 +39,42 @@ encounter PySpark-related import errors while running hlink on Python 3.12, try
   versions of Python. So you should have better chances getting PySpark to work
   well on Python 3.10 or 3.11.
 
-### XGBoost Support
+### Additional Machine Learning Algorithms
 
-[XGBoost](https://xgboost.readthedocs.io/en/stable/index.html) is a highly
-performant gradient boosting machine learning library. hlink includes optional
-support for XGBoost through the xgboost Python package. This support is
-experimental and may change since the XGBoost-PySpark integration provided by
-the xgboost package is currently unstable.
+hlink has optional support for two additional machine learning algorithms,
+[XGBoost](https://xgboost.readthedocs.io/en/stable/index.html) and
+[LightGBM](https://lightgbm.readthedocs.io/en/latest/index.html). Both of these
+algorithms are highly performant gradient boosting libraries, each with its own
+characteristics. These algorithms are not implemented directly in Spark, so
+they require some additional dependencies. To install the required Python
+dependencies, run
 
-To install the xgboost package and its Python dependencies, run `pip install
-hlink[xgboost]`. This may be enough to get xgboost running on some machines. If
-you run into further errors, you might need to install the libomp package,
-which xgboost requires.
-
-After installing xgboost, you can use it as a model type in training and model
-exploration. xgboost has a large list of available parameters, which you can
-check out [here](https://xgboost.readthedocs.io/en/latest/parameter.html).
-hlink passes parameters defined in your config file through to the xgboost
-library.
-
-```toml
-# max_depth, eta, and gamma are parameters for xgboost. threshold and
-# threshold_ratio are hlink-specific configurations universal to all model types.
-chosen_model = {
-    type = "xgboost",
-    max_depth = 5,
-    eta = 0.5,
-    gamma = 0.05,
-    threshold = 0.5,
-    threshold_ratio = 2.0
-}
+```
+pip install hlink[xgboost]
 ```
 
+for XGBoost or
+
+```
+pip install hlink[lightgbm]
+```
+
+for LightGBM. If you would like to install both at once, you can run
+
+```
+pip install hlink[xgboost,lightgbm]
+```
+
+to get the Python dependencies for both. Both XGBoost and LightGBM also require
+libomp, which will need to be installed separately if you don't already have it.
+
+After installing the dependencies for one or both of these algorithms, you can
+use them as model types in training and model exploration. You can read more
+about these models in the hlink documentation [here](https://hlink.docs.ipums.org/models.html).
+
+*Note: The XGBoost-PySpark integration provided by the xgboost Python package is
+currently unstable. So the hlink xgboost support is experimental and may change
+in the future.*
 
 ## Docs
 
