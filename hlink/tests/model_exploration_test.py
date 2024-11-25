@@ -75,9 +75,7 @@ def test_all(
     tr = spark.table("model_eval_training_results").toPandas()
     print(f"Test all results: {tr}")
 
-    # We need 8 rows because there are 4 splits and we test each combination of thresholds against
-    # each split -- in this case there are only 2 threshold combinations.
-    assert tr.__len__() == 8
+    assert tr.__len__() == 2
     assert tr.query("threshold_ratio == 1.01")["precision_test_mean"].iloc[0] >= 0.5
     assert tr.query("threshold_ratio == 1.3")["alpha_threshold"].iloc[0] == 0.8
 
@@ -370,11 +368,11 @@ def test_step_2_train_gradient_boosted_trees_spark(
 
     training_results = tr.query("model == 'gradient_boosted_trees'")
 
-    print(f"XX training_results: {training_results}")
+    # print(f"XX training_results: {training_results}")
 
     # assert tr.shape == (1, 18)
     assert (
-        tr.query("model == 'gradient_boosted_trees'")["precision_test_mean"].iloc[1] > 0
+        tr.query("model == 'gradient_boosted_trees'")["precision_test_mean"].iloc[0] > 0
     )
     assert tr.query("model == 'gradient_boosted_trees'")["maxDepth"].iloc[0] == 5
     assert (
