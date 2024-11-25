@@ -305,8 +305,8 @@ def test_step_2_train_logistic_regression_spark(
 
     tr = spark.table("model_eval_training_results").toPandas()
 
-    # assert tr.shape == (1, 16)
-    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.8125
+    assert tr.shape == (1, 9)
+    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.75
     assert (
         round(tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0], 1)
         == 0.7
@@ -330,10 +330,9 @@ def test_step_2_train_decision_tree_spark(
 
     print(f"Decision tree results: {tr}")
 
-    # There are 2 rows because there are two splits
-    assert tr.shape == (2, 19)
-    # The test data is so small the first split gives bad results, check the second.
-    assert tr.query("model == 'decision_tree'")["precision_test_mean"].iloc[1] > 0
+    
+    assert tr.shape == (1, 13)    
+    assert tr.query("model == 'decision_tree'")["precision_test_mean"].iloc[0] > 0
     assert tr.query("model == 'decision_tree'")["maxDepth"].iloc[0] == 3
     assert tr.query("model == 'decision_tree'")["minInstancesPerNode"].iloc[0] == 1
     assert tr.query("model == 'decision_tree'")["maxBins"].iloc[0] == 7

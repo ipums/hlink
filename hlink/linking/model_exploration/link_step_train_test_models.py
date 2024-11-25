@@ -477,10 +477,11 @@ class LinkStepTrainTestModels(LinkStep):
         itself a list of two DataFrames which are the splits of prepped_data.
         The split DataFrames are roughly equal in size.
         """
-        print(f"Splitting prepped data that starts with  {prepped_data.count()} rows.")
+        print(f"Splitting prepped data that starts with  {prepped_data.count()} total rows.")
         if self.task.link_run.config[f"{self.task.training_conf}"].get(
-            "split_by_id_a", False
+             "split_by_id_a", False
         ):
+            print("Get distinct id_a for training")
             split_ids = [
                 prepped_data.select(id_a)
                 .distinct()
@@ -495,6 +496,7 @@ class LinkStepTrainTestModels(LinkStep):
                 splits.append([split_a, split_b])
 
         else:
+            print("Splitting randomly n times.")
             splits = [
                 prepped_data.randomSplit([0.5, 0.5], seed=seed + i)
                 for i in range(n_training_iterations)
