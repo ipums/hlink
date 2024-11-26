@@ -122,15 +122,13 @@ def test_all(
     main.do_drop_all("")
 
 
-def test_step_2_param_grid(main, training_conf):
-    """Test matching step 2 training to see if the custom param grid builder is working"""
-
-    training_conf["training"]["model_parameters"] = [
+def test_custom_param_grid_builder():
+    """Test matching step 2's custom param grid builder"""
+    model_parameters = [
         {"type": "random_forest", "maxDepth": [3, 4, 5], "numTrees": [50, 100]},
         {"type": "probit", "threshold": [0.5, 0.7]},
     ]
-
-    param_grid = _custom_param_grid_builder("training", training_conf)
+    param_grid = _custom_param_grid_builder(model_parameters)
 
     expected = [
         {"maxDepth": 3, "numTrees": 50, "type": "random_forest"},
@@ -144,8 +142,6 @@ def test_step_2_param_grid(main, training_conf):
 
     assert len(param_grid) == len(expected)
     assert all(m in expected for m in param_grid)
-
-    main.do_drop_all("")
 
 
 # -------------------------------------

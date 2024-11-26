@@ -303,7 +303,7 @@ class LinkStepTrainTestModels(LinkStep):
 
         model_parameters = conf[training_conf]["model_parameters"]
         if "param_grid" in conf[training_conf] and conf[training_conf]["param_grid"]:
-            model_parameters = _custom_param_grid_builder(training_conf, conf)
+            model_parameters = _custom_param_grid_builder(model_parameters)
         elif model_parameters == []:
             raise ValueError(
                 "No model parameters found. In 'training' config, either supply 'model_parameters' or 'param_grid'."
@@ -665,10 +665,10 @@ def _create_desc_df() -> pd.DataFrame:
 
 
 def _custom_param_grid_builder(
-    training_conf: str, conf: dict[str, Any]
+    model_parameters: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
     print("Building param grid for models")
-    given_parameters = conf[training_conf]["model_parameters"]
+    given_parameters = model_parameters
     new_params = []
     for run in given_parameters:
         params = run.copy()
