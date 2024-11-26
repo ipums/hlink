@@ -201,6 +201,51 @@ def test_get_model_parameters_param_grid_true(training_conf):
     assert len(model_parameters) == 6
 
 
+def test_get_model_parameters_search_strategy_explicit(training_conf):
+    """
+    When training.model_parameter_search.strategy is set to "explicit",
+    model_parameters pass through unchanged.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {"type": "random_forest", "maxDepth": 15, "numTrees": 100, "threshold": 0.5},
+        {"type": "probit", "threshold": 0.8, "threshold_ratio": 1.3},
+    ]
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "explicit",
+    }
+    assert "param_grid" not in training_conf["training"]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    assert model_parameters == [
+        {"type": "random_forest", "maxDepth": 15, "numTrees": 100, "threshold": 0.5},
+        {"type": "probit", "threshold": 0.8, "threshold_ratio": 1.3},
+    ]
+
+
+def test_get_model_parameters_search_strategy_grid(training_conf):
+    """
+    When training.model_parameter_search.strategy is set to "grid",
+    model_parameters are exploded.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": [5, 10, 15],
+            "numTrees": [50, 100],
+            "threshold": 0.5,
+        },
+    ]
+    training_conf["model_parameter_search"] = {
+        "strategy": "grid",
+    }
+    assert "param_grid" not in training_conf
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+    # 3 settings for maxDepth * 2 settings for numTrees = 6 total settings
+    assert len(model_parameters) == 6
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------
