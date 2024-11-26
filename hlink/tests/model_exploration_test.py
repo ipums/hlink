@@ -10,6 +10,7 @@ import hlink.linking.core.threshold as threshold_core
 from hlink.linking.model_exploration.link_step_train_test_models import (
     LinkStepTrainTestModels,
     _custom_param_grid_builder,
+    _get_model_parameters,
 )
 
 
@@ -142,6 +143,62 @@ def test_custom_param_grid_builder():
 
     assert len(param_grid) == len(expected)
     assert all(m in expected for m in param_grid)
+
+
+def test_get_model_parameters_no_param_grid_attribute(training_conf):
+    """
+    When there's no training.param_grid attribute, the default is to use the "explicit"
+    strategy, testing each element of model_parameters in turn.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {"type": "random_forest", "maxDepth": 3, "numTrees": 50},
+        {"type": "probit", "threshold": 0.7},
+    ]
+    assert "param_grid" not in training_conf["training"]
+
+    model_parameters = _get_model_parameters("training", training_conf)
+
+    assert model_parameters == [
+        {"type": "random_forest", "maxDepth": 3, "numTrees": 50},
+        {"type": "probit", "threshold": 0.7},
+    ]
+
+
+def test_get_model_parameters_param_grid_false(training_conf):
+    """
+    When training.param_grid is set to False, model exploration uses the "explicit"
+    strategy. The model_parameters are returned unchanged.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {"type": "logistic_regression", "threshold": 0.3, "threshold_ratio": 1.4},
+    ]
+    training_conf["training"]["param_grid"] = False
+
+    model_parameters = _get_model_parameters("training", training_conf)
+
+    assert model_parameters == [
+        {"type": "logistic_regression", "threshold": 0.3, "threshold_ratio": 1.4},
+    ]
+
+
+def test_get_model_parameters_param_grid_true(training_conf):
+    """
+    When training.param_grid is set to True, model exploration uses the "grid"
+    strategy, exploding model_parameters.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": [5, 10, 15],
+            "numTrees": [50, 100],
+            "threshold": 0.5,
+        },
+    ]
+    training_conf["training"]["param_grid"] = True
+
+    model_parameters = _get_model_parameters("training", training_conf)
+    # 3 settings for maxDepth * 2 settings for numTrees = 6 total settings
+    assert len(model_parameters) == 6
 
 
 # -------------------------------------
