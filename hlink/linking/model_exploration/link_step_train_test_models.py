@@ -67,7 +67,7 @@ class LinkStepTrainTestModels(LinkStep):
 
         splits = self._get_splits(prepped_data, id_a, n_training_iterations, seed)
 
-        model_parameters = self._get_model_parameters(config)
+        model_parameters = _get_model_parameters(training_conf, config)
 
         logger.info(
             f"There are {len(model_parameters)} sets of model parameters to explore; "
@@ -297,18 +297,6 @@ class LinkStepTrainTestModels(LinkStep):
             },
         )
         return pd.concat([results_df, new_results], ignore_index=True)
-
-    def _get_model_parameters(self, conf: dict[str, Any]) -> list[dict[str, Any]]:
-        training_conf = str(self.task.training_conf)
-
-        model_parameters = conf[training_conf]["model_parameters"]
-        if "param_grid" in conf[training_conf] and conf[training_conf]["param_grid"]:
-            model_parameters = _custom_param_grid_builder(model_parameters)
-        elif model_parameters == []:
-            raise ValueError(
-                "No model parameters found. In 'training' config, either supply 'model_parameters' or 'param_grid'."
-            )
-        return model_parameters
 
     def _save_training_results(
         self, desc_df: pd.DataFrame, spark: pyspark.sql.SparkSession
@@ -694,3 +682,16 @@ def _custom_param_grid_builder(
 
         new_params.extend(params_exploded)
     return new_params
+
+
+def _get_model_parameters(
+    training_conf: str, conf: dict[str, Any]
+) -> list[dict[str, Any]]:
+    model_parameters = conf[training_conf]["model_parameters"]
+    if "param_grid" in conf[training_conf] and conf[training_conf]["param_grid"]:
+        model_parameters = _custom_param_grid_builder(model_parameters)
+    elif model_parameters == []:
+        raise ValueError(
+            "No model parameters found. In 'training' config, either supply 'model_parameters' or 'param_grid'."
+        )
+    return model_parameters
