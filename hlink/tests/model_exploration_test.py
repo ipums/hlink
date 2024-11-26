@@ -9,6 +9,7 @@ import pandas as pd
 import hlink.linking.core.threshold as threshold_core
 from hlink.linking.model_exploration.link_step_train_test_models import (
     LinkStepTrainTestModels,
+    _custom_param_grid_builder,
 )
 
 
@@ -121,7 +122,7 @@ def test_all(
     main.do_drop_all("")
 
 
-def test_step_2_param_grid(spark, main, training_conf, model_exploration, fake_self):
+def test_step_2_param_grid(main, training_conf):
     """Test matching step 2 training to see if the custom param grid builder is working"""
 
     training_conf["training"]["model_parameters"] = [
@@ -129,8 +130,7 @@ def test_step_2_param_grid(spark, main, training_conf, model_exploration, fake_s
         {"type": "probit", "threshold": [0.5, 0.7]},
     ]
 
-    link_step = LinkStepTrainTestModels(model_exploration)
-    param_grid = link_step._custom_param_grid_builder(training_conf)
+    param_grid = _custom_param_grid_builder("training", training_conf)
 
     expected = [
         {"maxDepth": 3, "numTrees": 50, "type": "random_forest"},
