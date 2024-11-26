@@ -67,7 +67,7 @@ class LinkStepTrainTestModels(LinkStep):
 
         splits = self._get_splits(prepped_data, id_a, n_training_iterations, seed)
 
-        model_parameters = _get_model_parameters(training_conf, config)
+        model_parameters = _get_model_parameters(config[training_conf])
 
         logger.info(
             f"There are {len(model_parameters)} sets of model parameters to explore; "
@@ -684,11 +684,9 @@ def _custom_param_grid_builder(
     return new_params
 
 
-def _get_model_parameters(
-    training_conf: str, conf: dict[str, Any]
-) -> list[dict[str, Any]]:
-    model_parameters = conf[training_conf]["model_parameters"]
-    if "param_grid" in conf[training_conf] and conf[training_conf]["param_grid"]:
+def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any]]:
+    model_parameters = training_config["model_parameters"]
+    if "param_grid" in training_config and training_config["param_grid"]:
         model_parameters = _custom_param_grid_builder(model_parameters)
     elif model_parameters == []:
         raise ValueError(

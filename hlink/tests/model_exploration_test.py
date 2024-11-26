@@ -156,7 +156,7 @@ def test_get_model_parameters_no_param_grid_attribute(training_conf):
     ]
     assert "param_grid" not in training_conf["training"]
 
-    model_parameters = _get_model_parameters("training", training_conf)
+    model_parameters = _get_model_parameters(training_conf["training"])
 
     assert model_parameters == [
         {"type": "random_forest", "maxDepth": 3, "numTrees": 50},
@@ -174,7 +174,7 @@ def test_get_model_parameters_param_grid_false(training_conf):
     ]
     training_conf["training"]["param_grid"] = False
 
-    model_parameters = _get_model_parameters("training", training_conf)
+    model_parameters = _get_model_parameters(training_conf["training"])
 
     assert model_parameters == [
         {"type": "logistic_regression", "threshold": 0.3, "threshold_ratio": 1.4},
@@ -196,7 +196,7 @@ def test_get_model_parameters_param_grid_true(training_conf):
     ]
     training_conf["training"]["param_grid"] = True
 
-    model_parameters = _get_model_parameters("training", training_conf)
+    model_parameters = _get_model_parameters(training_conf["training"])
     # 3 settings for maxDepth * 2 settings for numTrees = 6 total settings
     assert len(model_parameters) == 6
 
