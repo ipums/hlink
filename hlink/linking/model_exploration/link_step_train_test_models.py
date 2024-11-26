@@ -686,8 +686,18 @@ def _custom_param_grid_builder(
 
 def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any]]:
     model_parameters = training_config["model_parameters"]
+    model_parameter_search = training_config.get("model_parameter_search")
+
     if "param_grid" in training_config and training_config["param_grid"]:
         model_parameters = _custom_param_grid_builder(model_parameters)
+    elif model_parameter_search is not None:
+        strategy = model_parameter_search["strategy"]
+        if strategy == "explicit":
+            return model_parameters
+        elif strategy == "grid":
+            return _custom_param_grid_builder(model_parameters)
+        else:
+            raise ValueError(f"Unknown model_parameter_search strategy '{strategy}'")
     elif model_parameters == []:
         raise ValueError(
             "No model parameters found. In 'training' config, either supply 'model_parameters' or 'param_grid'."

@@ -236,7 +236,7 @@ def test_get_model_parameters_search_strategy_grid(training_conf):
             "threshold": 0.5,
         },
     ]
-    training_conf["model_parameter_search"] = {
+    training_conf["training"]["model_parameter_search"] = {
         "strategy": "grid",
     }
     assert "param_grid" not in training_conf
