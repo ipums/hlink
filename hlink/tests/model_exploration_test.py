@@ -145,16 +145,18 @@ def test_custom_param_grid_builder():
     assert all(m in expected for m in param_grid)
 
 
-def test_get_model_parameters_no_param_grid_attribute(training_conf):
+def test_get_model_parameters_default_behavior(training_conf):
     """
-    When there's no training.param_grid attribute, the default is to use the "explicit"
-    strategy, testing each element of model_parameters in turn.
+    When there's no training.param_grid attribute or
+    training.model_parameter_search attribute, the default is to use the
+    "explicit" strategy, testing each element of model_parameters in turn.
     """
     training_conf["training"]["model_parameters"] = [
         {"type": "random_forest", "maxDepth": 3, "numTrees": 50},
         {"type": "probit", "threshold": 0.7},
     ]
     assert "param_grid" not in training_conf["training"]
+    assert "model_parameter_search" not in training_conf["training"]
 
     model_parameters = _get_model_parameters(training_conf["training"])
 
@@ -243,6 +245,56 @@ def test_get_model_parameters_search_strategy_grid(training_conf):
 
     model_parameters = _get_model_parameters(training_conf["training"])
     # 3 settings for maxDepth * 2 settings for numTrees = 6 total settings
+    assert len(model_parameters) == 6
+
+
+def test_get_model_parameters_search_strategy_explicit_with_param_grid_true(
+    training_conf,
+):
+    """
+    When both model_parameter_search and param_grid are set, model_parameter_search
+    takes precedence.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": 10,
+            "numTrees": 75,
+            "threshold": 0.7,
+        }
+    ]
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "explicit",
+    }
+    # model_parameter_search takes precedence over this
+    training_conf["training"]["param_grid"] = True
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+    assert model_parameters == [
+        {"type": "random_forest", "maxDepth": 10, "numTrees": 75, "threshold": 0.7}
+    ]
+
+
+def test_get_model_parameters_search_strategy_grid_with_param_grid_false(training_conf):
+    """
+    When both model_parameter_search and param_grid are set, model_parameter_search
+    takes precedence.
+    """
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": [5, 10, 15],
+            "numTrees": [50, 100],
+            "threshold": 0.5,
+        },
+    ]
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "grid",
+    }
+    # model_parameter_search takes precedence over this
+    training_conf["training"]["param_grid"] = False
+
+    model_parameters = _get_model_parameters(training_conf["training"])
     assert len(model_parameters) == 6
 
 
