@@ -145,6 +145,17 @@ def test_custom_param_grid_builder():
     assert all(m in expected for m in param_grid)
 
 
+def test_get_model_parameters_error_if_list_empty(training_conf):
+    """
+    It's an error if the model_parameters list is empty, since in that case there
+    aren't any models to evaluate.
+    """
+    training_conf["training"]["model_parameters"] = []
+
+    with pytest.raises(ValueError, match="model_parameters is empty"):
+        _get_model_parameters(training_conf["training"])
+
+
 def test_get_model_parameters_default_behavior(training_conf):
     """
     When there's no training.param_grid attribute or

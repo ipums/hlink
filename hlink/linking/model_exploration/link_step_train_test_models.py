@@ -707,6 +707,11 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
     model_parameter_search = training_config.get("model_parameter_search")
     use_param_grid = training_config.get("param_grid", False)
 
+    if model_parameters == []:
+        raise ValueError(
+            "model_parameters is empty, so there are no models to evaluate"
+        )
+
     if model_parameter_search is not None:
         strategy = model_parameter_search["strategy"]
         if strategy == "explicit":
@@ -717,8 +722,5 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
             raise ValueError(f"Unknown model_parameter_search strategy '{strategy}'")
     elif use_param_grid:
         return _custom_param_grid_builder(model_parameters)
-    elif model_parameters == []:
-        raise ValueError(
-            "No model parameters found. In 'training' config, either supply 'model_parameters' or 'param_grid'."
-        )
+
     return model_parameters
