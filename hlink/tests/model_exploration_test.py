@@ -362,6 +362,41 @@ def test_get_model_parameters_search_strategy_randomized_sample_from_lists(
         assert parameter_choice["maxBins"] in {10, 20, 40}
 
 
+def test_get_model_parameters_search_strategy_randomized_sample_from_distributions(
+    training_conf,
+):
+    """
+    The "randomized" strategy also accepts dictionary values for parameters.
+    These dictionaries define distributions from which the parameters should be
+    sampled.
+
+    For example, {"distribution": "randint", "low": 1, "high": 20} means to
+    pick a random integer between 1 and 20, each integer with an equal chance.
+    And {"distribution": "uniform", "low": 0.0, "high": 100.0} means to pick a
+    random float between 0.0 and 100.0 with a uniform distribution.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 15,
+    }
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "decision_tree",
+            "maxDepth": {"distribution": "randint", "low": 1, "high": 20},
+            "minInfoGain": {"distribution": "uniform", "low": 0.0, "high": 100.0},
+        }
+    ]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    assert len(model_parameters) == 15
+
+    for parameter_choice in model_parameters:
+        assert parameter_choice["type"] == "decision_tree"
+        assert 1 <= parameter_choice["maxDepth"] <= 20
+        assert 0.0 <= parameter_choice["minInfoGain"] <= 100.0
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------

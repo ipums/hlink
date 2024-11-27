@@ -696,8 +696,21 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
     for key, value in model_parameters.items():
         if key == "type":
             parameter_choices[key] = value
-        else:
+        elif type(value) == list:
             parameter_choices[key] = random.choice(value)
+        elif type(value) == dict:
+            distribution = value["distribution"]
+            low = value["low"]
+            high = value["high"]
+
+            if distribution == "randint":
+                parameter_choices[key] = random.randint(low, high)
+            elif distribution == "uniform":
+                parameter_choices[key] = random.uniform(low, high)
+            else:
+                raise ValueError("unknown distribution")
+        else:
+            raise ValueError("can't handle value type")
 
     return parameter_choices
 
