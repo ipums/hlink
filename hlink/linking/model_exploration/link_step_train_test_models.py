@@ -3,6 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import collections.abc
 import itertools
 import logging
 import math
@@ -696,9 +697,12 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
     for key, value in model_parameters.items():
         if key == "type":
             parameter_choices[key] = value
-        elif type(value) == list:
+        # If it's a Sequence (usually list), choose one of the values at random.
+        elif isinstance(value, collections.abc.Sequence):
             parameter_choices[key] = random.choice(value)
-        elif type(value) == dict:
+        # If it's a Mapping (usually dict), it defines a distribution from which
+        # the parameter should be sampled.
+        elif isinstance(value, collections.abc.Mapping):
             distribution = value["distribution"]
             low = value["low"]
             high = value["high"]
