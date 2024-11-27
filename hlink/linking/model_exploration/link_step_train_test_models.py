@@ -6,6 +6,7 @@
 import itertools
 import logging
 import math
+import random
 import re
 import sys
 from textwrap import dedent
@@ -686,6 +687,21 @@ def _custom_param_grid_builder(
     return new_params
 
 
+def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str, Any]:
+    """
+    Choose a randomized setting of parameters from the given specification.
+    """
+    parameter_choices = dict()
+
+    for key, value in model_parameters.items():
+        if key == "type":
+            parameter_choices[key] = value
+        else:
+            parameter_choices[key] = random.choice(value)
+
+    return parameter_choices
+
+
 def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any]]:
     if "param_grid" in training_config:
         print(
@@ -718,6 +734,16 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
             return model_parameters
         elif strategy == "grid":
             return _custom_param_grid_builder(model_parameters)
+        elif strategy == "randomized":
+            num_samples = model_parameter_search["num_samples"]
+
+            return_parameters = []
+            for _ in range(num_samples):
+                parameter_spec = random.choice(model_parameters)
+                randomized = _choose_randomized_parameters(parameter_spec)
+                return_parameters.append(randomized)
+
+            return return_parameters
         else:
             raise ValueError(f"Unknown model_parameter_search strategy '{strategy}'")
     elif use_param_grid:

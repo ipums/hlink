@@ -331,6 +331,37 @@ def test_get_model_parameters_search_strategy_grid_with_param_grid_false(
     assert "Deprecation Warning: training.param_grid is deprecated" in output.err
 
 
+def test_get_model_parameters_search_strategy_randomized_sample_from_lists(
+    training_conf,
+):
+    """
+    Strategy "randomized" accepts lists for parameter values, but it does not work
+    the same way as the "grid" strategy. It randomly samples values from the lists
+    num_samples times to create parameter combinations.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 37,
+    }
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "decision_tree",
+            "maxDepth": [1, 5, 10, 20],
+            "maxBins": [10, 20, 40],
+        }
+    ]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    # Note that if we used strategy grid, we would get a list of length 4 * 3 = 12 instead
+    assert len(model_parameters) == 37
+
+    for parameter_choice in model_parameters:
+        assert parameter_choice["type"] == "decision_tree"
+        assert parameter_choice["maxDepth"] in {1, 5, 10, 20}
+        assert parameter_choice["maxBins"] in {10, 20, 40}
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------
