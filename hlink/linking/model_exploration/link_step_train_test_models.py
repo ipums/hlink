@@ -695,8 +695,8 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
     parameter_choices = dict()
 
     for key, value in model_parameters.items():
-        # If it's a Sequence (usually list), choose one of the values at random.
-        if isinstance(value, collections.abc.Sequence):
+        # If it's a Sequence (usually list) but not a string, choose one of the values at random.
+        if isinstance(value, collections.abc.Sequence) and not isinstance(value, str):
             parameter_choices[key] = random.choice(value)
         # If it's a Mapping (usually dict), it defines a distribution from which
         # the parameter should be sampled.
@@ -711,8 +711,9 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
                 parameter_choices[key] = random.uniform(low, high)
             else:
                 raise ValueError("unknown distribution")
+        # All other types (including strings) are passed through unchanged.
         else:
-            raise ValueError("can't handle value type")
+            parameter_choices[key] = value
 
     return parameter_choices
 

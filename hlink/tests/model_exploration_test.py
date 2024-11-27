@@ -397,6 +397,40 @@ def test_get_model_parameters_search_strategy_randomized_sample_from_distributio
         assert 0.0 <= parameter_choice["minInfoGain"] <= 100.0
 
 
+def test_get_model_parameters_search_strategy_randomized_take_values(training_conf):
+    """
+    If a value is neither a list nor a table, the "randomized" strategy just passes
+    it along as a value. This lets the user easily pin some parameters to a particular
+    value and randomize others.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 25,
+    }
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": 7,
+            "impurity": "entropy",
+            "minInfoGain": 0.5,
+            "numTrees": {"distribution": "randint", "low": 10, "high": 100},
+            "subsamplingRate": [0.5, 1.0, 1.5],
+        }
+    ]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    assert len(model_parameters) == 25
+
+    for parameter_choice in model_parameters:
+        assert parameter_choice["type"] == "random_forest"
+        assert parameter_choice["maxDepth"] == 7
+        assert parameter_choice["impurity"] == "entropy"
+        assert parameter_choice["minInfoGain"] == 0.5
+        assert 10 <= parameter_choice["numTrees"] <= 100
+        assert parameter_choice["subsamplingRate"] in {0.5, 1.0, 1.5}
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------
