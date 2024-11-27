@@ -7,6 +7,8 @@ import itertools
 import logging
 import math
 import re
+import sys
+from textwrap import dedent
 from time import perf_counter
 from typing import Any
 import numpy as np
@@ -688,6 +690,21 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
     model_parameters = training_config["model_parameters"]
     model_parameter_search = training_config.get("model_parameter_search")
 
+    if "param_grid" in training_config:
+        print(
+            dedent(
+                """\
+                Deprecation Warning: training.param_grid is deprecated.
+
+                Please use training.model_parameter_search instead by replacing
+
+                `param_grid = True` with `model_parameter_search = {strategy = "grid"}` or
+                `param_grid = False` with `model_parameter_search = {strategy = "explicit"}`
+
+                [deprecated_in_version=4.0.0]"""
+            ),
+            file=sys.stderr,
+        )
     if model_parameter_search is not None:
         strategy = model_parameter_search["strategy"]
         if strategy == "explicit":

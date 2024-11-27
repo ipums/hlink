@@ -166,10 +166,12 @@ def test_get_model_parameters_default_behavior(training_conf):
     ]
 
 
-def test_get_model_parameters_param_grid_false(training_conf):
+def test_get_model_parameters_param_grid_false(training_conf, capsys):
     """
     When training.param_grid is set to False, model exploration uses the "explicit"
     strategy. The model_parameters are returned unchanged.
+
+    This prints a deprecation warning because param_grid is deprecated.
     """
     training_conf["training"]["model_parameters"] = [
         {"type": "logistic_regression", "threshold": 0.3, "threshold_ratio": 1.4},
@@ -182,11 +184,16 @@ def test_get_model_parameters_param_grid_false(training_conf):
         {"type": "logistic_regression", "threshold": 0.3, "threshold_ratio": 1.4},
     ]
 
+    output = capsys.readouterr()
+    assert "Deprecation Warning: training.param_grid is deprecated" in output.err
 
-def test_get_model_parameters_param_grid_true(training_conf):
+
+def test_get_model_parameters_param_grid_true(training_conf, capsys):
     """
     When training.param_grid is set to True, model exploration uses the "grid"
     strategy, exploding model_parameters.
+
+    This prints a deprecation warning because param_grid is deprecated.
     """
     training_conf["training"]["model_parameters"] = [
         {
@@ -201,6 +208,9 @@ def test_get_model_parameters_param_grid_true(training_conf):
     model_parameters = _get_model_parameters(training_conf["training"])
     # 3 settings for maxDepth * 2 settings for numTrees = 6 total settings
     assert len(model_parameters) == 6
+
+    output = capsys.readouterr()
+    assert "Deprecation Warning: training.param_grid is deprecated" in output.err
 
 
 def test_get_model_parameters_search_strategy_explicit(training_conf):
@@ -249,11 +259,13 @@ def test_get_model_parameters_search_strategy_grid(training_conf):
 
 
 def test_get_model_parameters_search_strategy_explicit_with_param_grid_true(
-    training_conf,
+    training_conf, capsys
 ):
     """
     When both model_parameter_search and param_grid are set, model_parameter_search
     takes precedence.
+
+    This prints a deprecation warning because param_grid is deprecated.
     """
     training_conf["training"]["model_parameters"] = [
         {
@@ -274,11 +286,18 @@ def test_get_model_parameters_search_strategy_explicit_with_param_grid_true(
         {"type": "random_forest", "maxDepth": 10, "numTrees": 75, "threshold": 0.7}
     ]
 
+    output = capsys.readouterr()
+    assert "Deprecation Warning: training.param_grid is deprecated" in output.err
 
-def test_get_model_parameters_search_strategy_grid_with_param_grid_false(training_conf):
+
+def test_get_model_parameters_search_strategy_grid_with_param_grid_false(
+    training_conf, capsys
+):
     """
     When both model_parameter_search and param_grid are set, model_parameter_search
     takes precedence.
+
+    This prints a deprecation warning because param_grid is deprecated.
     """
     training_conf["training"]["model_parameters"] = [
         {
@@ -296,6 +315,9 @@ def test_get_model_parameters_search_strategy_grid_with_param_grid_false(trainin
 
     model_parameters = _get_model_parameters(training_conf["training"])
     assert len(model_parameters) == 6
+
+    output = capsys.readouterr()
+    assert "Deprecation Warning: training.param_grid is deprecated" in output.err
 
 
 # -------------------------------------
