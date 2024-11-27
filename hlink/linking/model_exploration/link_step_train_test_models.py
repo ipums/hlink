@@ -695,10 +695,8 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
     parameter_choices = dict()
 
     for key, value in model_parameters.items():
-        if key == "type":
-            parameter_choices[key] = value
         # If it's a Sequence (usually list), choose one of the values at random.
-        elif isinstance(value, collections.abc.Sequence):
+        if isinstance(value, collections.abc.Sequence):
             parameter_choices[key] = random.choice(value)
         # If it's a Mapping (usually dict), it defines a distribution from which
         # the parameter should be sampled.
@@ -757,7 +755,14 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
             return_parameters = []
             for _ in range(num_samples):
                 parameter_spec = random.choice(model_parameters)
-                randomized = _choose_randomized_parameters(parameter_spec)
+                model_type = parameter_spec["type"]
+                sample_parameters = dict(
+                    (key, value)
+                    for (key, value) in parameter_spec.items()
+                    if key != "type"
+                )
+                randomized = _choose_randomized_parameters(sample_parameters)
+                randomized["type"] = model_type
                 return_parameters.append(randomized)
 
             return return_parameters
