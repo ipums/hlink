@@ -97,6 +97,9 @@ class ModelEval:
     threshold: float | list[float]
     threshold_ratio: float | list[float] | bool
 
+    def print(self):
+        return f"{self.model_type} {self.score} params: {self.hyperparams}"
+
     def make_threshold_matrix(self) -> list[list[float]]:
         return _calc_threshold_matrix(self.threshold, self.threshold_ratio)
 
@@ -204,6 +207,7 @@ class LinkStepTrainTestModels(LinkStep):
         config,
         training_conf,
     ) -> list[ModelEval]:
+        print("Begin evaluating all selected hyperparameters.")
         results = []
         for index, params_combo in enumerate(all_model_parameter_combos, 1):
             eval_start_info = f"Starting run {index} of {len(all_model_parameter_combos)} with these parameters: {params_combo}"
@@ -239,6 +243,7 @@ class LinkStepTrainTestModels(LinkStep):
                 threshold=threshold,
                 threshold_ratio=threshold_ratio,
             )
+            print(f"{index}: {model_eval.print()}")
             results.append(model_eval)
         return results
 
@@ -457,6 +462,10 @@ class LinkStepTrainTestModels(LinkStep):
                 training_conf,
             )
 
+            print(
+                f"Take the best hyper-parameter set from {len(hyperparam_evaluation_results)} results and test every threshold combination against it..."
+            )
+
             thresholded_metrics_df, suspicious_data = (
                 self._evaluate_threshold_combinations(
                     hyperparam_evaluation_results,
@@ -491,12 +500,17 @@ class LinkStepTrainTestModels(LinkStep):
     def _combine_folds(
         self, folds: list[pyspark.sql.DataFrame], ignore=None
     ) -> pyspark.sql.DataFrame:
+
         folds_to_combine = []
         for fold_number, fold in enumerate(folds, 0):
             if fold_number != ignore:
                 folds_to_combine.append(fold)
 
-        return reduce(DataFrame.unionAll, folds_to_combine)
+        combined = reduce(DataFrame.unionAll, folds_to_combine).cache()
+        print(
+            f"Combine non-test outer folds into {combined.count()} training data records."
+        )
+        return combined
 
     def _get_outer_folds(
         self, prepped_data: pyspark.sql.DataFrame, id_a: str, k_folds: int, seed: int
