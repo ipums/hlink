@@ -207,7 +207,9 @@ class LinkStepTrainTestModels(LinkStep):
         config,
         training_conf,
     ) -> list[ModelEval]:
-        print("Begin evaluating all selected hyperparameters.")
+        print(
+            f"Begin evaluating all {len(all_model_parameter_combos)} selected hyperparameter combinations."
+        )
         results = []
         for index, params_combo in enumerate(all_model_parameter_combos, 1):
             eval_start_info = f"Starting run {index} of {len(all_model_parameter_combos)} with these parameters: {params_combo}"
@@ -449,6 +451,9 @@ class LinkStepTrainTestModels(LinkStep):
             outer_training_data = self._combine_folds(
                 outer_folds, ignore=test_data_index
             )
+            print(
+                f"Combine non-test outer folds into {outer_training_data.count()} training data records."
+            )
 
             inner_folds = self._split_into_folds(outer_training_data, inner_fold_count)
 
@@ -507,9 +512,6 @@ class LinkStepTrainTestModels(LinkStep):
                 folds_to_combine.append(fold)
 
         combined = reduce(DataFrame.unionAll, folds_to_combine).cache()
-        print(
-            f"Combine non-test outer folds into {combined.count()} training data records."
-        )
         return combined
 
     def _get_outer_folds(
