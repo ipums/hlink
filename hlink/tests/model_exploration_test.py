@@ -2,6 +2,7 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+from collections import Counter
 
 import pytest
 import pandas as pd
@@ -429,6 +430,61 @@ def test_get_model_parameters_search_strategy_randomized_take_values(training_co
         assert parameter_choice["minInfoGain"] == 0.5
         assert 10 <= parameter_choice["numTrees"] <= 100
         assert parameter_choice["subsamplingRate"] in {0.5, 1.0, 1.5}
+
+
+def test_get_model_parameters_search_strategy_randomized_multiple_models(training_conf):
+    """
+    When there are multiple models for the "randomized" strategy, it randomly
+    samples the model before sampling the parameters for that model. Setting
+    the training.seed attribute lets us assert more precisely the counts for
+    each model type.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 100,
+    }
+    training_conf["training"]["seed"] = 101
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "minInfoGain": {"distribution": "uniform", "low": 0.1, "high": 0.9},
+        },
+        {"type": "probit"},
+    ]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    counter = Counter(parameter_choice["type"] for parameter_choice in model_parameters)
+    assert counter["random_forest"] == 47
+    assert counter["probit"] == 53
+
+
+def test_get_model_parameters_search_strategy_randomized_uses_seed(training_conf):
+    """
+    The "randomized" strategy uses training.seed to allow reproducible runs.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 5,
+    }
+    training_conf["training"]["seed"] = 35830969
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": {"distribution": "randint", "low": 1, "high": 10},
+            "numTrees": [1, 10, 100, 1000],
+        }
+    ]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    assert model_parameters == [
+        {"type": "random_forest", "maxDepth": 8, "numTrees": 100},
+        {"type": "random_forest", "maxDepth": 2, "numTrees": 1},
+        {"type": "random_forest", "maxDepth": 4, "numTrees": 100},
+        {"type": "random_forest", "maxDepth": 9, "numTrees": 10},
+        {"type": "random_forest", "maxDepth": 7, "numTrees": 100},
+    ]
 
 
 # -------------------------------------

@@ -688,7 +688,9 @@ def _custom_param_grid_builder(
     return new_params
 
 
-def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str, Any]:
+def _choose_randomized_parameters(
+    rng: random.Random, model_parameters: dict[str, Any]
+) -> dict[str, Any]:
     """
     Choose a randomized setting of parameters from the given specification.
     """
@@ -697,7 +699,7 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
     for key, value in model_parameters.items():
         # If it's a Sequence (usually list) but not a string, choose one of the values at random.
         if isinstance(value, collections.abc.Sequence) and not isinstance(value, str):
-            parameter_choices[key] = random.choice(value)
+            parameter_choices[key] = rng.choice(value)
         # If it's a Mapping (usually dict), it defines a distribution from which
         # the parameter should be sampled.
         elif isinstance(value, collections.abc.Mapping):
@@ -706,9 +708,9 @@ def _choose_randomized_parameters(model_parameters: dict[str, Any]) -> dict[str,
             high = value["high"]
 
             if distribution == "randint":
-                parameter_choices[key] = random.randint(low, high)
+                parameter_choices[key] = rng.randint(low, high)
             elif distribution == "uniform":
-                parameter_choices[key] = random.uniform(low, high)
+                parameter_choices[key] = rng.uniform(low, high)
             else:
                 raise ValueError("unknown distribution")
         # All other types (including strings) are passed through unchanged.
@@ -737,6 +739,7 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
 
     model_parameters = training_config["model_parameters"]
     model_parameter_search = training_config.get("model_parameter_search")
+    seed = training_config.get("seed")
     use_param_grid = training_config.get("param_grid", False)
 
     if model_parameters == []:
@@ -752,17 +755,18 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
             return _custom_param_grid_builder(model_parameters)
         elif strategy == "randomized":
             num_samples = model_parameter_search["num_samples"]
+            rng = random.Random(seed)
 
             return_parameters = []
             for _ in range(num_samples):
-                parameter_spec = random.choice(model_parameters)
+                parameter_spec = rng.choice(model_parameters)
                 model_type = parameter_spec["type"]
                 sample_parameters = dict(
                     (key, value)
                     for (key, value) in parameter_spec.items()
                     if key != "type"
                 )
-                randomized = _choose_randomized_parameters(sample_parameters)
+                randomized = _choose_randomized_parameters(rng, sample_parameters)
                 randomized["type"] = model_type
                 return_parameters.append(randomized)
 
