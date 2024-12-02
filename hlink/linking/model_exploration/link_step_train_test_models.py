@@ -433,9 +433,10 @@ class LinkStepTrainTestModels(LinkStep):
 
         outer_folds = self._get_outer_folds(prepped_data, id_a, outer_fold_count, seed)
 
-
         for test_data_index, outer_test_data in enumerate(outer_folds):
-            print(f"\nTesting fold {test_data_index} -------------------------------------------------\n")
+            print(
+                f"\nTesting fold {test_data_index} -------------------------------------------------\n"
+            )
             # Explode params into all the combinations we want to test with the current model.
             # This may use a grid search or a random search or exactly the parameters in the config.
             model_parameters = self._get_model_parameters(config)
@@ -471,12 +472,12 @@ class LinkStepTrainTestModels(LinkStep):
             thresholded_metrics_df = _load_thresholded_metrics_df_params(
                 thresholded_metrics_df
             )
+            _print_thresholded_metrics_df(
+                thresholded_metrics_df.sort_values(by="mcc_test_mean", ascending=False)
+            )
 
         print("***   Final thresholded metrics ***")
 
-        _print_thresholded_metrics_df(
-            thresholded_metrics_df.sort_values(by="mcc_test_mean", ascending=False)
-        )
         self._save_training_results(thresholded_metrics_df, self.task.spark)
         self._save_otd_data(suspicious_data, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
@@ -501,12 +502,14 @@ class LinkStepTrainTestModels(LinkStep):
         self, prepped_data: pyspark.sql.DataFrame, id_a: str, k_folds: int, seed: int
     ) -> list[pyspark.sql.DataFrame]:
 
-        print(f"Create {k_folds} outer folds from {prepped_data.count()} training records.")
+        print(
+            f"Create {k_folds} outer folds from {prepped_data.count()} training records."
+        )
 
         weights = [1.0 / k_folds for i in range(k_folds)]
         print(f"Split into folds using weights {weights}")
         fold_ids_list = (
-            prepped_data.select(id_a).distinct().randomSplit(weights, seed=seed+1)
+            prepped_data.select(id_a).distinct().randomSplit(weights, seed=seed + 1)
         )
         outer_folds = [
             prepped_data.join(f_ids, on=id_a, how="inner") for f_ids in fold_ids_list
@@ -906,7 +909,6 @@ def _get_aggregate_metrics(
     else:
         recall = TP_count / (TP_count + FN_count)
     mcc = _calc_mcc(TP_count, TN_count, FP_count, FN_count)
-    # print(f"XX Aggregates precision {precision} recall {recall}")
     return precision, recall, mcc
 
 

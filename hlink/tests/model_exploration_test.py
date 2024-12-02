@@ -275,7 +275,7 @@ def test_step_2_train_random_forest_spark(
     tr = spark.table("model_eval_training_results").toPandas()
     print(f"training results {tr}")
     # assert tr.shape == (1, 18)
-    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 2.0/3.0
+    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 2.0 / 3.0
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 3
 
     FNs = spark.table("model_eval_repeat_fns").toPandas()
