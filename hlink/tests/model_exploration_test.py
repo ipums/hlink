@@ -385,6 +385,11 @@ def test_get_model_parameters_search_strategy_randomized_sample_from_distributio
             "type": "decision_tree",
             "maxDepth": {"distribution": "randint", "low": 1, "high": 20},
             "minInfoGain": {"distribution": "uniform", "low": 0.0, "high": 100.0},
+            "minWeightFractionPerNode": {
+                "distribution": "normal",
+                "mean": 10.0,
+                "standard_deviation": 2.5,
+            },
         }
     ]
 
@@ -396,6 +401,10 @@ def test_get_model_parameters_search_strategy_randomized_sample_from_distributio
         assert parameter_choice["type"] == "decision_tree"
         assert 1 <= parameter_choice["maxDepth"] <= 20
         assert 0.0 <= parameter_choice["minInfoGain"] <= 100.0
+        # Technically a normal distribution can return any value, even ones very
+        # far from its mean. So we can't assert on the value returned here. But
+        # there definitely should be a value of some sort in the dictionary.
+        assert "minWeightFractionPerNode" in parameter_choice
 
 
 def test_get_model_parameters_search_strategy_randomized_take_values(training_conf):

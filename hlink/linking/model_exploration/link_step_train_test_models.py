@@ -704,13 +704,19 @@ def _choose_randomized_parameters(
         # the parameter should be sampled.
         elif isinstance(value, collections.abc.Mapping):
             distribution = value["distribution"]
-            low = value["low"]
-            high = value["high"]
 
             if distribution == "randint":
+                low = value["low"]
+                high = value["high"]
                 parameter_choices[key] = rng.randint(low, high)
             elif distribution == "uniform":
+                low = value["low"]
+                high = value["high"]
                 parameter_choices[key] = rng.uniform(low, high)
+            elif distribution == "normal":
+                mean = value["mean"]
+                stdev = value["standard_deviation"]
+                parameter_choices[key] = rng.normalvariate(mean, stdev)
             else:
                 raise ValueError("unknown distribution")
         # All other types (including strings) are passed through unchanged.
