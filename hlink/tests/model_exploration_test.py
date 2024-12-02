@@ -548,6 +548,20 @@ def test_get_model_parameters_search_strategy_randomized_thresholds(training_con
         assert parameter_choice["threshold_ratio"] == 1.2
 
 
+def test_get_model_parameters_unknown_search_strategy(training_conf):
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "something",
+    }
+    training_conf["training"]["model_parameters"] = [{"type": "probit"}]
+
+    with pytest.raises(
+        ValueError,
+        match="Unknown model_parameter_search strategy 'something'. "
+        "Please choose one of 'explicit', 'grid', or 'randomized'.",
+    ):
+        _parameters = _get_model_parameters(training_conf["training"])
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------

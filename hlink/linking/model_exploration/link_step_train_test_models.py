@@ -788,7 +788,10 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
 
             return return_parameters
         else:
-            raise ValueError(f"Unknown model_parameter_search strategy '{strategy}'")
+            raise ValueError(
+                f"Unknown model_parameter_search strategy '{strategy}'. "
+                "Please choose one of 'explicit', 'grid', or 'randomized'."
+            )
     elif use_param_grid:
         return _custom_param_grid_builder(model_parameters)
 
