@@ -435,7 +435,7 @@ class LinkStepTrainTestModels(LinkStep):
 
 
         for test_data_index, outer_test_data in enumerate(outer_folds):
-            print(f"\nTesting fold {test_data_index}} -------------------------------------------------\n")
+            print(f"\nTesting fold {test_data_index} -------------------------------------------------\n")
             # Explode params into all the combinations we want to test with the current model.
             # This may use a grid search or a random search or exactly the parameters in the config.
             model_parameters = self._get_model_parameters(config)

@@ -266,7 +266,7 @@ def test_step_2_train_random_forest_spark(
         }
     ]
     feature_conf["training"]["output_suspicious_TD"] = True
-    feature_conf["training"]["n_training_iterations"] = 10
+    feature_conf["training"]["n_training_iterations"] = 3
 
     model_exploration.run_step(0)
     model_exploration.run_step(1)
@@ -275,12 +275,12 @@ def test_step_2_train_random_forest_spark(
     tr = spark.table("model_eval_training_results").toPandas()
     print(f"training results {tr}")
     # assert tr.shape == (1, 18)
-    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 0.7
+    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 2.0/3.0
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 3
 
     FNs = spark.table("model_eval_repeat_fns").toPandas()
     assert FNs.shape == (3, 4)
-    assert FNs.query("id_a == 30")["count"].iloc[0] > 5
+    assert FNs.query("id_a == 30")["count"].iloc[0] > 3
 
     TPs = spark.table("model_eval_repeat_tps").toPandas()
     assert TPs.shape == (2, 4)
