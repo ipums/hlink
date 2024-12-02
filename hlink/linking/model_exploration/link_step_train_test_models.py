@@ -718,7 +718,9 @@ def _choose_randomized_parameters(
                 stdev = value["standard_deviation"]
                 parameter_choices[key] = rng.normalvariate(mean, stdev)
             else:
-                raise ValueError("unknown distribution")
+                raise ValueError(
+                    f"Unknown distribution '{distribution}'. Please choose one of 'randint', 'uniform', or 'normal'."
+                )
         # All other types (including strings) are passed through unchanged.
         else:
             parameter_choices[key] = value

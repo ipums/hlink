@@ -496,6 +496,30 @@ def test_get_model_parameters_search_strategy_randomized_uses_seed(training_conf
     ]
 
 
+def test_get_model_parameters_search_strategy_randomized_unknown_distribution(
+    training_conf,
+):
+    """
+    Passing a distrbution other than "uniform", "randint", or "normal" is an error.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 10,
+    }
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "decision_tree",
+            "minInfoGain": {"distribution": "laplace", "location": 0.0, "scale": 1.0},
+        }
+    ]
+
+    with pytest.raises(
+        ValueError,
+        match="Unknown distribution 'laplace'. Please choose one of 'randint', 'uniform', or 'normal'.",
+    ):
+        _get_model_parameters(training_conf["training"])
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------
