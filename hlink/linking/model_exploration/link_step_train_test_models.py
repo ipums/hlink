@@ -766,17 +766,25 @@ def _get_model_parameters(training_config: dict[str, Any]) -> list[dict[str, Any
             rng = random.Random(seed)
 
             return_parameters = []
+            # These keys are special and should not be sampled or modified. All
+            # other keys are hyper-parameters to the model and should be sampled.
+            frozen_keys = {"type", "threshold", "threshold_ratio"}
             for _ in range(num_samples):
                 parameter_spec = rng.choice(model_parameters)
-                model_type = parameter_spec["type"]
-                sample_parameters = dict(
-                    (key, value)
+                sample_parameters = {
+                    key: value
                     for (key, value) in parameter_spec.items()
-                    if key != "type"
-                )
+                    if key not in frozen_keys
+                }
+                frozen_parameters = {
+                    key: value
+                    for (key, value) in parameter_spec.items()
+                    if key in frozen_keys
+                }
+
                 randomized = _choose_randomized_parameters(rng, sample_parameters)
-                randomized["type"] = model_type
-                return_parameters.append(randomized)
+                result = {**frozen_parameters, **randomized}
+                return_parameters.append(result)
 
             return return_parameters
         else:

@@ -520,6 +520,34 @@ def test_get_model_parameters_search_strategy_randomized_unknown_distribution(
         _get_model_parameters(training_conf["training"])
 
 
+def test_get_model_parameters_search_strategy_randomized_thresholds(training_conf):
+    """
+    Even when the model parameters are selected with strategy "randomized", the
+    thresholds are still treated with a "grid" strategy.
+    _get_model_parameters() is not in charge of creating the threshold matrix,
+    so it passes the threshold and threshold_ratio through unchanged.
+    """
+    training_conf["training"]["model_parameter_search"] = {
+        "strategy": "randomized",
+        "num_samples": 25,
+    }
+    training_conf["training"]["model_parameters"] = [
+        {
+            "type": "random_forest",
+            "maxDepth": [1, 10, 100],
+            "threshold": [0.3, 0.5, 0.7, 0.8, 0.9],
+            "threshold_ratio": 1.2,
+        }
+    ]
+
+    model_parameters = _get_model_parameters(training_conf["training"])
+
+    for parameter_choice in model_parameters:
+        assert parameter_choice["type"] == "random_forest"
+        assert parameter_choice["threshold"] == [0.3, 0.5, 0.7, 0.8, 0.9]
+        assert parameter_choice["threshold_ratio"] == 1.2
+
+
 # -------------------------------------
 # Tests that probably should be moved
 # -------------------------------------
