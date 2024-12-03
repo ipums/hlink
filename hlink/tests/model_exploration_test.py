@@ -78,7 +78,7 @@ def test_all(
 
     assert tr.__len__() == 2
     # TODO this should be a valid test once we fix the results output
-    #assert tr.query("threshold_ratio == 1.01")["precision_test_mean"].iloc[0] >= 0.5
+    # assert tr.query("threshold_ratio == 1.01")["precision_test_mean"].iloc[0] >= 0.5
     assert tr.query("threshold_ratio == 1.3")["alpha_threshold"].iloc[0] == 0.8
 
     # The old behavior was to process all the model types, but now we select the best
@@ -91,8 +91,8 @@ def test_all(
     #   == tr.query("threshold_ratio == 1.3")["pr_auc_mean"].iloc[0]
     # )
 
-# TODO these asserts will mostly succeed if you change the random number seed: Basically the 
-"""
+    # TODO these asserts will mostly succeed if you change the random number seed: Basically the
+    """
     preds = spark.table("model_eval_predictions").toPandas()
     assert (
         preds.query("id_a == 20 and id_b == 30")["probability"].round(2).iloc[0] > 0.5
@@ -110,7 +110,7 @@ def test_all(
 
     pred_train = spark.table("model_eval_predict_train").toPandas()
     assert pred_train.query("id_a == 20 and id_b == 50")["match"].iloc[0] == 0
-"""
+    """
     # assert pd.isnull(
     #     pred_train.query("id_a == 10 and id_b == 50")["second_best_prob"].iloc[1]
     # )
@@ -341,7 +341,7 @@ def test_step_2_train_decision_tree_spark(
 
     # TODO This is  1,12 instead of 1,13, because the precision_test_mean column is dropped as it is NaN
     assert tr.shape == (1, 12)
-    #assert tr.query("model == 'decision_tree'")["precision_test_mean"].iloc[0] > 0
+    # assert tr.query("model == 'decision_tree'")["precision_test_mean"].iloc[0] > 0
     assert tr.query("model == 'decision_tree'")["maxDepth"].iloc[0] == 3
     assert tr.query("model == 'decision_tree'")["minInstancesPerNode"].iloc[0] == 1
     assert tr.query("model == 'decision_tree'")["maxBins"].iloc[0] == 7
@@ -381,9 +381,9 @@ def test_step_2_train_gradient_boosted_trees_spark(
 
     # assert tr.shape == (1, 18)
     # TODO once the train_tgest results are properly combined this should pass
-    #assert (
+    # assert (
     #    tr.query("model == 'gradient_boosted_trees'")["precision_test_mean"].iloc[0] > 0
-    #)
+    # )
     assert tr.query("model == 'gradient_boosted_trees'")["maxDepth"].iloc[0] == 5
     assert (
         tr.query("model == 'gradient_boosted_trees'")["minInstancesPerNode"].iloc[0]

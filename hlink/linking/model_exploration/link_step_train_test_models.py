@@ -177,9 +177,6 @@ class LinkStepTrainTestModels(LinkStep):
         predictions_tmp = _get_probability_and_select_pred_columns(
             test_data, model, post_transformer, id_a, id_b, dep_var
         )
-        predict_train_tmp = _get_probability_and_select_pred_columns(
-            training_data, model, post_transformer, id_a, id_b, dep_var
-        )
 
         test_pred = predictions_tmp.toPandas()
         precision, recall, thresholds_raw = precision_recall_curve(
