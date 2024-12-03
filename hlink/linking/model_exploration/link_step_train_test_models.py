@@ -171,11 +171,17 @@ class LinkStepTrainTestModels(LinkStep):
         id_a: str,
         id_b: str,
     ) -> list[float]:
+        start_time = perf_counter()
         # Collect auc values so we can pull out the highest
         validation_results = []
         for validation_index in range(len(inner_folds)):
             validation_data = inner_folds[validation_index]
+            c_start_time = perf_counter()
             training_data = self._combine_folds(inner_folds, ignore=validation_index)
+            c_end_time = perf_counter()
+            logger.debug(
+                f"Combined inner folds to make training data, except {validation_index}, took {c_end_time - c_start_time:.2f}"
+            )
 
             cached_training_data = training_data.cache()
             cached_validation_data = validation_data.cache()
@@ -193,6 +199,11 @@ class LinkStepTrainTestModels(LinkStep):
             training_data.unpersist()
             validation_data.unpersist()
             validation_results.append(prauc)
+        end_time = perf_counter()
+        logger.debug(
+            f"Inner folds: Evaluated model + params on {len(inner_folds)} folds in {end_time - start_time:.2f}"
+        )
+        logger.debug(f"Validation results {validation_results}")
         return validation_results
 
     # Returns a list of  ModelEval instances.
@@ -207,9 +218,9 @@ class LinkStepTrainTestModels(LinkStep):
         config,
         training_conf,
     ) -> list[ModelEval]:
-        print(
-            f"Begin evaluating all {len(all_model_parameter_combos)} selected hyperparameter combinations."
-        )
+        info = f"Begin evaluating all {len(all_model_parameter_combos)} selected hyperparameter combinations."
+        print(info)
+        logger.debug(info)
         results = []
         for index, params_combo in enumerate(all_model_parameter_combos, 1):
             eval_start_info = f"Starting run {index} of {len(all_model_parameter_combos)} with these parameters: {params_combo}"
@@ -245,7 +256,9 @@ class LinkStepTrainTestModels(LinkStep):
                 threshold=threshold,
                 threshold_ratio=threshold_ratio,
             )
-            print(f"{index}: {model_eval.print()}")
+            info = f"{index}: {model_eval.print()}"
+            print(info)
+            logger.debug(info)
             results.append(model_eval)
         return results
 
@@ -320,12 +333,12 @@ class LinkStepTrainTestModels(LinkStep):
         print(f"\n======== Best Model and Parameters ========\n")
         print(f"\t{best_results}\n")
         print("=============================================\n\n")
+        logger.debug(f"Best model results: {best_results}")
 
         threshold_matrix = best_results.make_threshold_matrix()
         logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
-        print(
-            f"\nTesting the best model + parameters against all {len(threshold_matrix)} threshold combinations.\n"
-        )
+        info = f"\nTesting the best model + parameters against all {len(threshold_matrix)} threshold combinations.\n"
+        logger.debug(info)
         results_dfs: dict[int, pd.DataFrame] = {}
         for i in range(len(threshold_matrix)):
             results_dfs[i] = _create_results_df()
@@ -338,7 +351,12 @@ class LinkStepTrainTestModels(LinkStep):
                 best_results.model_type, best_results.hyperparams, dep_var
             )
         )
+        start_time = perf_counter()
         thresholding_model = thresholding_classifier.fit(cached_training_data)
+        end_time = perf_counter()
+        logger.debug(
+            f"Trained model on thresholding training data, took {end_time - start_time:.2f}s"
+        )
 
         thresholding_predictions = _get_probability_and_select_pred_columns(
             cached_test_data,
