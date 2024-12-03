@@ -131,7 +131,13 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
                         inputCol=input_col,
                         outputCol=pipeline_feature["output_column"],
                     )
+                    remove_commas_from_bucketizer_vector = RenameVectorAttributes(
+                        inputCol=bucketizer.getOutputCol(),
+                        strsToReplace=[","],
+                        replaceWith="",
+                    )
                     pipeline_stages.append(bucketizer)
+                    pipeline_stages.append(remove_commas_from_bucketizer_vector)
 
                 elif pipeline_feature["transformer_type"] == "interaction":
                     input_cols = []

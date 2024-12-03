@@ -190,6 +190,14 @@ def test_step_2_bucketizer(spark, main, conf):
     prep_pipeline = Pipeline(stages=pipeline_stages)
     prep_model = prep_pipeline.fit(tf)
     prepped_data = prep_model.transform(tf)
+
+    prepped_data.show()
+    metadata = prepped_data.schema["features_vector"].metadata
+    attributes_by_type = metadata["ml_attr"]["attrs"]
+    for _attribute_type, attributes in attributes_by_type.items():
+        for attribute in attributes:
+            print(f"""'{attribute["name"]}'""")
+
     prepped_data = prepped_data.toPandas()
 
     assert prepped_data.shape == (8, 7)
@@ -499,6 +507,11 @@ def test_step_3_with_lightgbm_model(
 def test_lightgbm_with_interacted_features(
     spark, training, training_conf, datasource_training_input
 ):
+    """
+    Interacted features add colons to vector attribute names, which cause
+    problems for LightGBM. Hlink handles this automatically by renaming the
+    vector attributes to remove the colons before invoking LightGBM.
+    """
     training_data_path, prepped_df_a_path, prepped_df_b_path = datasource_training_input
     training_conf["comparison_features"] = [
         {
@@ -536,6 +549,61 @@ def test_lightgbm_with_interacted_features(
     }
     training_conf["training"]["score_with_model"] = True
     training_conf["training"]["feature_importances"] = True
+    prepped_df_a = spark.read.csv(prepped_df_a_path, header=True, inferSchema=True)
+    prepped_df_b = spark.read.csv(prepped_df_b_path, header=True, inferSchema=True)
+
+    prepped_df_a.write.mode("overwrite").saveAsTable("prepped_df_a")
+    prepped_df_b.write.mode("overwrite").saveAsTable("prepped_df_b")
+
+    training.run_all_steps()
+
+    importances_df = spark.table("training_feature_importances")
+    importances_df.show()
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "weight",
+        "gain",
+    ]
+
+
+def test_lightgbm_with_bucketized_features(
+    spark, training, training_conf, datasource_training_input
+):
+    """
+    Bucketized features add commas to vector attribute names, which cause
+    problems for LightGBM. Hlink handles this automatically by renaming the
+    vector attributes to remove the commas before invoking LightGBM.
+    """
+    training_data_path, prepped_df_a_path, prepped_df_b_path = datasource_training_input
+    training_conf["comparison_features"] = [
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast",
+            "comparison_type": "jaro_winkler",
+        },
+    ]
+    training_conf["pipeline_features"] = [
+        {
+            "input_column": "namelast_jw",
+            "output_column": "namelast_jw_buckets",
+            "transformer_type": "bucketizer",
+            "categorical": True,
+            "splits": [0.0, 0.33, 0.67, 1.0],
+        }
+    ]
+    training_conf["training"]["dataset"] = training_data_path
+    training_conf["training"]["dependent_var"] = "match"
+    training_conf["training"]["independent_vars"] = [
+        "namelast_jw_buckets",
+    ]
+    training_conf["training"]["chosen_model"] = {
+        "type": "lightgbm",
+        "threshold": 0.5,
+    }
+    training_conf["training"]["score_with_model"] = True
+    training_conf["training"]["feature_importances"] = True
+
     prepped_df_a = spark.read.csv(prepped_df_a_path, header=True, inferSchema=True)
     prepped_df_b = spark.read.csv(prepped_df_b_path, header=True, inferSchema=True)
 

@@ -68,21 +68,29 @@ class RenameVectorAttributes(Transformer, HasInputCol):
         to_replace = self.getOrDefault("strsToReplace")
         replacement_str = self.getOrDefault("replaceWith")
         metadata = dataset.schema[input_col].metadata
-        attributes_by_type = metadata["ml_attr"]["attrs"]
 
         logger.debug(
             f"Renaming the attributes of vector column '{input_col}': "
             f"replacing {to_replace} with '{replacement_str}'"
         )
 
-        # The attributes are grouped by type, which may be numeric, binary, or
-        # nominal. We don't care about the type here; we'll just rename all of
-        # the attributes.
-        for _attribute_type, attributes in attributes_by_type.items():
-            for attribute in attributes:
+        if "attrs" in metadata["ml_attr"]:
+            attributes_by_type = metadata["ml_attr"]["attrs"]
+
+            # The attributes are grouped by type, which may be numeric, binary, or
+            # nominal. We don't care about the type here; we'll just rename all of
+            # the attributes.
+            for _attribute_type, attributes in attributes_by_type.items():
+                for attribute in attributes:
+                    for substring in to_replace:
+                        attribute["name"] = attribute["name"].replace(
+                            substring, replacement_str
+                        )
+        elif "vals" in metadata["ml_attr"]:
+            values = metadata["ml_attr"]["vals"]
+
+            for index in range(len(values)):
                 for substring in to_replace:
-                    attribute["name"] = attribute["name"].replace(
-                        substring, replacement_str
-                    )
+                    values[index] = values[index].replace(substring, replacement_str)
 
         return dataset.withMetadata(input_col, metadata)
