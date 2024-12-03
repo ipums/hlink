@@ -27,7 +27,36 @@ from hlink.linking.link_step import LinkStep
 #   This is a refactor to make the train-test model process faster.
 """
 
-Current algorithm:
+Current Nested CV implementation:
+
+1. Prepare train-test data
+2.  Split prepared  data into 'n' outer folds (distinct pieces.)
+3. For 'outer_index' in outer folds length:
+    test_data := outer_folds[outer_fold_index]
+    training_data := combine(outer_folds, excluding = outer_fold_index)
+
+    model_results := []
+    inner_folds := split training_data into 'j' inner folds
+    for inner_fold_index in inner_folds length:
+        inner_test_data := inner_folds[inner_fold_index]
+        inner_training_data := combine(inner_folds, exclude = inner_fold_index)
+        for param_set in all_hyper_params():
+                model_results.append(train_test(params, inner_test_data, inner_training_data))
+    score_models(model_results)
+    best_model := select_best_model(model_results)
+
+    for threshold_values in all_threshold_combinations:
+        train_test_results :=  train_test(best_model, test_data, training_data)
+        collect_train_test_results(train_test_results)
+4.. Report train_test_results
+
+
+
+Complexity: n*t + n*j*p
+
+j == inner folds, n == outer folds, t == threshold combinations, p == hyper-parameter tests (grid, random)
+
+Revised algorithm:
 
 1. Prepare test-train data
 2. split data into n pairs of training and test data. In our tests n == 10.
