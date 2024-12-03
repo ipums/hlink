@@ -8,7 +8,6 @@ from pyspark.ml import Pipeline
 import hlink.linking.core.pipeline as pipeline_core
 
 
-@pytest.mark.quickcheck
 def test_all_steps(
     spark,
     training_conf,

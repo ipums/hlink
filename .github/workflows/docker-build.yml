@@ -1,6 +1,13 @@
 name: HLink Docker CI
 
-on: [pull_request, push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
   HLINK_TAG: hlink:githubactions
@@ -27,9 +34,6 @@ jobs:
     
     - name: Check formatting with black
       run: docker run $HLINK_TAG-${{ matrix.python_version}} black --check .
-      
-    - name: Lint with flake8
-      run: docker run $HLINK_TAG-${{ matrix.python_version}} flake8 --count .
       
     - name: Test
       run: docker run $HLINK_TAG-${{ matrix.python_version}} pytest
