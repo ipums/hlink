@@ -386,6 +386,7 @@ class LinkStepTrainTestModels(LinkStep):
                 f"{this_alpha_threshold=} and {this_threshold_ratio=}"
             )
             logger.debug(diag)
+            start_predict_time = perf_counter()
             predictions = threshold_core.predict_using_thresholds(
                 thresholding_predictions,
                 this_alpha_threshold,
@@ -401,6 +402,10 @@ class LinkStepTrainTestModels(LinkStep):
                 config["id_column"],
             )
 
+            end_predict_time = perf_counter()
+            info = f"Predictions for test-train data on threshold took {end_predict_time - start_predict_time:.2f}s"
+            logger.debug(info)
+
             results_dfs[i] = self._capture_results(
                 predictions,
                 predict_train,
@@ -413,14 +418,15 @@ class LinkStepTrainTestModels(LinkStep):
                 best_results.score,
             )
 
-            # for i in range(len(threshold_matrix)):
+            i += 1
+
+        for i in range(len(threshold_matrix)):
             thresholded_metrics_df = _append_results(
                 thresholded_metrics_df,
                 results_dfs[i],
                 best_results.model_type,
                 best_results.hyperparams,
             )
-            i += 1
 
         thresholding_test_data.unpersist()
         thresholding_training_data.unpersist()
