@@ -518,7 +518,7 @@ class LinkStepTrainTestModels(LinkStep):
 
         self._save_training_results(thresholded_metrics_df, self.task.spark)
         self._save_otd_data(suspicious_data, self.task.spark)
-        self.task.spark.sql("set spark.sql.shuffle.partitions=32")
+        self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
     def _split_into_folds(
         self, data: pyspark.sql.DataFrame, fold_count: int
