@@ -508,7 +508,9 @@ class LinkStepTrainTestModels(LinkStep):
                 f"Combine non-test outer folds into {outer_training_data.count()} training data records."
             )
 
-            inner_folds = self._split_into_folds(outer_training_data, inner_fold_count)
+            inner_folds = self._split_into_folds(
+                outer_training_data, inner_fold_count, seed
+            )
 
             hyperparam_evaluation_results = self._evaluate_hyperparam_combinations(
                 model_parameters,
@@ -550,10 +552,10 @@ class LinkStepTrainTestModels(LinkStep):
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
     def _split_into_folds(
-        self, data: pyspark.sql.DataFrame, fold_count: int
+        self, data: pyspark.sql.DataFrame, fold_count: int, seed: int
     ) -> list[pyspark.sql.DataFrame]:
         weights = [1.0 / fold_count for i in range(fold_count)]
-        return data.randomSplit(weights)
+        return data.randomSplit(weights, seed=seed)
 
     def _combine_folds(
         self, folds: list[pyspark.sql.DataFrame], ignore=None
