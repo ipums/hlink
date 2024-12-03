@@ -131,6 +131,13 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
                         inputCol=input_col,
                         outputCol=pipeline_feature["output_column"],
                     )
+
+                    # Spark's Bucketizer adds commas to its output vector slot
+                    # names. This causes issues later in the pipeline if the ML
+                    # model chosen is LightGBM. So we rename the slots here to
+                    # remove the commas. A similar issue happens with
+                    # Interaction below; see the comment there for a more
+                    # detailed description.
                     remove_commas_from_bucketizer_vector = RenameVectorAttributes(
                         inputCol=bucketizer.getOutputCol(),
                         strsToReplace=[","],

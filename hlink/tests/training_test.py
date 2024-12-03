@@ -190,14 +190,6 @@ def test_step_2_bucketizer(spark, main, conf):
     prep_pipeline = Pipeline(stages=pipeline_stages)
     prep_model = prep_pipeline.fit(tf)
     prepped_data = prep_model.transform(tf)
-
-    prepped_data.show()
-    metadata = prepped_data.schema["features_vector"].metadata
-    attributes_by_type = metadata["ml_attr"]["attrs"]
-    for _attribute_type, attributes in attributes_by_type.items():
-        for attribute in attributes:
-            print(f"""'{attribute["name"]}'""")
-
     prepped_data = prepped_data.toPandas()
 
     assert prepped_data.shape == (8, 7)
@@ -558,7 +550,6 @@ def test_lightgbm_with_interacted_features(
     training.run_all_steps()
 
     importances_df = spark.table("training_feature_importances")
-    importances_df.show()
     assert importances_df.columns == [
         "feature_name",
         "category",
@@ -567,6 +558,7 @@ def test_lightgbm_with_interacted_features(
     ]
 
 
+@requires_lightgbm
 def test_lightgbm_with_bucketized_features(
     spark, training, training_conf, datasource_training_input
 ):
