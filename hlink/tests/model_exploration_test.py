@@ -307,7 +307,9 @@ def test_step_2_train_logistic_regression_spark(
     tr = spark.table("model_eval_training_results").toPandas()
 
     assert tr.shape == (1, 9)
+    # This is now 0.83333333333.... I'm not sure it's worth testing against
     # assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.75
+    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] > 0.74
     assert (
         round(tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0], 1)
         == 0.7
