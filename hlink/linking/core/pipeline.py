@@ -12,6 +12,7 @@ from pyspark.ml.feature import (
     Interaction,
 )
 import hlink.linking.transformers.float_cast_transformer
+from hlink.linking.transformers.rename_vector_attributes import RenameVectorAttributes
 import logging
 
 logger = logging.getLogger(__name__)
@@ -130,7 +131,20 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
                         inputCol=input_col,
                         outputCol=pipeline_feature["output_column"],
                     )
+
+                    # Spark's Bucketizer adds commas to its output vector slot
+                    # names. This causes issues later in the pipeline if the ML
+                    # model chosen is LightGBM. So we rename the slots here to
+                    # remove the commas. A similar issue happens with
+                    # Interaction below; see the comment there for a more
+                    # detailed description.
+                    remove_commas_from_bucketizer_vector = RenameVectorAttributes(
+                        inputCol=bucketizer.getOutputCol(),
+                        strsToReplace=[","],
+                        replaceWith="",
+                    )
                     pipeline_stages.append(bucketizer)
+                    pipeline_stages.append(remove_commas_from_bucketizer_vector)
 
                 elif pipeline_feature["transformer_type"] == "interaction":
                     input_cols = []
@@ -143,7 +157,25 @@ def generate_pipeline_stages(conf, ind_vars, tf, tconf):
                         inputCols=input_cols,
                         outputCol=pipeline_feature["output_column"],
                     )
+
+                    # Spark's Interaction creates its output vector attribute names
+                    # by concatenating the input column names with colons :. This
+                    # works fine for most of the down-pipeline transformers, but
+                    # LightGBM cannot run with attribute names that contain colons.
+                    # So this custom hlink transformer replaces colons in the vector
+                    # attribute names with underscores.
+                    #
+                    # Without this step, the colons propagate into the attribute
+                    # names for the features vector created by the VectorAssembler
+                    # and cause an error when training a LightGBM model.
+                    remove_colons_from_interaction_vector = RenameVectorAttributes(
+                        inputCol=interaction.getOutputCol(),
+                        strsToReplace=[":"],
+                        replaceWith="_",
+                    )
+
                     pipeline_stages.append(interaction)
+                    pipeline_stages.append(remove_colons_from_interaction_vector)
 
     if len(categorical_pipeline_features) > 0:
         encoded_output_cols = [
