@@ -48,7 +48,11 @@
 <p>You must supply a substitution file and either specify <code class="docutils literal notranslate"><span class="pre">regex_word_replace=true</span></code> or supply a join value.</p>
 <section id="substitution-by-data-table">
 <h2>1:1 substitution by data table<a class="headerlink" href="#substitution-by-data-table" title="Link to this heading">¶</a></h2>
-<p>Performs a 1:1 replacement on a filtered subset of the data table.  If the input column data equals a value in the first column of the substitution file, it is replaced with the data in the second column of the substitution file.  Used to replace variant name forms with standardized name forms, filtering on sex.</p>
+<p>Performs a 1:1 replacement on a filtered subset of the data table.  If the
+input column data equals a value in the second column of the substitution file,
+it is replaced with the data in the first column of the substitution file.
+Used to replace variant name forms with standardized name forms, filtering on
+a column like sex which may affect common names.</p>
 <ul class="simple">
 <li><p>Attributes:</p>
 <ul>

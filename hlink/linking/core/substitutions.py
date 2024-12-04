@@ -4,10 +4,18 @@
 #   https://github.com/ipums/hlink
 
 from collections import namedtuple
+from typing import Any
+
+from pyspark import SparkContext
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import concat_ws, lit, regexp_replace, split, when
 
 
-def generate_substitutions(spark, df_selected, substitution_columns):
+def generate_substitutions(
+    spark: SparkSession,
+    df_selected: DataFrame,
+    substitution_columns: list[dict[str, Any]],
+) -> DataFrame:
     for substitution_column in substitution_columns:
         column_name = substitution_column["column_name"]
         for substitution in substitution_column["substitutions"]:
@@ -29,7 +37,7 @@ def generate_substitutions(spark, df_selected, substitution_columns):
     return df_selected
 
 
-def _load_substitutions(file_name):
+def _load_substitutions(file_name: str) -> tuple[list[str], list[str]]:
     """Reads in the substitution file and returns a 2-tuple representing it.
 
     Parameters
@@ -51,7 +59,9 @@ def _load_substitutions(file_name):
     return (sub_froms, sub_tos)
 
 
-def _apply_substitution(df, column_name, substitution, sc):
+def _apply_substitution(
+    df: DataFrame, column_name: str, substitution: dict[str, Any], sc: SparkContext
+) -> DataFrame:
     """Returns a new df with the values in the column column_name replaced using substitutions defined in substitution_file."""
     substitution_file = substitution["substitution_file"]
     join_value = substitution["join_value"]
@@ -81,7 +91,9 @@ def _apply_substitution(df, column_name, substitution, sc):
     return df_sub.select(df_sub_selects)
 
 
-def _apply_regex_substitution(df, column_name, substitution, sc):
+def _apply_regex_substitution(
+    df: DataFrame, column_name: str, substitution: dict[str, Any], sc: SparkContext
+) -> DataFrame:
     """Returns a new df with the values in the column column_name replaced using substitutions defined in substitution_file."""
 
     substitution_file = substitution["substitution_file"]
