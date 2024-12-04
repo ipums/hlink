@@ -34,19 +34,40 @@
             
   <section id="models">
 <h1>Models<a class="headerlink" href="#models" title="Link to this heading">¶</a></h1>
-<p>These are models available to be used in the model evaluation, training, and household training link tasks.</p>
+<p>These are the machine learning models available for use in the model evaluation
+and training tasks and in their household counterparts.</p>
+<p>There are a few attributes available for all models.</p>
 <ul class="simple">
-<li><p>Attributes for all models:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">threshold</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">float</span></code>.  Alpha threshold (model hyperparameter).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">threshold_ratio</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">float</span></code>.  Beta threshold (de-duplication distance ratio).</p></li>
-<li><p>Any parameters available in the model as defined in the Spark documentation can be passed as params using the label given in the Spark docs.  Commonly used parameters are listed below with descriptive explanations from the Spark docs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. The name of the model type. The available model
+types are listed below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">threshold</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">float</span></code>.  The “alpha threshold”. This is the probability
+score required for a potential match to be labeled a match. <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">≤</span> <span class="pre">threshold</span> <span class="pre">≤</span> <span class="pre">1</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">threshold_ratio</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">float</span></code>. The threshold ratio or “beta threshold”.
+This applies to records which have multiple potential matches when
+<code class="docutils literal notranslate"><span class="pre">training.decision</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;drop_duplicate_with_threshold_ratio&quot;</span></code>. For
+each record, only potential matches which have the highest probability, have
+a probability of at least <code class="docutils literal notranslate"><span class="pre">threshold</span></code>, <em>and</em> whose probabilities are at least
+<code class="docutils literal notranslate"><span class="pre">threshold_ratio</span></code> times larger than the second-highest probability are
+matches. This is sometimes called the “de-duplication distance ratio”. <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">≤</span> <span class="pre">threshold_ratio</span> <span class="pre">&lt;</span> <span class="pre">∞</span></code>.</p></li>
 </ul>
-</li>
-</ul>
+<p>In addition, any model parameters documented in a model type’s Spark
+documentation can be passed as parameters to the model through hlink’s
+<code class="docutils literal notranslate"><span class="pre">training.chosen_model</span></code> and <code class="docutils literal notranslate"><span class="pre">training.model_exploration</span></code> configuration
+sections.</p>
+<p>Here is an example <code class="docutils literal notranslate"><span class="pre">training.chosen_model</span></code> configuration. The <code class="docutils literal notranslate"><span class="pre">type</span></code>,
+<code class="docutils literal notranslate"><span class="pre">threshold</span></code>, and <code class="docutils literal notranslate"><span class="pre">threshold_ratio</span></code> attributes are hlink specific. <code class="docutils literal notranslate"><span class="pre">maxDepth</span></code> is
+a parameter to the random forest model which hlink passes through to the
+underlying Spark classifier.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;random_forest&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2</span>
+<span class="n">maxDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+</pre></div>
+</div>
 <section id="random-forest">
 <h2>random_forest<a class="headerlink" href="#random-forest" title="Link to this heading">¶</a></h2>
-<p>Uses <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.classification.RandomForestClassifier.html">pyspark.ml.classification.RandomForestClassifier</a>.  Returns probability as an array.</p>
+<p>Uses <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.classification.RandomForestClassifier.html">pyspark.ml.classification.RandomForestClassifier</a>.</p>
 <ul class="simple">
 <li><p>Parameters:</p>
 <ul>
@@ -56,36 +77,33 @@
 </ul>
 </li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_parameters</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span>
-    <span class="n">maxDepth</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="n">numTrees</span> <span class="o">=</span> <span class="mi">75</span><span class="p">,</span>
-    <span class="n">featureSubsetStrategy</span> <span class="o">=</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
-    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">,</span>
-    <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
-<span class="p">}</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;random_forest&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.15</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="n">maxDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">numTrees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">75</span>
+<span class="n">featureSubsetStrategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sqrt&quot;</span>
 </pre></div>
 </div>
 </section>
 <section id="probit">
 <h2>probit<a class="headerlink" href="#probit" title="Link to this heading">¶</a></h2>
 <p>Uses <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.regression.GeneralizedLinearRegression.html">pyspark.ml.regression.GeneralizedLinearRegression</a> with <code class="docutils literal notranslate"><span class="pre">family=&quot;binomial&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">link=&quot;probit&quot;</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_parameters</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span>
-    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span>
-    <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.2</span>
-<span class="p">}</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;probit&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.85</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.2</span>
 </pre></div>
 </div>
 </section>
 <section id="logistic-regression">
 <h2>logistic_regression<a class="headerlink" href="#logistic-regression" title="Link to this heading">¶</a></h2>
 <p>Uses <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.classification.LogisticRegression.html">pyspark.ml.classification.LogisticRegression</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_model</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span>
-    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
-<span class="p">}</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;logistic_regression&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
 </pre></div>
 </div>
 </section>
@@ -101,12 +119,13 @@
 </ul>
 </li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_model</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;decision_tree&quot;</span><span class="p">,</span>
-    <span class="n">maxDepth</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-    <span class="n">minInstancesPerNode</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">maxBins</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="p">}</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;decision_tree&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5</span>
+<span class="n">maxDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span>
+<span class="n">minInstancesPerNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">maxBins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
 </pre></div>
 </div>
 </section>
@@ -122,14 +141,84 @@
 </ul>
 </li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chosen_model</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;gradient_boosted_trees&quot;</span><span class="p">,</span>
-    <span class="n">maxDepth</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="n">minInstancesPerNode</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">maxBins</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
-    <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.3</span>
-<span class="p">}</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;gradient_boosted_trees&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.7</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.3</span>
+<span class="n">maxDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+<span class="n">minInstancesPerNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">maxBins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span>
+</pre></div>
+</div>
+</section>
+<section id="xgboost">
+<h2>xgboost<a class="headerlink" href="#xgboost" title="Link to this heading">¶</a></h2>
+<p><em>Added in version 3.8.0.</em></p>
+<p>XGBoost is an alternate, high-performance implementation of gradient boosting.
+It uses <a class="reference external" href="https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.spark.SparkXGBClassifier">xgboost.spark.SparkXGBClassifier</a>.
+Since the XGBoost-PySpark integration which the xgboost Python package provides
+is currently unstable, support for the xgboost model type is disabled in hlink
+by default. hlink will stop with an error if you try to use this model type
+without enabling support for it. To enable support for xgboost, install hlink
+with the <code class="docutils literal notranslate"><span class="pre">xgboost</span></code> extra.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hlink</span><span class="p">[</span><span class="n">xgboost</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This installs the xgboost package and its Python dependencies. Depending on
+your machine and operating system, you may also need to install the libomp
+library, which is another dependency of xgboost. xgboost should raise a helpful
+error if it detects that you need to install libomp.</p>
+<p>You can view a list of xgboost’s parameters
+<a class="reference external" href="https://xgboost.readthedocs.io/en/latest/parameter.html">here</a>.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;xgboost&quot;</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5</span>
+<span class="n">max_depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">eta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="n">gamma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span>
+</pre></div>
+</div>
+</section>
+<section id="lightgbm">
+<h2>lightgbm<a class="headerlink" href="#lightgbm" title="Link to this heading">¶</a></h2>
+<p><em>Added in version 3.8.0.</em></p>
+<p>LightGBM is another alternate, high-performance implementation of gradient
+boosting. It uses
+<a class="reference external" href="https://mmlspark.blob.core.windows.net/docs/1.0.8/pyspark/synapse.ml.lightgbm.html#module-synapse.ml.lightgbm.LightGBMClassifier">synapse.ml.lightgbm.LightGBMClassifier</a>.
+<code class="docutils literal notranslate"><span class="pre">synapse.ml</span></code> is a library which provides various integrations with PySpark,
+including integrations between the C++ LightGBM library and PySpark.</p>
+<p>LightGBM requires some additional Scala libraries that hlink does not usually
+install, so support for the lightgbm model is disabled in hlink by default.
+hlink will stop with an error if you try to use this model type without
+enabling support for it. To enable support for lightgbm, install hlink with the
+<code class="docutils literal notranslate"><span class="pre">lightgbm</span></code> extra.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hlink</span><span class="p">[</span><span class="n">lightgbm</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This installs the lightgbm package and its Python dependencies. Depending on
+your machine and operating system, you may also need to install the libomp
+library, which is another dependency of lightgbm. If you encounter errors when
+training a lightgbm model, please try installing libomp if you do not have it
+installed.</p>
+<p>lightgbm has an enormous number of available parameters. Many of these are
+available as normal in hlink, via the <a class="reference external" href="https://mmlspark.blob.core.windows.net/docs/1.0.8/pyspark/synapse.ml.lightgbm.html#module-synapse.ml.lightgbm.LightGBMClassifier">LightGBMClassifier
+class</a>.
+Others are available through the special <code class="docutils literal notranslate"><span class="pre">passThroughArgs</span></code> parameter, which
+passes additional parameters through to the C++ library. You can see a full
+list of the supported parameters
+<a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/Parameters.html">here</a>.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.chosen_model]</span>
+<span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;lightgbm&quot;</span>
+<span class="c1"># hlink&#39;s threshold and threshold_ratio</span>
+<span class="n">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span>
+<span class="n">threshold_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5</span>
+<span class="c1"># LightGBMClassifier supports these parameters (and many more).</span>
+<span class="n">maxDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">learningRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="c1"># LightGBMClassifier does not directly support this parameter,</span>
+<span class="c1"># so we have to send it to the C++ library with passThroughArgs.</span>
+<span class="n">passThroughArgs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;force_row_wise=true&quot;</span>
 </pre></div>
 </div>
 </section>
@@ -183,6 +272,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#logistic-regression">logistic_regression</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#decision-tree">decision_tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gradient-boosted-trees">gradient_boosted_trees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#xgboost">xgboost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lightgbm">lightgbm</a></li>
 </ul>
 </li>
 </ul>

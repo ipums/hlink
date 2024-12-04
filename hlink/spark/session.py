@@ -17,6 +17,17 @@ from pyspark.sql.types import (
     StructType,
 )
 
+# SynapseML is a package which provides LightGBM-Spark integration for hlink.
+# It's an optional dependency. When it is installed, we need to download an
+# additional Scala library by setting some Spark configurations. When it's not
+# installed, we avoid downloading the extra library since it won't be useful.
+try:
+    import synapse.ml  # noqa: F401
+except ModuleNotFoundError:
+    _synapse_ml_available = False
+else:
+    _synapse_ml_available = True
+
 
 class SparkConnection:
     """Handles initialization of spark session and connection to local cluster."""
@@ -59,6 +70,16 @@ class SparkConnection:
 
         if os.path.isfile(jar_path):
             conf = conf.set("spark.jars", jar_path)
+
+        # A bit of a kludge. We set spark.jars.repositories here in the configuration,
+        # but then we actually download the SynapseML Scala jar later in connect().
+        # See the comment on the ADD JAR SQL statement in connect() for some more
+        # context.
+        #
+        # SynapseML used to be named MMLSpark, thus the URL.
+        if _synapse_ml_available:
+            conf.set("spark.jars.repositories", "https://mmlspark.azureedge.net/maven")
+
         return conf
 
     def local(self, cores=1, executor_memory="10G"):
@@ -96,6 +117,18 @@ class SparkConnection:
         session.catalog.setCurrentDatabase(self.db_name)
         session.sparkContext.setCheckpointDir(str(self.tmp_dir))
         self._register_udfs(session)
+
+        # If the SynapseML Python package is available, include the Scala
+        # package as well. Note that we have to pin to a particular version of
+        # the Scala package here.
+        #
+        # Despite what the documentation for the spark.jars.packages config setting
+        # says, this is the only way that I have found to include this jar for both
+        # the driver and the executors. Setting spark.jars.packages caused errors
+        # because the executors could not find the jar.
+        if _synapse_ml_available:
+            session.sql("ADD JAR ivy://com.microsoft.azure:synapseml_2.12:1.0.8")
+
         return session
 
     def _register_udfs(self, session):

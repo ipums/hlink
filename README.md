@@ -26,18 +26,55 @@ We do our best to make hlink compatible with Python 3.10-3.12. If you have a
 problem using hlink on one of these versions of Python, please open an issue
 through GitHub. Versions of Python older than 3.10 are not supported.
 
-Note that pyspark 3.5 does not yet officially support Python 3.12. If you
-encounter pyspark-related import errors while running hlink on Python 3.12, try
+Note that PySpark 3.5 does not yet officially support Python 3.12. If you
+encounter PySpark-related import errors while running hlink on Python 3.12, try
 
 - Installing the setuptools package. The distutils package was deleted from the
-  standard library in Python 3.12, but some versions of pyspark still import
+  standard library in Python 3.12, but some versions of PySpark still import
   it. The setuptools package provides a hacky stand-in distutils library which
-  should fix some import errors in pyspark. We install setuptools in our
+  should fix some import errors in PySpark. We install setuptools in our
   development and test dependencies so that our tests work on Python 3.12.
 
-- Downgrading Python to 3.10 or 3.11. Pyspark officially supports these
-  versions of Python. So you should have better chances getting pyspark to work
+- Downgrading Python to 3.10 or 3.11. PySpark officially supports these
+  versions of Python. So you should have better chances getting PySpark to work
   well on Python 3.10 or 3.11.
+
+### Additional Machine Learning Algorithms
+
+hlink has optional support for two additional machine learning algorithms,
+[XGBoost](https://xgboost.readthedocs.io/en/stable/index.html) and
+[LightGBM](https://lightgbm.readthedocs.io/en/latest/index.html). Both of these
+algorithms are highly performant gradient boosting libraries, each with its own
+characteristics. These algorithms are not implemented directly in Spark, so
+they require some additional dependencies. To install the required Python
+dependencies, run
+
+```
+pip install hlink[xgboost]
+```
+
+for XGBoost or
+
+```
+pip install hlink[lightgbm]
+```
+
+for LightGBM. If you would like to install both at once, you can run
+
+```
+pip install hlink[xgboost,lightgbm]
+```
+
+to get the Python dependencies for both. Both XGBoost and LightGBM also require
+libomp, which will need to be installed separately if you don't already have it.
+
+After installing the dependencies for one or both of these algorithms, you can
+use them as model types in training and model exploration. You can read more
+about these models in the hlink documentation [here](https://hlink.docs.ipums.org/models.html).
+
+*Note: The XGBoost-PySpark integration provided by the xgboost Python package is
+currently unstable. So the hlink xgboost support is experimental and may change
+in the future.*
 
 ## Docs
 

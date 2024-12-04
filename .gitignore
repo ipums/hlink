@@ -15,6 +15,7 @@ scala_jar/target
 scala_jar/project/target
 *.class
 *.cache
+.metals/
 
 # MacOS
 .DS_Store
