@@ -3,11 +3,15 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-import statistics
+import collections.abc
 import itertools
 import logging
 import math
+import random
 import re
+import statistics
+import sys
+from textwrap import dedent
 from time import perf_counter
 from dataclasses import dataclass
 from typing import Any
@@ -492,7 +496,7 @@ class LinkStepTrainTestModels(LinkStep):
             )
             # Explode params into all the combinations we want to test with the current model.
             # This may use a grid search or a random search or exactly the parameters in the config.
-            model_parameters = self._get_model_parameters(config)
+            model_parameters = _get_model_parameters(training_settings)
 
             outer_training_data = self._combine_folds(
                 outer_folds, ignore=test_data_index
@@ -632,35 +636,6 @@ class LinkStepTrainTestModels(LinkStep):
             )
         return splits
 
-    def _custom_param_grid_builder(self, conf: dict[str, Any]) -> list[dict[str, Any]]:
-        print("Building param grid for models")
-        given_parameters = conf[f"{self.task.training_conf}"]["model_parameters"]
-        new_params = []
-        for run in given_parameters:
-            params = run.copy()
-            model_type = params.pop("type")
-
-            # dropping thresholds to prep for scikitlearn model exploration refactor
-            threshold = params.pop("threshold", False)
-            threshold_ratio = params.pop("threshold_ratio", False)
-
-            keys = params.keys()
-            values = params.values()
-
-            params_exploded = []
-            for prod in itertools.product(*values):
-                params_exploded.append(dict(zip(keys, prod)))
-
-            for subdict in params_exploded:
-                subdict["type"] = model_type
-                if threshold:
-                    subdict["threshold"] = threshold
-                if threshold_ratio:
-                    subdict["threshold_ratio"] = threshold_ratio
-
-            new_params.extend(params_exploded)
-        return new_params
-
     def _capture_results(
         self,
         predictions: pyspark.sql.DataFrame,
@@ -720,18 +695,6 @@ class LinkStepTrainTestModels(LinkStep):
             },
         )
         return pd.concat([results_df, new_results], ignore_index=True)
-
-    def _get_model_parameters(self, conf: dict[str, Any]) -> list[dict[str, Any]]:
-        training_conf = str(self.task.training_conf)
-
-        model_parameters = conf[training_conf]["model_parameters"]
-        if "param_grid" in conf[training_conf] and conf[training_conf]["param_grid"]:
-            model_parameters = self._custom_param_grid_builder(conf)
-        elif model_parameters == []:
-            raise ValueError(
-                "No model parameters found. In 'training' config, either supply 'model_parameters' or 'param_grid'."
-            )
-        return model_parameters
 
     def _save_training_results(
         self, desc_df: pd.DataFrame, spark: pyspark.sql.SparkSession
@@ -1119,3 +1082,145 @@ def _create_thresholded_metrics_df() -> pd.DataFrame:
             "mcc_train_sd",
         ]
     )
+
+
+def _custom_param_grid_builder(
+    model_parameters: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    print("Building param grid for models")
+    given_parameters = model_parameters
+    new_params = []
+    for run in given_parameters:
+        params = run.copy()
+        model_type = params.pop("type")
+
+        # dropping thresholds to prep for scikitlearn model exploration refactor
+        threshold = params.pop("threshold", False)
+        threshold_ratio = params.pop("threshold_ratio", False)
+
+        keys = params.keys()
+        values = params.values()
+
+        params_exploded = []
+        for prod in itertools.product(*values):
+            params_exploded.append(dict(zip(keys, prod)))
+
+        for subdict in params_exploded:
+            subdict["type"] = model_type
+            if threshold:
+                subdict["threshold"] = threshold
+            if threshold_ratio:
+                subdict["threshold_ratio"] = threshold_ratio
+
+        new_params.extend(params_exploded)
+    return new_params
+
+
+def _choose_randomized_parameters(
+    rng: random.Random, model_parameters: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Choose a randomized setting of parameters from the given specification.
+    """
+    parameter_choices = dict()
+
+    for key, value in model_parameters.items():
+        # If it's a Sequence (usually list) but not a string, choose one of the values at random.
+        if isinstance(value, collections.abc.Sequence) and not isinstance(value, str):
+            parameter_choices[key] = rng.choice(value)
+        # If it's a Mapping (usually dict), it defines a distribution from which
+        # the parameter should be sampled.
+        elif isinstance(value, collections.abc.Mapping):
+            distribution = value["distribution"]
+
+            if distribution == "randint":
+                low = value["low"]
+                high = value["high"]
+                parameter_choices[key] = rng.randint(low, high)
+            elif distribution == "uniform":
+                low = value["low"]
+                high = value["high"]
+                parameter_choices[key] = rng.uniform(low, high)
+            elif distribution == "normal":
+                mean = value["mean"]
+                stdev = value["standard_deviation"]
+                parameter_choices[key] = rng.normalvariate(mean, stdev)
+            else:
+                raise ValueError(
+                    f"Unknown distribution '{distribution}'. Please choose one of 'randint', 'uniform', or 'normal'."
+                )
+        # All other types (including strings) are passed through unchanged.
+        else:
+            parameter_choices[key] = value
+
+    return parameter_choices
+
+
+def _get_model_parameters(training_settings: dict[str, Any]) -> list[dict[str, Any]]:
+    if "param_grid" in training_settings:
+        print(
+            dedent(
+                """\
+                Deprecation Warning: training.param_grid is deprecated.
+
+                Please use training.model_parameter_search instead by replacing
+
+                `param_grid = True` with `model_parameter_search = {strategy = "grid"}` or
+                `param_grid = False` with `model_parameter_search = {strategy = "explicit"}`
+
+                [deprecated_in_version=4.0.0]"""
+            ),
+            file=sys.stderr,
+        )
+
+    model_parameters = training_settings["model_parameters"]
+    model_parameter_search = training_settings.get("model_parameter_search")
+    seed = training_settings.get("seed")
+    use_param_grid = training_settings.get("param_grid", False)
+
+    if model_parameters == []:
+        raise ValueError(
+            "model_parameters is empty, so there are no models to evaluate"
+        )
+
+    if model_parameter_search is not None:
+        strategy = model_parameter_search["strategy"]
+        if strategy == "explicit":
+            return model_parameters
+        elif strategy == "grid":
+            return _custom_param_grid_builder(model_parameters)
+        elif strategy == "randomized":
+            num_samples = model_parameter_search["num_samples"]
+            rng = random.Random(seed)
+
+            return_parameters = []
+            # These keys are special and should not be sampled or modified. All
+            # other keys are hyper-parameters to the model and should be sampled.
+            frozen_keys = {"type", "threshold", "threshold_ratio"}
+            for _ in range(num_samples):
+                parameter_spec = rng.choice(model_parameters)
+                sample_parameters = {
+                    key: value
+                    for (key, value) in parameter_spec.items()
+                    if key not in frozen_keys
+                }
+                frozen_parameters = {
+                    key: value
+                    for (key, value) in parameter_spec.items()
+                    if key in frozen_keys
+                }
+
+                randomized = _choose_randomized_parameters(rng, sample_parameters)
+                result = {**frozen_parameters, **randomized}
+                return_parameters.append(result)
+
+            return return_parameters
+        else:
+            raise ValueError(
+                f"Unknown model_parameter_search strategy '{strategy}'. "
+                "Please choose one of 'explicit', 'grid', or 'randomized'."
+            )
+    elif use_param_grid:
+        return _custom_param_grid_builder(model_parameters)
+
+    return model_parameters
