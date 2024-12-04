@@ -1404,7 +1404,7 @@ def hh_training_conf(spark, conf, hh_training_data_path):
         "dataset": hh_training_data_path,
         "dependent_var": "match",
         "prediction_col": "match",
-        "n_training_iterations": 4,
+        "n_training_iterations": 3,
         "seed": 120,
         "independent_vars": [
             "namelast_jw",
@@ -1423,14 +1423,7 @@ def hh_training_conf(spark, conf, hh_training_data_path):
             "threshold_ratio": 1.2,
         },
         "model_parameters": [
-            {"type": "logistic_regression", "threshold": 0.5, "threshold_ratio": 1.2},
-            {
-                "type": "random_forest",
-                "maxDepth": 5.0,
-                "numTrees": 75.0,
-                "threshold": 0.5,
-                "threshold_ratio": 1.2,
-            },
+            {"type": "logistic_regression", "threshold": 0.5, "threshold_ratio": 1.2}
         ],
     }
     conf["column_mappings"] = [
