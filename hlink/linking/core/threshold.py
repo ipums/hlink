@@ -3,11 +3,16 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from typing import Any
+
+from pyspark.sql import DataFrame
 from pyspark.sql.window import Window
 from pyspark.sql.functions import rank, lead
 
 
-def get_threshold_ratio(training_conf, model_conf, default=1.3):
+def get_threshold_ratio(
+    training_conf: dict[str, Any], model_conf: dict[str, Any], default: float = 1.3
+) -> float | Any:
     """Gets the threshold ratio or default from the config using the correct precedence.
 
     Parameters
@@ -32,8 +37,12 @@ def get_threshold_ratio(training_conf, model_conf, default=1.3):
 
 
 def predict_using_thresholds(
-    pred_df, alpha_threshold, threshold_ratio, training_conf, id_col
-):
+    pred_df: DataFrame,
+    alpha_threshold: float,
+    threshold_ratio: float,
+    training_conf: dict[str, Any],
+    id_col: str,
+) -> DataFrame:
     """Adds a prediction column to the given pred_df by applying thresholds.
 
     Parameters
@@ -69,14 +78,16 @@ def predict_using_thresholds(
         return _apply_alpha_threshold(pred_df.drop("prediction"), alpha_threshold)
 
 
-def _apply_alpha_threshold(pred_df, alpha_threshold):
+def _apply_alpha_threshold(pred_df: DataFrame, alpha_threshold: float) -> DataFrame:
     return pred_df.selectExpr(
         "*",
         f"case when probability >= {alpha_threshold} then 1 else 0 end as prediction",
     )
 
 
-def _apply_threshold_ratio(df, alpha_threshold, threshold_ratio, id_col):
+def _apply_threshold_ratio(
+    df: DataFrame, alpha_threshold: float, threshold_ratio: float, id_col: str
+) -> DataFrame:
     """Apply a decision threshold using the ration of a match's probability to the next closest match's probability."""
     id_a = id_col + "_a"
     id_b = id_col + "_b"
