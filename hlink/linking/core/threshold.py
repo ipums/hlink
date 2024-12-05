@@ -40,8 +40,8 @@ def predict_using_thresholds(
     pred_df: DataFrame,
     alpha_threshold: float,
     threshold_ratio: float,
-    training_conf: dict[str, Any],
     id_col: str,
+    decision: str | None,
 ) -> DataFrame:
     """Adds a prediction column to the given pred_df by applying thresholds.
 
@@ -57,17 +57,17 @@ def predict_using_thresholds(
         to the "a" record's next best probability value.
         Only used with the "drop_duplicate_with_threshold_ratio"
         configuration value.
-    training_conf: dictionary
-        the training config section
     id_col: string
         the id column
+    decision: str | None
+        how to apply the thresholds
 
     Returns
     -------
     A Spark DataFrame containing the "prediction" column as well as other intermediate columns generated to create the prediction.
     """
     use_threshold_ratio = (
-        training_conf.get("decision", "") == "drop_duplicate_with_threshold_ratio"
+        decision is not None and decision == "drop_duplicate_with_threshold_ratio"
     )
 
     if use_threshold_ratio:

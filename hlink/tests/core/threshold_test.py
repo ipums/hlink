@@ -26,7 +26,7 @@ def test_predict_using_thresholds_default_decision(spark: SparkSession) -> None:
 
     # We are using the default decision, so threshold_ratio will be ignored
     predictions = predict_using_thresholds(
-        df, alpha_threshold=0.6, threshold_ratio=0.0, training_conf={}, id_col="id"
+        df, alpha_threshold=0.6, threshold_ratio=0.0, id_col="id", decision=None
     )
 
     output_rows = (
@@ -64,13 +64,12 @@ def test_predict_using_thresholds_drop_duplicates_decision(spark: SparkSession) 
         (3, "E", 0.8),
     ]
     df = spark.createDataFrame(input_rows, schema=["id_a", "id_b", "probability"])
-    training_conf = {"decision": "drop_duplicate_with_threshold_ratio"}
     predictions = predict_using_thresholds(
         df,
         alpha_threshold=0.5,
         threshold_ratio=2.0,
-        training_conf=training_conf,
         id_col="id",
+        decision="drop_duplicate_with_threshold_ratio",
     )
 
     output_rows = (
