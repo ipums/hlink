@@ -61,11 +61,7 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
     features_vector = "features_vector"
     if model_type == "random_forest":
         classifier = RandomForestClassifier(
-            **{
-                key: val
-                for key, val in params.items()
-                if key not in ["threshold", "threshold_ratio"]
-            },
+            **params,
             labelCol=dep_var,
             featuresCol=features_vector,
             seed=2133,
@@ -110,11 +106,7 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
 
     elif model_type == "gradient_boosted_trees":
         classifier = GBTClassifier(
-            **{
-                key: val
-                for key, val in params.items()
-                if key not in ["threshold", "threshold_ratio"]
-            },
+            **params,
             featuresCol=features_vector,
             labelCol=dep_var,
             seed=2133,
@@ -130,13 +122,8 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
                 "its dependencies. Try installing hlink with the lightgbm extra: "
                 "\n\n    pip install hlink[lightgbm]"
             )
-        params_without_threshold = {
-            key: val
-            for key, val in params.items()
-            if key not in {"threshold", "threshold_ratio"}
-        }
         classifier = synapse.ml.lightgbm.LightGBMClassifier(
-            **params_without_threshold,
+            **params,
             featuresCol=features_vector,
             labelCol=dep_var,
             probabilityCol="probability_array",
@@ -151,13 +138,8 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
                 "the xgboost library and its dependencies. Try installing hlink with "
                 "the xgboost extra:\n\n    pip install hlink[xgboost]"
             )
-        params_without_threshold = {
-            key: val
-            for key, val in params.items()
-            if key not in {"threshold", "threshold_ratio"}
-        }
         classifier = xgboost.spark.SparkXGBClassifier(
-            **params_without_threshold,
+            **params,
             features_col=features_vector,
             label_col=dep_var,
             probability_col="probability_array",
