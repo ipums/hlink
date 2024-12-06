@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 from pyspark.sql import Row, SparkSession
+import pytest
 
 from hlink.linking.core.threshold import predict_using_thresholds
 
@@ -46,7 +47,7 @@ def test_predict_using_thresholds_default_decision(spark: SparkSession) -> None:
 
 def test_predict_using_thresholds_drop_duplicates_decision(spark: SparkSession) -> None:
     """
-    The "drop_duplicates_with_threshold_ratio" decision tells
+    The "drop_duplicate_with_threshold_ratio" decision tells
     predict_using_thresholds() to look at the ratio between the first- and
     second-best probabilities for each id, and to only set prediction = 1 when
     the ratio between those probabilities is at least threshold_ratio.
@@ -85,3 +86,20 @@ def test_predict_using_thresholds_drop_duplicates_decision(spark: SparkSession) 
         OutputRow(3, "D", 0),
         OutputRow(3, "E", 1),
     ]
+
+
+@pytest.mark.parametrize("decision", [None, "drop_duplicate_with_threshold_ratio"])
+def test_predict_using_thresholds_missing_probability_column_error(
+    spark: SparkSession, decision: str | None
+) -> None:
+    """
+    When the input DataFrame is missing the "probability" column,
+    predict_using_thresholds() raises a friendly error.
+    """
+    df = spark.createDataFrame([(0, "A"), (1, "B")], schema=["id_a", "id_b"])
+    with pytest.raises(
+        ValueError, match="the input data frame must have a 'probability' column"
+    ):
+        predict_using_thresholds(
+            df, alpha_threshold=0.5, threshold_ratio=1.5, id_col="id", decision=decision
+        )

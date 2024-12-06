@@ -66,6 +66,11 @@ def predict_using_thresholds(
     -------
     A Spark DataFrame containing the "prediction" column as well as other intermediate columns generated to create the prediction.
     """
+    if "probability" not in pred_df.columns:
+        raise ValueError(
+            "the input data frame must have a 'probability' column to make predictions using thresholds"
+        )
+
     use_threshold_ratio = (
         decision is not None and decision == "drop_duplicate_with_threshold_ratio"
     )
@@ -89,11 +94,6 @@ def _apply_threshold_ratio(
     """Apply a decision threshold using the ration of a match's probability to the next closest match's probability."""
     id_a = id_col + "_a"
     id_b = id_col + "_b"
-    if "probability" not in df.columns:
-        raise NameError(
-            'In order to calculate the threshold ratio based on probabilities, you need to have a "probability" column in your data.'
-        )
-
     windowSpec = Window.partitionBy(id_a).orderBy(col("probability").desc(), id_b)
     prob_rank = rank().over(windowSpec)
     prob_lead = lead("probability", 1).over(windowSpec)
