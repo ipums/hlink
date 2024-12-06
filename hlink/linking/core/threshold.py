@@ -120,18 +120,13 @@ def _apply_threshold_ratio(
             prob_rank.alias("prob_rank"),
             prob_lead.alias("second_best_prob"),
         )
-        .select(
-            "*",
+        .withColumn(
+            "ratio",
             when(
                 should_compute_probability_ratio,
                 col("probability") / col("second_best_prob"),
-            )
-            .otherwise(None)
-            .alias("ratio"),
+            ).otherwise(None),
         )
-        .select(
-            "*",
-            is_match.cast("integer").alias("prediction"),
-        )
+        .withColumn("prediction", is_match.cast("integer"))
         .drop("prob_rank")
     )
