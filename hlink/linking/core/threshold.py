@@ -3,11 +3,14 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import logging
 from typing import Any
 
 from pyspark.sql import DataFrame
 from pyspark.sql.window import Window
 from pyspark.sql.functions import col, lead, rank, when
+
+logger = logging.getLogger(__name__)
 
 
 def get_threshold_ratio(
@@ -43,28 +46,58 @@ def predict_using_thresholds(
     id_col: str,
     decision: str | None,
 ) -> DataFrame:
-    """Adds a prediction column to the given pred_df by applying thresholds.
+    """Adds a "prediction" column to the given data frame by applying
+    thresholds to the "probability" column. The prediction column has either
+    the value 0, indicating that the potential match does not meet the
+    requirements for a match, or 1, indicating that the potential match does
+    meet the requirements for a match. The requirements for a match depend on
+    the decision argument, which switches between two different options.
+
+    1. If decision is "drop_duplicate_with_threshold_ratio", then
+    predict_using_thresholds() uses both the alpha_threshold and
+    threshold_ratio.
+
+    predict_using_thresholds() groups the matches by their id in data set A, and
+    selects from each group the potential match with the highest probability.
+    Then, if there is a second-highest probability in the group and it is at
+    least alpha_threshold, predict_using_thresholds() computes the ratio of the
+    highest probability to the second highest probability and stores it as the
+    ratio column. Finally, predict_using_thresholds() picks out of each group
+    the potential match with the highest probability and marks it with
+    prediction = 1 if
+
+      A. its probability is at least alpha_threshold and
+      B. either there is no second-highest probability over alpha_threshold, or
+      the ratio of the highest probability to the second-highest is greater
+      than threshold_ratio.
+
+    2. If decision is any other string or is None, then
+    predict_using_thresholds() does not use threshold_ratio and instead just
+    applies alpha_threshold. Each potential match with a probability of at
+    least alpha_threshold gets prediction = 1, and each potential match with a
+    probability less than alpha_threshold gets prediction = 0.
 
     Parameters
     ----------
-    pred_df: DataFrame
-        a Spark DataFrame of potential matches a probability column
-    alpha_threshold: float
-        the alpha threshold cutoff value. No record with a probability lower than this
-        value will be considered for prediction = 1.
-    threshold_ratio: float
-        the threshold ratio cutoff value. Ratio's refer
-        to the "a" record's next best probability value.
-        Only used with the "drop_duplicate_with_threshold_ratio"
-        configuration value.
-    id_col: string
-        the id column
-    decision: str | None
-        how to apply the thresholds
+    pred_df:
+        a Spark DataFrame of potential matches with a probability column
+    alpha_threshold:
+        The alpha threshold cutoff value. No record with a probability lower
+        than this value will be considered for prediction = 1.
+    threshold_ratio:
+        The threshold ratio cutoff value, only used with the
+        "drop_duplicate_with_threshold_ratio" decision. The ratio is between
+        the best probability and second-best probability for potential matches
+        with the same id in data set A.
+    id_col:
+        the name of the id column
+    decision:
+        how to apply the alpha_threshold and threshold_ratio
 
     Returns
     -------
-    A Spark DataFrame containing the "prediction" column as well as other intermediate columns generated to create the prediction.
+    a Spark DataFrame containing the "prediction" column, and possibly some
+    additional intermediate columns generated to create the prediction
     """
     if "probability" not in pred_df.columns:
         raise ValueError(
@@ -76,10 +109,16 @@ def predict_using_thresholds(
     )
 
     if use_threshold_ratio:
+        logger.debug(
+            f"Making predictions with alpha threshold and threshold ratio: {alpha_threshold=}, {threshold_ratio=}"
+        )
         return _apply_threshold_ratio(
             pred_df.drop("prediction"), alpha_threshold, threshold_ratio, id_col
         )
     else:
+        logger.debug(
+            f"Making predictions with alpha threshold but without threshold ratio: {alpha_threshold=}"
+        )
         return _apply_alpha_threshold(pred_df.drop("prediction"), alpha_threshold)
 
 
@@ -91,7 +130,11 @@ def _apply_alpha_threshold(pred_df: DataFrame, alpha_threshold: float) -> DataFr
 def _apply_threshold_ratio(
     df: DataFrame, alpha_threshold: float, threshold_ratio: float, id_col: str
 ) -> DataFrame:
-    """Apply a decision threshold using the ration of a match's probability to the next closest match's probability."""
+    """Apply an alpha_threshold and threshold_ratio.
+
+    After thresholding on alpha_threshold, compute the ratio of each id_a's
+    highest potential match probability to its second-highest potential match
+    probability and compare the ratio to threshold_ratio."""
     id_a = id_col + "_a"
     id_b = id_col + "_b"
     windowSpec = Window.partitionBy(id_a).orderBy(col("probability").desc(), id_b)
