@@ -411,20 +411,21 @@ class LinkStepTrainTestModels(LinkStep):
                 f"{this_alpha_threshold=} and {this_threshold_ratio=}"
             )
             logger.debug(diag)
+            decision = training_settings.get("decision")
             start_predict_time = perf_counter()
             predictions = threshold_core.predict_using_thresholds(
                 thresholding_predictions,
                 this_alpha_threshold,
                 this_threshold_ratio,
-                training_settings,
                 id_column,
+                decision,
             )
             predict_train = threshold_core.predict_using_thresholds(
                 thresholding_predict_train,
                 this_alpha_threshold,
                 this_threshold_ratio,
-                training_settings,
                 id_column,
+                decision,
             )
 
             end_predict_time = perf_counter()
