@@ -725,7 +725,7 @@ def test_step_2_train_logistic_regression_spark(
 
     tr = spark.table("model_eval_training_results").toPandas()
 
-    assert tr.shape == (1, 9)
+    assert tr.shape == (1, 11)
     # This is now 0.83333333333.... I'm not sure it's worth testing against
     # assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.75
     assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] > 0.74
@@ -754,7 +754,7 @@ def test_step_2_train_decision_tree_spark(
     print(f"Decision tree results: {tr}")
 
     # TODO This is  1,12 instead of 1,13, because the precision_test_mean column is dropped as it is NaN
-    assert tr.shape == (1, 12)
+    assert tr.shape == (1, 13)
     # assert tr.query("model == 'decision_tree'")["precision_test_mean"].iloc[0] > 0
     assert tr.query("model == 'decision_tree'")["maxDepth"].iloc[0] == 3
     assert tr.query("model == 'decision_tree'")["minInstancesPerNode"].iloc[0] == 1

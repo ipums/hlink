@@ -572,8 +572,7 @@ class LinkStepTrainTestModels(LinkStep):
 
         thresholded_metrics_df = _create_thresholded_metrics_df()
         for i in range(threshold_matrix_size):
-            print(type(combined_test[i]))
-            print(combined_test[i])
+            print(f"Aggregate threshold matrix entry {i}")
             thresholded_metrics_df = _aggregate_per_threshold_results(
                 thresholded_metrics_df, combined_test[i], best_models
             )
@@ -1007,6 +1006,7 @@ def _aggregate_per_threshold_results(
     # training_results: list[ThresholdTestResult],
     best_models: list[ModelEval],
 ) -> pd.DataFrame:
+
     # The threshold is the same for all entries in the lists
     alpha_threshold = prediction_results[0].alpha_threshold
     threshold_ratio = prediction_results[0].threshold_ratio
@@ -1015,16 +1015,17 @@ def _aggregate_per_threshold_results(
     precision_test = [
         r.precision for r in prediction_results if r.precision is not np.nan
     ]
-    recall_test = [r.recall for r in prediction_results if r.recall is not np.NaN]
-    pr_auc_test = [r.pr_auc for r in prediction_results]
-    mcc_test = [r.mcc for r in prediction_results]
+    recall_test = [r.recall for r in prediction_results if r.recall is not np.nan]
+    pr_auc_test = [r.pr_auc for r in prediction_results if r.pr_auc is not np.nan]
+    mcc_test = [r.mcc for r in prediction_results if r.mcc is not np.nan]
 
-    """
-    precision_train = [r.precision for r in training_results]
-    recall_train = [r.recall for r in training_results]
-    pr_auc_train = [r.pr_auc for r in training_results]
-    mcc_train = [r.mcc for r in training_results]
-    """
+    # # variance requires at least two values
+    precision_test_sd = (
+        statistics.stdev(precision_test) if len(precision_test) > 1 else np.nan
+    )
+    recall_test_sd = statistics.stdev(recall_test) if len(recall_test) > 1 else np.nan
+    pr_auc_test_sd = statistics.stdev(pr_auc_test) if len(pr_auc_test) > 1 else np.nan
+    mcc_test_sd = statistics.stdev(mcc_test) if len(mcc_test) > 1 else np.nan
 
     new_desc = pd.DataFrame(
         {
@@ -1033,13 +1034,13 @@ def _aggregate_per_threshold_results(
             "alpha_threshold": [alpha_threshold],
             "threshold_ratio": [threshold_ratio],
             "precision_test_mean": [statistics.mean(precision_test)],
-            "precision_test_sd": [statistics.stdev(precision_test)],
+            "precision_test_sd": [precision_test_sd],
             "recall_test_mean": [statistics.mean(recall_test)],
-            "recall_test_sd": [statistics.stdev(recall_test)],
+            "recall_test_sd": [recall_test_sd],
             "pr_auc_test_mean": [statistics.mean(pr_auc_test)],
-            "pr_auc_test_sd": [statistics.stdev(pr_auc_test)],
+            "pr_auc_test_sd": [pr_auc_test_sd],
             "mcc_test_mean": [statistics.mean(mcc_test)],
-            "mcc_test_sd": [statistics.stdev(mcc_test)],
+            "mcc_test_sd": [mcc_test_sd],
         },
     )
 
@@ -1052,17 +1053,8 @@ def _aggregate_per_threshold_results(
 
 def _print_thresholded_metrics_df(desc_df: pd.DataFrame) -> None:
     pd.set_option("display.max_colwidth", None)
-    print(
-        desc_df.drop(
-            [
-                "recall_test_sd",
-                "recall_train_sd",
-                "precision_test_sd",
-                "precision_train_sd",
-            ],
-            axis=1,
-        ).iloc[-1]
-    )
+    print(desc_df.iloc[-1])
+
     print("\n")
 
 
@@ -1105,17 +1097,7 @@ def _create_thresholded_metrics_df() -> pd.DataFrame:
             "recall_test_mean",
             "recall_test_sd",
             "mcc_test_mean",
-            "mcc_test_sd"
-            """
-            "precision_train_mean",
-            "precision_train_sd",
-            "recall_train_mean",
-            "recall_train_sd",
-            "pr_auc_mean",
-            "pr_auc_sd",
-            "mcc_train_mean",
-            "mcc_train_sd",
-            """,
+            "mcc_test_sd",
         ]
     )
 
