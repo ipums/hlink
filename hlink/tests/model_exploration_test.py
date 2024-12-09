@@ -584,7 +584,7 @@ def feature_conf(training_conf):
     training_conf["training"]["independent_vars"] = ["namelast_jw", "regionf"]
 
     training_conf["training"]["model_parameters"] = []
-    training_conf["training"]["n_training_iterations"] = 2
+    training_conf["training"]["n_training_iterations"] = 3
     return training_conf
 
 
