@@ -137,6 +137,18 @@ class ModelEval:
         return _calc_threshold_matrix(self.threshold, self.threshold_ratio)
 
 
+# Both training and test results can be captured in this type
+@dataclass(kw_only=True)
+class ThresholdTestResult:
+    precision: float
+    recall: float
+    pr_auc: float
+    mcc: float
+    model_id: str
+    alpha_threshold: float
+    threshold_ratio: float
+
+
 class LinkStepTrainTestModels(LinkStep):
     def __init__(self, task) -> None:
         super().__init__(
@@ -329,20 +341,18 @@ class LinkStepTrainTestModels(LinkStep):
 
     def _evaluate_threshold_combinations(
         self,
-        hyperparam_evaluation_results: list[ModelEval],
+        best_model: ModelEval,
         suspicious_data: Any,
         split: dict[str : pyspark.sql.DataFrame],
         dep_var: str,
         id_a: str,
         id_b: str,
-    ) -> tuple[pd.DataFrame, Any]:
+    ) -> tuple[dict[int, pd.DataFrame], Any]:
         training_config_name = str(self.task.training_conf)
         config = self.task.link_run.config
 
         id_column = config["id_column"]
         training_settings = config[training_config_name]
-
-        thresholded_metrics_df = _create_thresholded_metrics_df()
 
         thresholding_training_data = split.get("training")
         thresholding_test_data = split.get("test")
@@ -351,29 +361,25 @@ class LinkStepTrainTestModels(LinkStep):
         if thresholding_test_data is None:
             raise RuntimeError("Must give some data with the 'test' key.")
 
-        # Note: We may change this to contain a list of best per model or something else
-        # but for now it's a single ModelEval instance -- the one with the highest score.
-        best_results = self._choose_best_training_results(hyperparam_evaluation_results)
-
         print(f"\n======== Best Model and Parameters ========\n")
-        print(f"\t{best_results}\n")
+        print(f"\t{best_model}\n")
         print("=============================================\n\n")
-        logger.debug(f"Best model results: {best_results}")
+        logger.debug(f"Best model results: {best_model}")
 
-        threshold_matrix = best_results.make_threshold_matrix()
+        threshold_matrix = best_model.make_threshold_matrix()
         logger.debug(f"The threshold matrix has {len(threshold_matrix)} entries")
         info = f"\nTesting the best model + parameters against all {len(threshold_matrix)} threshold combinations.\n"
         logger.debug(info)
-        results_dfs: dict[int, pd.DataFrame] = {}
-        for i in range(len(threshold_matrix)):
-            results_dfs[i] = _create_results_df()
+
+        prediction_results: dict[int, ThresholdTestResult] = {}
+        # training_results: dict[int, ThresholdTestResult] = {}
 
         cached_training_data = thresholding_training_data.cache()
         cached_test_data = thresholding_test_data.cache()
 
         thresholding_classifier, thresholding_post_transformer = (
             classifier_core.choose_classifier(
-                best_results.model_type, best_results.hyperparams, dep_var
+                best_model.model_type, best_model.hyperparams, dep_var
             )
         )
         start_time = perf_counter()
@@ -391,6 +397,7 @@ class LinkStepTrainTestModels(LinkStep):
             id_b,
             dep_var,
         )
+        """
         thresholding_predict_train = _get_probability_and_select_pred_columns(
             cached_training_data,
             thresholding_model,
@@ -399,20 +406,21 @@ class LinkStepTrainTestModels(LinkStep):
             id_b,
             dep_var,
         )
+        """
 
-        i = 0
         for threshold_index, (
             this_alpha_threshold,
             this_threshold_ratio,
-        ) in enumerate(threshold_matrix, 1):
+        ) in enumerate(threshold_matrix, 0):
 
             diag = (
-                f"Predicting with threshold matrix entry {threshold_index} of {len(threshold_matrix)}: "
+                f"Predicting with threshold matrix entry {threshold_index+1} of {len(threshold_matrix)}: "
                 f"{this_alpha_threshold=} and {this_threshold_ratio=}"
             )
             logger.debug(diag)
             decision = training_settings.get("decision")
             start_predict_time = perf_counter()
+
             predictions = threshold_core.predict_using_thresholds(
                 thresholding_predictions,
                 this_alpha_threshold,
@@ -420,6 +428,7 @@ class LinkStepTrainTestModels(LinkStep):
                 id_column,
                 decision,
             )
+            """
             predict_train = threshold_core.predict_using_thresholds(
                 thresholding_predict_train,
                 this_alpha_threshold,
@@ -427,37 +436,37 @@ class LinkStepTrainTestModels(LinkStep):
                 id_column,
                 decision,
             )
+            """
 
             end_predict_time = perf_counter()
             info = f"Predictions for test-train data on threshold took {end_predict_time - start_predict_time:.2f}s"
             logger.debug(info)
 
-            results_dfs[i] = self._capture_results(
+            prediction_results[threshold_index] = self._capture_prediction_results(
                 predictions,
-                predict_train,
                 dep_var,
                 thresholding_model,
-                results_dfs[i],
                 suspicious_data,
                 this_alpha_threshold,
                 this_threshold_ratio,
-                best_results.score,
+                best_model.score,
             )
-
-            i += 1
-
-        for i in range(len(threshold_matrix)):
-            thresholded_metrics_df = _append_results(
-                thresholded_metrics_df,
-                results_dfs[i],
-                best_results.model_type,
-                best_results.hyperparams,
+            """
+            training_results[threshold_index] = self._capture_training_results(
+                predict_train,
+                dep_var,
+                thresholding_model,
+                suspicious_data,
+                this_alpha_threshold,
+                this_threshold_ratio,
+                best_model.score,
             )
+            """
 
         thresholding_test_data.unpersist()
         thresholding_training_data.unpersist()
 
-        return thresholded_metrics_df, suspicious_data
+        return prediction_results, suspicious_data
 
     def _run(self) -> None:
         training_section_name = str(self.task.training_conf)
@@ -479,13 +488,20 @@ class LinkStepTrainTestModels(LinkStep):
         )
 
         # Stores suspicious data
-        suspicious_data = self._create_suspicious_data(id_a, id_b)
+        # suspicious_data = self._create_suspicious_data(id_a, id_b)
+        suspicious_data = None
 
         outer_fold_count = training_settings.get("n_training_iterations", 10)
         inner_fold_count = 3
 
         if outer_fold_count < 3:
             raise RuntimeError("You must use at least three outer folds.")
+
+        # At the end we combine this information collected from every outer fold
+        threshold_test_results: list[ThresholdTestResult] = []
+        # threshold_training_results: list[ThresholdTestResult]
+        all_suspicious_data: list[Any] = []
+        best_models: list[ModelEval] = []
 
         seed = training_settings.get("seed", 2133)
 
@@ -523,9 +539,15 @@ class LinkStepTrainTestModels(LinkStep):
                 f"Take the best hyper-parameter set from {len(hyperparam_evaluation_results)} results and test every threshold combination against it..."
             )
 
-            thresholded_metrics_df, suspicious_data = (
+            # Note: We may change this to contain a list of best per model or something else
+            # but for now it's a single ModelEval instance -- the one with the highest score.
+            best_model = self._choose_best_training_results(
+                hyperparam_evaluation_results
+            )
+
+            prediction_results, suspicious_data_for_threshold = (
                 self._evaluate_threshold_combinations(
-                    hyperparam_evaluation_results,
+                    best_model,
                     suspicious_data,
                     {"test": outer_test_data, "training": outer_training_data},
                     dep_var,
@@ -534,18 +556,39 @@ class LinkStepTrainTestModels(LinkStep):
                 )
             )
 
-            # thresholded_metrics_df has one row per threshold combination. and each outer fold
-            thresholded_metrics_df = _load_thresholded_metrics_df_params(
-                thresholded_metrics_df
-            )
-            _print_thresholded_metrics_df(
-                thresholded_metrics_df.sort_values(by="mcc_test_mean", ascending=False)
+            # Collect the outputs for each fold
+            threshold_test_results.append(prediction_results)
+            # threshold_training_results.append(training_results)
+            # all_suspicious_data.append(suspicious_data_for_threshold)
+            best_models.append(best_model)
+
+        combined_test = _combine_by_threshold_matrix_entry(threshold_test_results)
+        # combined_train = (_combine_by_threshold_matrix_entry(training_results),)
+
+        # there are 'm'  threshold_test_results items matching the number of
+        # inner folds. Each entry has 'n' items matching the number of
+        # threshold matrix entries.
+        threshold_matrix_size = len(threshold_test_results[0])
+
+        thresholded_metrics_df = _create_thresholded_metrics_df()
+        for i in range(threshold_matrix_size):
+            print(f"Aggregate threshold matrix entry {i}")
+            thresholded_metrics_df = _aggregate_per_threshold_results(
+                thresholded_metrics_df, combined_test[i], best_models
             )
 
         print("***   Final thresholded metrics ***")
 
+        # thresholded_metrics_df has one row per threshold combination. and each outer fold
+        thresholded_metrics_df = _load_thresholded_metrics_df_params(
+            thresholded_metrics_df
+        )
+        _print_thresholded_metrics_df(
+            thresholded_metrics_df.sort_values(by="mcc_test_mean", ascending=False)
+        )
+
         self._save_training_results(thresholded_metrics_df, self.task.spark)
-        self._save_suspicious_data(suspicious_data, self.task.spark)
+        # self._save_suspicious_data(suspicious_data, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
     def _split_into_folds(
@@ -637,29 +680,19 @@ class LinkStepTrainTestModels(LinkStep):
             )
         return splits
 
-    def _capture_results(
+    def _capture_prediction_results(
         self,
         predictions: pyspark.sql.DataFrame,
-        predict_train: pyspark.sql.DataFrame,
         dep_var: str,
         model: Model,
-        results_df: pd.DataFrame,
         suspicious_data: dict[str, Any] | None,
         alpha_threshold: float,
         threshold_ratio: float | None,
         pr_auc: float,
-    ) -> pd.DataFrame:
+    ) -> ThresholdTestResult:
         table_prefix = self.task.table_prefix
-
         # write to sql tables for testing
         predictions.createOrReplaceTempView(f"{table_prefix}predictions")
-        predict_train.createOrReplaceTempView(f"{table_prefix}predict_train")
-        # print("------------------------------------------------------------")
-        # print(f"Capturing predictions:")
-        # predictions.show()
-        # print(f"Capturing predict_train:")
-        # predict_train.show()
-        # print("------------------------------------------------------------")
 
         (
             test_TP_count,
@@ -671,31 +704,17 @@ class LinkStepTrainTestModels(LinkStep):
             test_TP_count, test_FP_count, test_FN_count, test_TN_count
         )
 
-        (
-            train_TP_count,
-            train_FP_count,
-            train_FN_count,
-            train_TN_count,
-        ) = _get_confusion_matrix(predict_train, dep_var, suspicious_data)
-        train_precision, train_recall, train_mcc = _get_aggregate_metrics(
-            train_TP_count, train_FP_count, train_FN_count, train_TN_count
+        result = ThresholdTestResult(
+            precision=test_precision,
+            recall=test_recall,
+            mcc=test_mcc,
+            pr_auc=pr_auc,
+            model_id=model,
+            alpha_threshold=alpha_threshold,
+            threshold_ratio=threshold_ratio,
         )
 
-        new_results = pd.DataFrame(
-            {
-                "precision_test": [test_precision],
-                "recall_test": [test_recall],
-                "precision_train": [train_precision],
-                "recall_train": [train_recall],
-                "pr_auc": [pr_auc],
-                "test_mcc": [test_mcc],
-                "train_mcc": [train_mcc],
-                "model_id": [model],
-                "alpha_threshold": [alpha_threshold],
-                "threshold_ratio": [threshold_ratio],
-            },
-        )
-        return pd.concat([results_df, new_results], ignore_index=True)
+        return result
 
     def _save_training_results(
         self, desc_df: pd.DataFrame, spark: pyspark.sql.SparkSession
@@ -950,52 +969,98 @@ def _get_aggregate_metrics(
     return precision, recall, mcc
 
 
-def _create_results_df() -> pd.DataFrame:
-    return pd.DataFrame(
-        columns=[
-            "precision_test",
-            "recall_test",
-            "precision_train",
-            "recall_train",
-            "pr_auc",
-            "test_mcc",
-            "train_mcc",
-            "model_id",
-            "alpha_threshold",
-            "threshold_ratio",
-        ]
-    )
+# The outer list  entries hold results from each outer fold, the inner list has a ThresholdTestResult per threshold
+# matrix entry. We need to get data for each threshold entry together. Basically we need to invert the data.
+def _combine_by_threshold_matrix_entry(
+    threshold_results: list[dict[int, ThresholdTestResult]],
+) -> list[ThresholdTestResult]:
+    # This list will have a size of the number of threshold matrix entries
+    results: list[list[ThresholdTestResult]] = []
+
+    # Check number of folds
+    if len(threshold_results) < 2:
+        raise RuntimeError("Must have at least two outer folds.")
+
+    # Check if there are more than 0 threshold matrix entries
+    if len(threshold_results[0]) == 0:
+        raise RuntimeError(
+            "No entries in the first set of threshold results; can't determine threshold matrix size."
+        )
+
+    inferred_threshold_matrix_size = len(threshold_results[0])
+
+    for t in range(inferred_threshold_matrix_size):
+        # One list per threshold matrix entry
+        results.append([])
+
+    for fold_results in threshold_results:
+        for t in range(inferred_threshold_matrix_size):
+            threshold_results_for_this_fold = fold_results[t]
+            results[t].append(threshold_results_for_this_fold)
+    return results
 
 
-def _append_results(
+def _aggregate_per_threshold_results(
     thresholded_metrics_df: pd.DataFrame,
-    results_df: pd.DataFrame,
-    model_type: str,
-    params: dict[str, Any],
+    prediction_results: list[ThresholdTestResult],
+    # training_results: list[ThresholdTestResult],
+    best_models: list[ModelEval],
 ) -> pd.DataFrame:
-    # run.pop("type")
-    #    print(f"appending results_df : {results_df}")
+
+    # The threshold is the same for all entries in the lists
+    alpha_threshold = prediction_results[0].alpha_threshold
+    threshold_ratio = prediction_results[0].threshold_ratio
+
+    # Pull out columns to be aggregated
+    precision_test = [
+        r.precision for r in prediction_results if r.precision is not np.nan
+    ]
+    recall_test = [r.recall for r in prediction_results if r.recall is not np.nan]
+    pr_auc_test = [r.pr_auc for r in prediction_results if r.pr_auc is not np.nan]
+    mcc_test = [r.mcc for r in prediction_results if r.mcc is not np.nan]
+
+    # # variance requires at least two values
+    precision_test_sd = (
+        statistics.stdev(precision_test) if len(precision_test) > 1 else np.nan
+    )
+    recall_test_sd = statistics.stdev(recall_test) if len(recall_test) > 1 else np.nan
+    pr_auc_test_sd = statistics.stdev(pr_auc_test) if len(pr_auc_test) > 1 else np.nan
+    mcc_test_sd = statistics.stdev(mcc_test) if len(mcc_test) > 1 else np.nan
+
+    # Deal with tiny test data. This should never arise in practice but if it did we ought
+    # to issue a warning.
+    if len(precision_test) < 1:
+        #        raise RuntimeError("Not enough training data to get any valid precision values.")
+        precision_test_mean = np.nan
+    else:
+        precision_test_mean = (
+            statistics.mean(precision_test)
+            if len(precision_test) > 1
+            else precision_test[0]
+        )
+
+    if len(recall_test) < 1:
+        # raise RuntimeError("Not enough training data to get any valid recall values.")
+        recall_test_mean = np.nan
+    else:
+        recall_test_mean = (
+            statistics.mean(recall_test) if len(recall_test) > 1 else recall_test[0]
+        )
 
     new_desc = pd.DataFrame(
         {
-            "model": [model_type],
-            "parameters": [params],
-            "alpha_threshold": [results_df["alpha_threshold"][0]],
-            "threshold_ratio": [results_df["threshold_ratio"][0]],
-            "precision_test_mean": [results_df["precision_test"].mean()],
-            "precision_test_sd": [results_df["precision_test"].std()],
-            "recall_test_mean": [results_df["recall_test"].mean()],
-            "recall_test_sd": [results_df["recall_test"].std()],
-            "pr_auc_mean": [results_df["pr_auc"].mean()],
-            "pr_auc_sd": [results_df["pr_auc"].std()],
-            "mcc_test_mean": [results_df["test_mcc"].mean()],
-            "mcc_test_sd": [results_df["test_mcc"].std()],
-            "precision_train_mean": [results_df["precision_train"].mean()],
-            "precision_train_sd": [results_df["precision_train"].std()],
-            "recall_train_mean": [results_df["recall_train"].mean()],
-            "recall_train_sd": [results_df["recall_train"].std()],
-            "mcc_train_mean": [results_df["train_mcc"].mean()],
-            "mcc_train_sd": [results_df["train_mcc"].std()],
+            "model": [best_models[0].model_type],
+            "parameters": [best_models[0].hyperparams],
+            "alpha_threshold": [alpha_threshold],
+            "threshold_ratio": [threshold_ratio],
+            "precision_test_mean": [precision_test_mean],
+            "precision_test_sd": [precision_test_sd],
+            "recall_test_mean": [recall_test_mean],
+            "recall_test_sd": [recall_test_sd],
+            "pr_auc_test_mean": [statistics.mean(pr_auc_test)],
+            "pr_auc_test_sd": [pr_auc_test_sd],
+            "mcc_test_mean": [statistics.mean(mcc_test)],
+            "mcc_test_sd": [mcc_test_sd],
         },
     )
 
@@ -1008,17 +1073,8 @@ def _append_results(
 
 def _print_thresholded_metrics_df(desc_df: pd.DataFrame) -> None:
     pd.set_option("display.max_colwidth", None)
-    print(
-        desc_df.drop(
-            [
-                "recall_test_sd",
-                "recall_train_sd",
-                "precision_test_sd",
-                "precision_train_sd",
-            ],
-            axis=1,
-        ).iloc[-1]
-    )
+    print(desc_df.iloc[-1])
+
     print("\n")
 
 
@@ -1049,17 +1105,6 @@ def _load_thresholded_metrics_df_params(desc_df: pd.DataFrame) -> pd.DataFrame:
     return desc_df
 
 
-def _create_probability_metrics_df() -> pd.DataFrame:
-    return pd.DataFrame(
-        columns=[
-            "model",
-            "parameters",
-            "pr_auc_mean",
-            "pr_auc_standard_deviation",
-        ]
-    )
-
-
 def _create_thresholded_metrics_df() -> pd.DataFrame:
     return pd.DataFrame(
         columns=[
@@ -1073,14 +1118,6 @@ def _create_thresholded_metrics_df() -> pd.DataFrame:
             "recall_test_sd",
             "mcc_test_mean",
             "mcc_test_sd",
-            "precision_train_mean",
-            "precision_train_sd",
-            "recall_train_mean",
-            "recall_train_sd",
-            "pr_auc_mean",
-            "pr_auc_sd",
-            "mcc_train_mean",
-            "mcc_train_sd",
         ]
     )
 

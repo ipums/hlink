@@ -57,10 +57,7 @@ def test_all_hh_mod_ev(
         "precision_test_mean",
         "recall_test_mean",
         "mcc_test_mean",
-        "precision_train_mean",
-        "recall_train_mean",
-        "pr_auc_mean",
-        "mcc_train_mean",
+        "pr_auc_test_mean",
     ]
 
     # TODO we should expect to get most of these columns once the results reporting is finished.
@@ -75,14 +72,8 @@ def test_all_hh_mod_ev(
         "recall_test_sd",
         "mcc_test_sd",
         "mcc_test_mean",
-        "precision_train_mean",
-        "precision_train_sd",
-        "recall_train_mean",
-        "recall_train_sd",
-        "pr_auc_mean",
-        "pr_auc_sd",
-        "mcc_train_mean",
-        "mcc_train_sd",
+        "pr_auc_test_mean",
+        "pr_auc_test_sd",
         "maxDepth",
         "numTrees",
     ]
@@ -97,7 +88,9 @@ def test_all_hh_mod_ev(
     )
     assert tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0] == 0.5
     assert (
-        0.7 < tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] <= 1.0
+        0.7
+        < tr.query("model == 'logistic_regression'")["pr_auc_test_mean"].iloc[0]
+        <= 1.0
     )
     assert (
         0.9
@@ -131,6 +124,8 @@ def test_all_hh_mod_ev(
     assert 0.0 < pm0["second_best_prob"].iloc[0] < 0.5
     """
 
+    # Not saving predict-train test results anymore
+    """
     pred_train = spark.table("hh_model_eval_predict_train").toPandas()
     assert all(
         elem in list(pred_train.columns)
@@ -145,6 +140,7 @@ def test_all_hh_mod_ev(
             "match",
         ]
     )
+    """
 
     # TODO the exact links are different.
     """

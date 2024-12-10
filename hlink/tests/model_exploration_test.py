@@ -584,7 +584,7 @@ def feature_conf(training_conf):
     training_conf["training"]["independent_vars"] = ["namelast_jw", "regionf"]
 
     training_conf["training"]["model_parameters"] = []
-    training_conf["training"]["n_training_iterations"] = 2
+    training_conf["training"]["n_training_iterations"] = 3
     return training_conf
 
 
@@ -684,7 +684,6 @@ def test_step_2_train_random_forest_spark(
             "featureSubsetStrategy": "sqrt",
         }
     ]
-    feature_conf["training"]["output_suspicious_TD"] = True
     feature_conf["training"]["n_training_iterations"] = 3
 
     model_exploration.run_step(0)
@@ -694,9 +693,12 @@ def test_step_2_train_random_forest_spark(
     tr = spark.table("model_eval_training_results").toPandas()
     print(f"training results {tr}")
     # assert tr.shape == (1, 18)
-    assert tr.query("model == 'random_forest'")["pr_auc_mean"].iloc[0] > 2.0 / 3.0
+    assert tr.query("model == 'random_forest'")["pr_auc_test_mean"].iloc[0] > 2.0 / 3.0
     assert tr.query("model == 'random_forest'")["maxDepth"].iloc[0] == 3
 
+    # TODO probably remove these since we're not planning to test suspicious data anymore.
+    # I disabled the saving of suspicious in this test config so these are invalid currently.
+    """
     FNs = spark.table("model_eval_repeat_fns").toPandas()
     assert FNs.shape == (3, 4)
     assert FNs.query("id_a == 30")["count"].iloc[0] == 3
@@ -706,6 +708,7 @@ def test_step_2_train_random_forest_spark(
 
     TNs = spark.table("model_eval_repeat_tns").toPandas()
     assert TNs.shape == (6, 4)
+    """
 
     main.do_drop_all("")
 
@@ -717,18 +720,19 @@ def test_step_2_train_logistic_regression_spark(
     feature_conf["training"]["model_parameters"] = [
         {"type": "logistic_regression", "threshold": 0.7}
     ]
-    feature_conf["training"]["n_training_iterations"] = 4
+    feature_conf["training"]["n_training_iterations"] = 3
 
     model_exploration.run_step(0)
     model_exploration.run_step(1)
     model_exploration.run_step(2)
 
     tr = spark.table("model_eval_training_results").toPandas()
+    # assert tr.count == 3
 
-    assert tr.shape == (1, 9)
+    assert tr.shape == (1, 11)
     # This is now 0.83333333333.... I'm not sure it's worth testing against
     # assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] == 0.75
-    assert tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] > 0.74
+    assert tr.query("model == 'logistic_regression'")["pr_auc_test_mean"].iloc[0] > 0.74
     assert (
         round(tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0], 1)
         == 0.7
@@ -754,7 +758,7 @@ def test_step_2_train_decision_tree_spark(
     print(f"Decision tree results: {tr}")
 
     # TODO This is  1,12 instead of 1,13, because the precision_test_mean column is dropped as it is NaN
-    assert tr.shape == (1, 12)
+    assert tr.shape == (1, 13)
     # assert tr.query("model == 'decision_tree'")["precision_test_mean"].iloc[0] > 0
     assert tr.query("model == 'decision_tree'")["maxDepth"].iloc[0] == 3
     assert tr.query("model == 'decision_tree'")["minInstancesPerNode"].iloc[0] == 1
