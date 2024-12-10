@@ -334,7 +334,6 @@ split_by_id_a = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 2
-output_suspicious_TD = true
 param_grid = true
 model_parameters = [ 
     { type = "random_forest", maxDepth = [7], numTrees = [100], threshold = [0.05, 0.005], threshold_ratio = [1.2, 1.3] },
@@ -361,7 +360,6 @@ split_by_id_a = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 10
-output_suspicious_TD = true
 param_grid = false
 model_parameters = [
     { type = "random_forest", maxDepth = 6, numTrees = 50, threshold = 0.5, threshold_ratio = 1.0 },
@@ -750,7 +748,6 @@ splits = [-1,0,6,11,9999]
   * `n_training_iterations` -- Type: `integer`. Optional; default value is 10. The number of training iterations to use during the `model_exploration` task.
   * `scale_data` -- Type: `boolean`.  Optional. Whether to scale the data as part of the machine learning pipeline.
   * `use_training_data_features` -- Type: `boolean`. Optional. If the identifiers in the training data set are not present in your raw input data, you will need to set this to `true`, or training features will not be able to be generated, giving null column errors.  For example, if the training data set you are using has individuals from 1900 and 1910, but you are about to train a model to score the 1930-1940 potential matches, you need this to be set to `true` or it will fail, since the individual IDs are not present in the 1930 and 1940 raw input data.  If you were about to train a model to score the 1900-1910 potential matches with this same training set, it would be best to set this to `false`, so you can be sure the training features are created from scratch to match your exact current configuration settings, although if you know the features haven't changed, you could set it to `true` to save a small amount of processing time.
-  * `output_suspicious_TD` -- Type: `boolean`.  Optional.  Used in the `model_exploration` link task.  Outputs tables of potential matches that the model repeatedly scores differently than the match value given by the training data.  Helps to identify false positives/false negatives in the training data, as well as areas that need additional training feature coverage in the model, or need increased representation in the training data set.
   * `split_by_id_a` -- Type: `boolean`.  Optional.  Used in the `model_exploration` link task.  When set to true, ensures that all potential matches for a given individual with ID_a are grouped together in the same train-test-split group. For example, if individual histid_a "A304BT" has three potential matches in the training data, one each to histid_b "B200", "C201", and "D425", all of those potential matches would either end up in the "train" split or the "test" split when evaluating the model performance.
   * `feature_importances` -- Type: `boolean`. Optional.  Whether to record
     feature importances or coefficients for the training features when training
@@ -764,7 +761,6 @@ scale_data = false
 dataset = "/path/to/1900_1910_training_data_20191023.csv"
 dependent_var = "match"
 use_training_data_features = false
-output_suspicious_TD = true
 split_by_id_a = true
 
 score_with_model = true
@@ -804,7 +800,6 @@ scale_data = false
 dataset = "/path/to/hh_training_data_1900_1910.csv"
 dependent_var = "match"
 use_training_data_features = false
-output_suspicious_TD = true
 split_by_id_a = true
 score_with_model = true
 feature_importances = true

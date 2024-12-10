@@ -93,12 +93,9 @@ Writes<span class="w"> </span>a<span class="w"> </span>dataframe<span class="w">
 </ol>
 </section>
 </section>
-<section id="ml-model-exploration-and-export-of-lists-of-potential-false-positives-negatives-in-training-data">
-<h2>ML model exploration and export of lists of potential false positives/negatives in training data<a class="headerlink" href="#ml-model-exploration-and-export-of-lists-of-potential-false-positives-negatives-in-training-data" title="Link to this heading">¶</a></h2>
+<section id="an-example-model-exploration-workflow">
+<h2>An Example Model Exploration Workflow<a class="headerlink" href="#an-example-model-exploration-workflow" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">hlink</span></code> accepts a matrix of ML models and hyper-parameters to run train/test splits for you, and outputs data you can use to select and tune your models.  You can see example <code class="docutils literal notranslate"><span class="pre">training</span></code> and <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> configuration sections that implement this in the <a class="reference external" href="config.html#training-and-models">training</a> and <a class="reference external" href="config.html#household-training-and-models">household training</a> sections of the configuration documentation.</p>
-<p>The model exploration link task also allows you to export lists of potential false positives (FPs) and false negatives (FNs) in your training data.  This is calculated when running the train/test splits in the regular model exploration tasks if the <code class="docutils literal notranslate"><span class="pre">output_suspicious_TD</span></code> flag is true.</p>
-<section id="example-model-exploration-and-fp-fn-export-workflow">
-<h3>Example model exploration and FP/FN export workflow<a class="headerlink" href="#example-model-exploration-and-fp-fn-export-workflow" title="Link to this heading">¶</a></h3>
 <ol>
 <li><p>Create a config file that has a <code class="docutils literal notranslate"><span class="pre">training</span></code> and/or <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> section with model parameters to explore. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">training</span><span class="p">]</span>
@@ -112,9 +109,6 @@ Writes<span class="w"> </span>a<span class="w"> </span>dataframe<span class="w">
 <span class="c1"># This would need to be changed to `true` in a run between other years if your</span>
 <span class="c1"># source data years weren&#39;t identical to the linked years of your training data.</span>
 <span class="n">use_training_data_features</span> <span class="o">=</span> <span class="n">false</span>
-
-<span class="c1"># VERY IMPORTANT if you want to output FPs/FNs</span>
-<span class="n">output_suspicious_TD</span> <span class="o">=</span> <span class="n">true</span>
 
 <span class="n">split_by_id_a</span> <span class="o">=</span> <span class="n">true</span>
 <span class="n">score_with_model</span> <span class="o">=</span> <span class="n">true</span>
@@ -150,15 +144,8 @@ Writes<span class="w"> </span>a<span class="w"> </span>dataframe<span class="w">
 </pre></div>
 </div>
 </li>
-<li><p>Export the potential FPs and FNs to csv.  For <code class="docutils literal notranslate"><span class="pre">training</span></code> params, the results will be in the <code class="docutils literal notranslate"><span class="pre">repeat_FPs</span></code> and <code class="docutils literal notranslate"><span class="pre">repeat_FNs</span></code> tables, and for <code class="docutils literal notranslate"><span class="pre">hh_training</span></code> in the <code class="docutils literal notranslate"><span class="pre">hh_repeat_FPs</span></code> and <code class="docutils literal notranslate"><span class="pre">hh_repeat_FNs</span></code> tables.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>hlink $ csv repeat_FPs /my/output/1900_1910_potential_FPs.csv
-hlink $ csv repeat_FNs /my/output/1900_1910_potential_FNs.csv
-</pre></div>
-</div>
-</li>
 <li><p>Use your preferred methods to analyze the data you’ve just exported.  Update the <code class="docutils literal notranslate"><span class="pre">chosen_model</span></code> in your configuration, and/or create new versions of your training data following your findings and update the path to the new training data in your configs.</p></li>
 </ol>
-</section>
 </section>
 </section>
 
@@ -195,7 +182,7 @@ hlink $ csv repeat_FNs /my/output/1900_1910_potential_FNs.csv
 <li class="toctree-l1"><a class="reference internal" href="running_the_program.html">Running hlink</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced Workflows</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#export-training-data-after-generating-features-to-reuse-in-different-linking-years">Export training data after generating features to reuse in different linking years</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ml-model-exploration-and-export-of-lists-of-potential-false-positives-negatives-in-training-data">ML model exploration and export of lists of potential false positives/negatives in training data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#an-example-model-exploration-workflow">An Example Model Exploration Workflow</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>

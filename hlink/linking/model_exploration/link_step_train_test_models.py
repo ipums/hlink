@@ -342,7 +342,6 @@ class LinkStepTrainTestModels(LinkStep):
     def _evaluate_threshold_combinations(
         self,
         best_model: ModelEval,
-        suspicious_data: Any,
         split: dict[str : pyspark.sql.DataFrame],
         dep_var: str,
         id_a: str,
@@ -397,16 +396,6 @@ class LinkStepTrainTestModels(LinkStep):
             id_b,
             dep_var,
         )
-        """
-        thresholding_predict_train = _get_probability_and_select_pred_columns(
-            cached_training_data,
-            thresholding_model,
-            thresholding_post_transformer,
-            id_a,
-            id_b,
-            dep_var,
-        )
-        """
 
         for threshold_index, (
             this_alpha_threshold,
@@ -428,15 +417,6 @@ class LinkStepTrainTestModels(LinkStep):
                 id_column,
                 decision,
             )
-            """
-            predict_train = threshold_core.predict_using_thresholds(
-                thresholding_predict_train,
-                this_alpha_threshold,
-                this_threshold_ratio,
-                id_column,
-                decision,
-            )
-            """
 
             end_predict_time = perf_counter()
             info = f"Predictions for test-train data on threshold took {end_predict_time - start_predict_time:.2f}s"
@@ -446,27 +426,15 @@ class LinkStepTrainTestModels(LinkStep):
                 predictions,
                 dep_var,
                 thresholding_model,
-                suspicious_data,
                 this_alpha_threshold,
                 this_threshold_ratio,
                 best_model.score,
             )
-            """
-            training_results[threshold_index] = self._capture_training_results(
-                predict_train,
-                dep_var,
-                thresholding_model,
-                suspicious_data,
-                this_alpha_threshold,
-                this_threshold_ratio,
-                best_model.score,
-            )
-            """
 
         thresholding_test_data.unpersist()
         thresholding_training_data.unpersist()
 
-        return prediction_results, suspicious_data
+        return prediction_results
 
     def _run(self) -> None:
         training_section_name = str(self.task.training_conf)
@@ -487,10 +455,6 @@ class LinkStepTrainTestModels(LinkStep):
             .cache()
         )
 
-        # Stores suspicious data
-        # suspicious_data = self._create_suspicious_data(id_a, id_b)
-        suspicious_data = None
-
         outer_fold_count = training_settings.get("n_training_iterations", 10)
         inner_fold_count = 3
 
@@ -500,7 +464,6 @@ class LinkStepTrainTestModels(LinkStep):
         # At the end we combine this information collected from every outer fold
         threshold_test_results: list[ThresholdTestResult] = []
         # threshold_training_results: list[ThresholdTestResult]
-        all_suspicious_data: list[Any] = []
         best_models: list[ModelEval] = []
 
         seed = training_settings.get("seed", 2133)
@@ -545,21 +508,17 @@ class LinkStepTrainTestModels(LinkStep):
                 hyperparam_evaluation_results
             )
 
-            prediction_results, suspicious_data_for_threshold = (
-                self._evaluate_threshold_combinations(
-                    best_model,
-                    suspicious_data,
-                    {"test": outer_test_data, "training": outer_training_data},
-                    dep_var,
-                    id_a,
-                    id_b,
-                )
+            prediction_results = self._evaluate_threshold_combinations(
+                best_model,
+                {"test": outer_test_data, "training": outer_training_data},
+                dep_var,
+                id_a,
+                id_b,
             )
 
             # Collect the outputs for each fold
             threshold_test_results.append(prediction_results)
             # threshold_training_results.append(training_results)
-            # all_suspicious_data.append(suspicious_data_for_threshold)
             best_models.append(best_model)
 
         combined_test = _combine_by_threshold_matrix_entry(threshold_test_results)
@@ -588,7 +547,6 @@ class LinkStepTrainTestModels(LinkStep):
         )
 
         self._save_training_results(thresholded_metrics_df, self.task.spark)
-        # self._save_suspicious_data(suspicious_data, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
     def _split_into_folds(
@@ -685,7 +643,6 @@ class LinkStepTrainTestModels(LinkStep):
         predictions: pyspark.sql.DataFrame,
         dep_var: str,
         model: Model,
-        suspicious_data: dict[str, Any] | None,
         alpha_threshold: float,
         threshold_ratio: float | None,
         pr_auc: float,
@@ -699,7 +656,7 @@ class LinkStepTrainTestModels(LinkStep):
             test_FP_count,
             test_FN_count,
             test_TN_count,
-        ) = _get_confusion_matrix(predictions, dep_var, suspicious_data)
+        ) = _get_confusion_matrix(predictions, dep_var)
         test_precision, test_recall, test_mcc = _get_aggregate_metrics(
             test_TP_count, test_FP_count, test_FN_count, test_TN_count
         )
@@ -731,101 +688,6 @@ class LinkStepTrainTestModels(LinkStep):
             # print(
             #    f"Training results saved to Spark table '{table_prefix}training_results'."
             # )
-
-    def _prepare_suspicious_table(
-        self, spark: pyspark.sql.SparkSession, df: pd.DataFrame, id_a: str, id_b: str
-    ) -> pyspark.sql.DataFrame:
-        spark_df = spark.createDataFrame(df)
-        counted = (
-            spark_df.groupby(id_a, id_b)
-            .agg(
-                count("*").alias("count"),
-                mean("probability").alias("mean_probability"),
-            )
-            .filter("count > 1")
-            .orderBy(["count", id_a, id_b])
-        )
-        return counted
-
-    def _save_suspicious_data(
-        self, suspicious_data: dict[str, Any] | None, spark: pyspark.sql.SparkSession
-    ) -> None:
-        table_prefix = self.task.table_prefix
-
-        if suspicious_data is None:
-            print("OTD suspicious data is None, not saving.")
-            return
-        id_a = suspicious_data["id_a"]
-        id_b = suspicious_data["id_b"]
-
-        if not suspicious_data["FP_data"].empty:
-            table_name = f"{table_prefix}repeat_fps"
-            counted_FPs = self._prepare_suspicious_table(
-                spark, suspicious_data["FP_data"], id_a, id_b
-            )
-            counted_FPs.write.mode("overwrite").saveAsTable(table_name)
-            print(
-                f"A table of false positives of length {counted_FPs.count()} was saved as '{table_name}' for analysis."
-            )
-        else:
-            print("There were no false positives recorded.")
-
-        if not suspicious_data["FN_data"].empty:
-            table_name = f"{table_prefix}repeat_fns"
-            counted_FNs = self._prepare_suspicious_table(
-                spark, suspicious_data["FN_data"], id_a, id_b
-            )
-            counted_FNs.write.mode("overwrite").saveAsTable(table_name)
-            print(
-                f"A table of false negatives of length {counted_FNs.count()} was saved as '{table_name}' for analysis."
-            )
-        else:
-            print("There were no false negatives recorded.")
-
-        if not suspicious_data["TP_data"].empty:
-            table_name = f"{table_prefix}repeat_tps"
-            counted_TPs = self._prepare_suspicious_table(
-                spark, suspicious_data["TP_data"], id_a, id_b
-            )
-            counted_TPs.write.mode("overwrite").saveAsTable(table_name)
-            print(
-                f"A table of true positives of length {counted_TPs.count()} was saved as '{table_name}' for analysis."
-            )
-        else:
-            print("There were no true positives recorded.")
-
-        if not suspicious_data["TN_data"].empty:
-            table_name = f"{table_prefix}repeat_tns"
-            counted_TNs = self._prepare_suspicious_table(
-                spark, suspicious_data["TN_data"], id_a, id_b
-            )
-            counted_TNs.write.mode("overwrite").saveAsTable(table_name)
-            print(
-                f"A table of true negatives of length {counted_TNs.count()} was saved as '{table_name}' for analysis."
-            )
-        else:
-            print("There were no true negatives recorded.")
-
-    def _create_suspicious_data(self, id_a: str, id_b: str) -> dict[str, Any] | None:
-        """Output Suspicious Data (OTD): used to check config to see if you should find sketchy training data that the models routinely mis-classify"""
-        training_section_name = str(self.task.training_conf)
-        config = self.task.link_run.config
-        training_settings = config[training_section_name]
-
-        if (
-            "output_suspicious_TD" in training_settings
-            and training_settings["output_suspicious_TD"]
-        ):
-            return {
-                "FP_data": pd.DataFrame(),
-                "FN_data": pd.DataFrame(),
-                "TP_data": pd.DataFrame(),
-                "TN_data": pd.DataFrame(),
-                "id_a": id_a,
-                "id_b": id_b,
-            }
-        else:
-            return None
 
 
 def _calc_mcc(TP: int, TN: int, FP: int, FN: int) -> float:
@@ -889,9 +751,7 @@ def _get_probability_and_select_pred_columns(
 def _get_confusion_matrix(
     predictions: pyspark.sql.DataFrame,
     dep_var: str,
-    suspicious_data: dict[str, Any] | None,
 ) -> tuple[int, int, int, int]:
-
     TP = predictions.filter((predictions[dep_var] == 1) & (predictions.prediction == 1))
     TP_count = TP.count()
 
@@ -911,38 +771,6 @@ def _get_confusion_matrix(
     # print(
     #   f"Confusion matrix -- true negatives and false negatives: FN {FN_count}  TN {TN_count}"
     # )
-
-    if suspicious_data:
-        id_a = suspicious_data["id_a"]
-        id_b = suspicious_data["id_b"]
-
-        new_FP_data = FP.select(
-            id_a, id_b, dep_var, "prediction", "probability"
-        ).toPandas()
-        suspicious_data["FP_data"] = pd.concat(
-            [suspicious_data["FP_data"], new_FP_data]
-        )
-
-        new_FN_data = FN.select(
-            id_a, id_b, dep_var, "prediction", "probability"
-        ).toPandas()
-        suspicious_data["FN_data"] = pd.concat(
-            [suspicious_data["FN_data"], new_FN_data]
-        )
-
-        new_TP_data = TP.select(
-            id_a, id_b, dep_var, "prediction", "probability"
-        ).toPandas()
-        suspicious_data["TP_data"] = pd.concat(
-            [suspicious_data["TP_data"], new_TP_data]
-        )
-
-        new_TN_data = TN.select(
-            id_a, id_b, dep_var, "prediction", "probability"
-        ).toPandas()
-        suspicious_data["TN_data"] = pd.concat(
-            [suspicious_data["TN_data"], new_TN_data]
-        )
 
     return TP_count, FP_count, FN_count, TN_count
 
