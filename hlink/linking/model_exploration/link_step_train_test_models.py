@@ -975,7 +975,7 @@ def _combine_by_threshold_matrix_entry(
     threshold_results: list[dict[int, ThresholdTestResult]],
 ) -> list[ThresholdTestResult]:
     # This list will have a size of the number of threshold matrix entries
-    results: list[ThresholdTestResult] = []
+    results: list[list[ThresholdTestResult]] = []
 
     # Check number of folds
     if len(threshold_results) < 2:
@@ -1027,15 +1027,35 @@ def _aggregate_per_threshold_results(
     pr_auc_test_sd = statistics.stdev(pr_auc_test) if len(pr_auc_test) > 1 else np.nan
     mcc_test_sd = statistics.stdev(mcc_test) if len(mcc_test) > 1 else np.nan
 
+    # Deal with tiny test data. This should never arise in practice but if it did we ought
+    # to issue a warning.
+    if len(precision_test) < 1:
+        #        raise RuntimeError("Not enough training data to get any valid precision values.")
+        precision_test_mean = np.nan
+    else:
+        precision_test_mean = (
+            statistics.mean(precision_test)
+            if len(precision_test) > 1
+            else precision_test[0]
+        )
+
+    if len(recall_test) < 1:
+        # raise RuntimeError("Not enough training data to get any valid recall values.")
+        recall_test_mean = np.nan
+    else:
+        recall_test_mean = (
+            statistics.mean(recall_test) if len(recall_test) > 1 else recall_test[0]
+        )
+
     new_desc = pd.DataFrame(
         {
             "model": [best_models[0].model_type],
             "parameters": [best_models[0].hyperparams],
             "alpha_threshold": [alpha_threshold],
             "threshold_ratio": [threshold_ratio],
-            "precision_test_mean": [statistics.mean(precision_test)],
+            "precision_test_mean": [precision_test_mean],
             "precision_test_sd": [precision_test_sd],
-            "recall_test_mean": [statistics.mean(recall_test)],
+            "recall_test_mean": [recall_test_mean],
             "recall_test_sd": [recall_test_sd],
             "pr_auc_test_mean": [statistics.mean(pr_auc_test)],
             "pr_auc_test_sd": [pr_auc_test_sd],
