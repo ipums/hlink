@@ -7,6 +7,10 @@ import math
 import numpy as np
 
 
+def f_measure(true_pos: int, false_pos: int, false_neg: int) -> float:
+    return 2 * true_pos / (2 * true_pos + false_pos + false_neg)
+
+
 def mcc(tp: int, tn: int, fp: int, fn: int) -> float:
     """
     Given the counts of true positives (tp), true negatives (tn), false

@@ -7,9 +7,49 @@ import math
 from hypothesis import assume, given
 import hypothesis.strategies as st
 
-from hlink.linking.core.model_metrics import mcc, precision, recall
+from hlink.linking.core.model_metrics import f_measure, mcc, precision, recall
 
 NonNegativeInt = st.integers(min_value=0)
+NegativeInt = st.integers(max_value=-1)
+
+
+def test_f_measure_example() -> None:
+    true_pos = 3112
+    false_pos = 205
+    false_neg = 1134
+
+    f_measure_score = f_measure(true_pos, false_pos, false_neg)
+    assert (
+        abs(f_measure_score - 0.8229539) < 0.0001
+    ), "expected F-measure to be near 0.8229539"
+
+
+@given(true_pos=NonNegativeInt, false_pos=NonNegativeInt, false_neg=NonNegativeInt)
+def test_f_measure_between_0_and_1(
+    true_pos: int, false_pos: int, false_neg: int
+) -> None:
+    assume(true_pos + false_pos + false_neg > 0)
+    f_measure_score = f_measure(true_pos, false_pos, false_neg)
+    assert 0.0 <= f_measure_score <= 1.0
+
+
+@given(true_pos=NonNegativeInt, false_pos=NonNegativeInt, false_neg=NonNegativeInt)
+def test_f_measure_is_harmonic_mean_of_precision_and_recall(
+    true_pos: int, false_pos: int, false_neg: int
+) -> None:
+    precision_score = precision(true_pos, false_pos)
+    recall_score = recall(true_pos, false_neg)
+
+    assume(precision_score + recall_score > 0)
+
+    f_measure_score = f_measure(true_pos, false_pos, false_neg)
+    harmonic_mean = (
+        2 * precision_score * recall_score / (precision_score + recall_score)
+    )
+
+    assert (
+        abs(harmonic_mean - f_measure_score) < 0.0001
+    ), f"harmonic mean is {harmonic_mean}, but F-measure is {f_measure_score}"
 
 
 def test_mcc_example() -> None:
