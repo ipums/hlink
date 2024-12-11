@@ -23,6 +23,7 @@ import pyspark.sql
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, count, count_if, mean
 from functools import reduce
+import hlink.linking.core.model_metrics as metrics_core
 import hlink.linking.core.threshold as threshold_core
 import hlink.linking.core.classifier as classifier_core
 
@@ -690,21 +691,6 @@ class LinkStepTrainTestModels(LinkStep):
             # )
 
 
-def _calc_mcc(tp: int, tn: int, fp: int, fn: int) -> float:
-    """
-    Given the counts of true positives (tp), true negatives (tn), false
-    positives (fp), and false negatives (fn) for a model run, compute the
-    Matthews Correlation Coefficient (MCC).
-    """
-    if (math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))) != 0:
-        mcc = ((tp * tn) - (fp * fn)) / (
-            math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
-        )
-    else:
-        mcc = 0
-    return mcc
-
-
 def _calc_threshold_matrix(
     alpha_threshold: float | list[float], threshold_ratio: float | list[float] | None
 ) -> list[list[float]]:
@@ -796,7 +782,9 @@ def _get_aggregate_metrics(
         recall = np.nan
     else:
         recall = true_positives / (true_positives + false_negatives)
-    mcc = _calc_mcc(true_positives, true_negatives, false_positives, false_negatives)
+    mcc = metrics_core.mcc(
+        true_positives, true_negatives, false_positives, false_negatives
+    )
     return precision, recall, mcc
 
 
