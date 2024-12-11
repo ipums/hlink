@@ -774,14 +774,8 @@ def _get_aggregate_metrics(
 
     Return a tuple of (precision, recall, Matthews Correlation Coefficient).
     """
-    if (true_positives + false_positives) == 0:
-        precision = np.nan
-    else:
-        precision = true_positives / (true_positives + false_positives)
-    if (true_positives + false_negatives) == 0:
-        recall = np.nan
-    else:
-        recall = true_positives / (true_positives + false_negatives)
+    precision = metrics_core.precision(true_positives, false_positives)
+    recall = metrics_core.recall(true_positives, false_negatives)
     mcc = metrics_core.mcc(
         true_positives, true_negatives, false_positives, false_negatives
     )

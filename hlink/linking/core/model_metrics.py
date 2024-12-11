@@ -18,3 +18,21 @@ def mcc(tp: int, tn: int, fp: int, fn: int) -> float:
     else:
         mcc = 0
     return mcc
+
+
+def precision(tp: int, fp: int) -> float:
+    if (tp + fp) == 0:
+        precision = np.nan
+    else:
+        precision = tp / (tp + fp)
+
+    return precision
+
+
+def recall(tp: int, fn: int) -> float:
+    if (tp + fn) == 0:
+        recall = np.nan
+    else:
+        recall = tp / (tp + fn)
+
+    return recall
