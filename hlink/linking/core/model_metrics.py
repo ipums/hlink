@@ -11,34 +11,46 @@ def f_measure(true_pos: int, false_pos: int, false_neg: int) -> float:
     return 2 * true_pos / (2 * true_pos + false_pos + false_neg)
 
 
-def mcc(tp: int, tn: int, fp: int, fn: int) -> float:
+def mcc(true_pos: int, true_neg: int, false_pos: int, false_neg: int) -> float:
     """
-    Given the counts of true positives (tp), true negatives (tn), false
-    positives (fp), and false negatives (fn) for a model run, compute the
+    Given the counts of true positives (true_pos), true negatives (true_neg), false
+    positives (false_pos), and false negatives (false_neg) for a model run, compute the
     Matthews Correlation Coefficient (MCC).
     """
-    if (math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))) != 0:
-        mcc = ((tp * tn) - (fp * fn)) / (
-            math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    if (
+        math.sqrt(
+            (true_pos + false_pos)
+            * (true_pos + false_neg)
+            * (true_neg + false_pos)
+            * (true_neg + false_neg)
+        )
+    ) != 0:
+        mcc = ((true_pos * true_neg) - (false_pos * false_neg)) / (
+            math.sqrt(
+                (true_pos + false_pos)
+                * (true_pos + false_neg)
+                * (true_neg + false_pos)
+                * (true_neg + false_neg)
+            )
         )
     else:
         mcc = 0
     return mcc
 
 
-def precision(tp: int, fp: int) -> float:
-    if (tp + fp) == 0:
+def precision(true_pos: int, false_pos: int) -> float:
+    if (true_pos + false_pos) == 0:
         precision = np.nan
     else:
-        precision = tp / (tp + fp)
+        precision = true_pos / (true_pos + false_pos)
 
     return precision
 
 
-def recall(tp: int, fn: int) -> float:
-    if (tp + fn) == 0:
+def recall(true_pos: int, false_neg: int) -> float:
+    if (true_pos + false_neg) == 0:
         recall = np.nan
     else:
-        recall = tp / (tp + fn)
+        recall = true_pos / (true_pos + false_neg)
 
     return recall

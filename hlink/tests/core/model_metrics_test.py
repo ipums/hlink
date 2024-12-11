@@ -53,20 +53,20 @@ def test_f_measure_is_harmonic_mean_of_precision_and_recall(
 
 
 def test_mcc_example() -> None:
-    tp = 3112
-    fp = 205
-    fn = 1134
-    tn = 33259
+    true_pos = 3112
+    false_pos = 205
+    false_neg = 1134
+    true_neg = 33259
 
-    mcc_score = mcc(tp, tn, fp, fn)
+    mcc_score = mcc(true_pos, true_neg, false_pos, false_neg)
     assert abs(mcc_score - 0.8111208) < 0.0001, "expected MCC to be near 0.8111208"
 
 
 def test_precision_example() -> None:
-    tp = 3112
-    fp = 205
+    true_pos = 3112
+    false_pos = 205
 
-    precision_score = precision(tp, fp)
+    precision_score = precision(true_pos, false_pos)
     assert (
         abs(precision_score - 0.9381972) < 0.0001
     ), "expected precision to be near 0.9381972"
@@ -93,10 +93,10 @@ def test_precision_no_positive_predictions() -> None:
 
 
 def test_recall_example() -> None:
-    tp = 3112
-    fn = 1134
+    true_pos = 3112
+    false_neg = 1134
 
-    recall_score = recall(tp, fn)
+    recall_score = recall(true_pos, false_neg)
     assert (
         abs(recall_score - 0.7329251) < 0.0001
     ), "expected recall to be near 0.7329251"
