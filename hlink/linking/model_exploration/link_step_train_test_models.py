@@ -658,9 +658,14 @@ class LinkStepTrainTestModels(LinkStep):
             fn_count,
             tn_count,
         ) = _get_confusion_matrix(predictions, dep_var)
-        precision = metrics_core.precision(tp_count, fp_count)
-        recall = metrics_core.recall(tp_count, fn_count)
-        mcc = metrics_core.mcc(tp_count, tn_count, fp_count, fn_count)
+        precision_raw = metrics_core.precision(tp_count, fp_count)
+        recall_raw = metrics_core.recall(tp_count, fn_count)
+        mcc_raw = metrics_core.mcc(tp_count, tn_count, fp_count, fn_count)
+
+        # Convert Python's math.nan to np.nan for numpy/pandas processing
+        precision = precision_raw if not math.isnan(precision_raw) else np.nan
+        recall = recall_raw if not math.isnan(recall_raw) else np.nan
+        mcc = mcc_raw if not math.isnan(mcc_raw) else np.nan
 
         result = ThresholdTestResult(
             precision=precision,

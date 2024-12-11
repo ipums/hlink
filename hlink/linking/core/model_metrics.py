@@ -4,8 +4,6 @@
 #   https://github.com/ipums/hlink
 import math
 
-import numpy as np
-
 
 def f_measure(true_pos: int, false_pos: int, false_neg: int) -> float:
     return 2 * true_pos / (2 * true_pos + false_pos + false_neg)
@@ -40,7 +38,7 @@ def mcc(true_pos: int, true_neg: int, false_pos: int, false_neg: int) -> float:
 
 def precision(true_pos: int, false_pos: int) -> float:
     if (true_pos + false_pos) == 0:
-        precision = np.nan
+        precision = math.nan
     else:
         precision = true_pos / (true_pos + false_pos)
 
@@ -49,7 +47,7 @@ def precision(true_pos: int, false_pos: int) -> float:
 
 def recall(true_pos: int, false_neg: int) -> float:
     if (true_pos + false_neg) == 0:
-        recall = np.nan
+        recall = math.nan
     else:
         recall = true_pos / (true_pos + false_neg)
 
