@@ -658,14 +658,14 @@ class LinkStepTrainTestModels(LinkStep):
             fn_count,
             tn_count,
         ) = _get_confusion_matrix(predictions, dep_var)
-        test_precision, test_recall, test_mcc = _get_aggregate_metrics(
-            tp_count, fp_count, fn_count, tn_count
-        )
+        precision = metrics_core.precision(tp_count, fp_count)
+        recall = metrics_core.recall(tp_count, fn_count)
+        mcc = metrics_core.mcc(tp_count, tn_count, fp_count, fn_count)
 
         result = ThresholdTestResult(
-            precision=test_precision,
-            recall=test_recall,
-            mcc=test_mcc,
+            precision=precision,
+            recall=recall,
+            mcc=mcc,
             pr_auc=pr_auc,
             model_id=model,
             alpha_threshold=alpha_threshold,
@@ -762,24 +762,6 @@ def _get_confusion_matrix(
         confusion_row.false_negatives,
         confusion_row.true_negatives,
     )
-
-
-def _get_aggregate_metrics(
-    true_positives: int, false_positives: int, false_negatives: int, true_negatives: int
-) -> tuple[float, float, float]:
-    """
-    Given the counts of true positives, false positives, false negatives, and
-    true negatives for a model run, compute several metrics to evaluate the
-    model's quality.
-
-    Return a tuple of (precision, recall, Matthews Correlation Coefficient).
-    """
-    precision = metrics_core.precision(true_positives, false_positives)
-    recall = metrics_core.recall(true_positives, false_negatives)
-    mcc = metrics_core.mcc(
-        true_positives, true_negatives, false_positives, false_negatives
-    )
-    return precision, recall, mcc
 
 
 # The outer list  entries hold results from each outer fold, the inner list has a ThresholdTestResult per threshold

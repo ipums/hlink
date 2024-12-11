@@ -4,6 +4,8 @@
 #   https://github.com/ipums/hlink
 import math
 
+import numpy as np
+
 
 def mcc(tp: int, tn: int, fp: int, fn: int) -> float:
     """
