@@ -535,7 +535,7 @@ class LinkStepTrainTestModels(LinkStep):
         # threshold matrix entries.
         threshold_matrix_size = len(threshold_test_results[0])
 
-        thresholded_metrics_df = _create_thresholded_metrics_df()
+        thresholded_metrics_df = pd.DataFrame()
         for i in range(threshold_matrix_size):
             print(f"Aggregate threshold matrix entry {i}")
             thresholded_metrics_df = _aggregate_per_threshold_results(
@@ -549,7 +549,7 @@ class LinkStepTrainTestModels(LinkStep):
             thresholded_metrics_df
         )
         _print_thresholded_metrics_df(
-            thresholded_metrics_df.sort_values(by="mcc_test_mean", ascending=False)
+            thresholded_metrics_df.sort_values(by="mcc_mean", ascending=False)
         )
 
         self._save_training_results(thresholded_metrics_df, self.task.spark)
@@ -835,17 +835,17 @@ def _aggregate_per_threshold_results(
     threshold_ratio = prediction_results[0].threshold_ratio
 
     # Pull out columns to be aggregated
-    precision_test = [
-        r.precision for r in prediction_results if not math.isnan(r.precision)
-    ]
-    recall_test = [r.recall for r in prediction_results if not math.isnan(r.recall)]
-    pr_auc_test = [r.pr_auc for r in prediction_results if not math.isnan(r.pr_auc)]
-    mcc_test = [r.mcc for r in prediction_results if not math.isnan(r.mcc)]
+    precision = [r.precision for r in prediction_results if not math.isnan(r.precision)]
+    recall = [r.recall for r in prediction_results if not math.isnan(r.recall)]
+    pr_auc = [r.pr_auc for r in prediction_results if not math.isnan(r.pr_auc)]
+    mcc = [r.mcc for r in prediction_results if not math.isnan(r.mcc)]
+    f_measure = [r.f_measure for r in prediction_results if not math.isnan(r.f_measure)]
 
-    (precision_test_mean, precision_test_sd) = _compute_mean_and_stdev(precision_test)
-    (recall_test_mean, recall_test_sd) = _compute_mean_and_stdev(recall_test)
-    (pr_auc_test_mean, pr_auc_test_sd) = _compute_mean_and_stdev(pr_auc_test)
-    (mcc_test_mean, mcc_test_sd) = _compute_mean_and_stdev(mcc_test)
+    (precision_mean, precision_sd) = _compute_mean_and_stdev(precision)
+    (recall_mean, recall_sd) = _compute_mean_and_stdev(recall)
+    (pr_auc_mean, pr_auc_sd) = _compute_mean_and_stdev(pr_auc)
+    (mcc_mean, mcc_sd) = _compute_mean_and_stdev(mcc)
+    (f_measure_mean, f_measure_sd) = _compute_mean_and_stdev(f_measure)
 
     new_desc = pd.DataFrame(
         {
@@ -853,14 +853,16 @@ def _aggregate_per_threshold_results(
             "parameters": [best_models[0].hyperparams],
             "alpha_threshold": [alpha_threshold],
             "threshold_ratio": [threshold_ratio],
-            "precision_test_mean": [precision_test_mean],
-            "precision_test_sd": [precision_test_sd],
-            "recall_test_mean": [recall_test_mean],
-            "recall_test_sd": [recall_test_sd],
-            "pr_auc_test_mean": [pr_auc_test_mean],
-            "pr_auc_test_sd": [pr_auc_test_sd],
-            "mcc_test_mean": [mcc_test_mean],
-            "mcc_test_sd": [mcc_test_sd],
+            "precision_mean": [precision_mean],
+            "precision_sd": [precision_sd],
+            "recall_mean": [recall_mean],
+            "recall_sd": [recall_sd],
+            "pr_auc_mean": [pr_auc_mean],
+            "pr_auc_sd": [pr_auc_sd],
+            "mcc_mean": [mcc_mean],
+            "mcc_sd": [mcc_sd],
+            "f_measure_mean": [f_measure_mean],
+            "f_measure_sd": [f_measure_sd],
         },
     )
 
@@ -903,23 +905,6 @@ def _load_thresholded_metrics_df_params(desc_df: pd.DataFrame) -> pd.DataFrame:
         lambda t: str(t) if pd.notnull(t) else t
     )
     return desc_df
-
-
-def _create_thresholded_metrics_df() -> pd.DataFrame:
-    return pd.DataFrame(
-        columns=[
-            "model",
-            "parameters",
-            "alpha_threshold",
-            "threshold_ratio",
-            "precision_test_mean",
-            "precision_test_sd",
-            "recall_test_mean",
-            "recall_test_sd",
-            "mcc_test_mean",
-            "mcc_test_sd",
-        ]
-    )
 
 
 def _custom_param_grid_builder(
