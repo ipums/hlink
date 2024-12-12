@@ -24,6 +24,15 @@ def test_f_measure_example() -> None:
     ), "expected F-measure to be near 0.8229539"
 
 
+def test_f_measure_all_zeroes() -> None:
+    """
+    When true_pos, false_pos, and false_neg are all 0, f_measure is undefined and
+    returns NaN to indicate this.
+    """
+    f_measure_score = f_measure(0, 0, 0)
+    assert math.isnan(f_measure_score)
+
+
 @given(true_pos=NonNegativeInt, false_pos=NonNegativeInt, false_neg=NonNegativeInt)
 def test_f_measure_between_0_and_1(
     true_pos: int, false_pos: int, false_neg: int

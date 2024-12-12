@@ -143,8 +143,9 @@ class ModelEval:
 class ThresholdTestResult:
     precision: float
     recall: float
-    pr_auc: float
     mcc: float
+    f_measure: float
+    pr_auc: float
     model_id: str
     alpha_threshold: float
     threshold_ratio: float
@@ -661,11 +662,13 @@ class LinkStepTrainTestModels(LinkStep):
         precision = metrics_core.precision(tp_count, fp_count)
         recall = metrics_core.recall(tp_count, fn_count)
         mcc = metrics_core.mcc(tp_count, tn_count, fp_count, fn_count)
+        f_measure = metrics_core.f_measure(tp_count, fp_count, fn_count)
 
         result = ThresholdTestResult(
             precision=precision,
             recall=recall,
             mcc=mcc,
+            f_measure=f_measure,
             pr_auc=pr_auc,
             model_id=model,
             alpha_threshold=alpha_threshold,

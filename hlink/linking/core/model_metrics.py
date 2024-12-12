@@ -6,7 +6,10 @@ import math
 
 
 def f_measure(true_pos: int, false_pos: int, false_neg: int) -> float:
-    return 2 * true_pos / (2 * true_pos + false_pos + false_neg)
+    denominator = 2 * true_pos + false_pos + false_neg
+    if denominator == 0:
+        return math.nan
+    return 2 * true_pos / denominator
 
 
 def mcc(true_pos: int, true_neg: int, false_pos: int, false_neg: int) -> float:
