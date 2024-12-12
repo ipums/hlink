@@ -544,13 +544,16 @@ class LinkStepTrainTestModels(LinkStep):
 
         print("***   Final thresholded metrics ***")
 
+        # Convert the parameters column to dtype string so that Spark can handle it
+        thresholded_metrics_df["parameters"] = thresholded_metrics_df[
+            "parameters"
+        ].apply(lambda t: str(t) if pd.notnull(t) else t)
         # thresholded_metrics_df has one row per threshold combination. and each outer fold
-        thresholded_metrics_df = _load_thresholded_metrics_df_params(
-            thresholded_metrics_df
-        )
-        _print_thresholded_metrics_df(
-            thresholded_metrics_df.sort_values(by="mcc_mean", ascending=False)
-        )
+        with pd.option_context(
+            "display.max_columns", None, "display.max_colwidth", None
+        ):
+            print(thresholded_metrics_df.sort_values(by="mcc_mean", ascending=False))
+        print("\n")
 
         self._save_training_results(thresholded_metrics_df, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
@@ -693,7 +696,6 @@ class LinkStepTrainTestModels(LinkStep):
         if desc_df.empty:
             print("Training results dataframe is empty.")
         else:
-            desc_df.dropna(axis=1, how="all", inplace=True)
             spark.createDataFrame(desc_df, samplingRatio=1).write.mode(
                 "overwrite"
             ).saveAsTable(f"{table_prefix}training_results")
@@ -871,40 +873,6 @@ def _aggregate_per_threshold_results(
     )
 
     return thresholded_metrics_df
-
-
-def _print_thresholded_metrics_df(desc_df: pd.DataFrame) -> None:
-    pd.set_option("display.max_colwidth", None)
-    print(desc_df.iloc[-1])
-
-    print("\n")
-
-
-def _load_thresholded_metrics_df_params(desc_df: pd.DataFrame) -> pd.DataFrame:
-    params = [
-        "maxDepth",
-        "numTrees",
-        "featureSubsetStrategy",
-        "subsample",
-        "minInstancesPerNode",
-        "maxBins",
-        "class_weight",
-        "C",
-        "kernel",
-        "threshold",
-        "maxIter",
-    ]
-
-    load_params = lambda j, param: j.get(param, np.nan)
-    for param in params:
-        desc_df[param] = desc_df["parameters"].apply(load_params, args=(param,))
-    desc_df["class_weight"] = desc_df["class_weight"].apply(
-        lambda x: str(x) if pd.notnull(x) else x
-    )
-    desc_df["parameters"] = desc_df["parameters"].apply(
-        lambda t: str(t) if pd.notnull(t) else t
-    )
-    return desc_df
 
 
 def _custom_param_grid_builder(
