@@ -6,6 +6,7 @@ import math
 
 from hypothesis import assume, given
 import hypothesis.strategies as st
+import pytest
 
 from hlink.linking.core.model_metrics import f_measure, mcc, precision, recall
 
@@ -69,6 +70,21 @@ def test_mcc_example() -> None:
 
     mcc_score = mcc(true_pos, true_neg, false_pos, false_neg)
     assert abs(mcc_score - 0.8111208) < 0.0001, "expected MCC to be near 0.8111208"
+
+
+@pytest.mark.parametrize(
+    "true_pos,true_neg,false_pos,false_neg",
+    [(0, 0, 0, 0), (0, 1, 0, 1), (0, 1, 1, 0), (1, 0, 0, 1), (1, 0, 1, 0)],
+)
+def test_mcc_denom_zero(
+    true_pos: int, true_neg: int, false_pos: int, false_neg: int
+) -> None:
+    """
+    If the denominator of MCC is 0, it's not well-defined, and it returns NaN. This
+    can happen in a variety of situations if at least 2 of the inputs are 0.
+    """
+    mcc_score = mcc(true_pos, true_neg, false_pos, false_neg)
+    assert math.isnan(mcc_score)
 
 
 def test_precision_example() -> None:

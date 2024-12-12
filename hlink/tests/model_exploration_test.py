@@ -759,7 +759,7 @@ def test_step_2_train_decision_tree_spark(
 
     print(f"Decision tree results: {tr}")
 
-    assert tr.shape == (1, 15)
+    assert tr.shape == (1, 14)
     # assert tr.query("model == 'decision_tree'")["precision_mean"].iloc[0] > 0
     assert tr.query("model == 'decision_tree'")["maxDepth"].iloc[0] == 3
     assert tr.query("model == 'decision_tree'")["minInstancesPerNode"].iloc[0] == 1

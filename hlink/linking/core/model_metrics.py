@@ -35,7 +35,7 @@ def mcc(true_pos: int, true_neg: int, false_pos: int, false_neg: int) -> float:
             )
         )
     else:
-        mcc = 0
+        mcc = math.nan
     return mcc
 
 
