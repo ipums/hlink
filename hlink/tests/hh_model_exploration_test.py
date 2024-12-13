@@ -54,10 +54,10 @@ def test_all_hh_mod_ev(
         "parameters",
         "alpha_threshold",
         "threshold_ratio",
-        "precision_test_mean",
-        "recall_test_mean",
-        "mcc_test_mean",
-        "pr_auc_test_mean",
+        "precision_mean",
+        "recall_mean",
+        "mcc_mean",
+        "pr_auc_mean",
     ]
 
     # TODO we should expect to get most of these columns once the results reporting is finished.
@@ -67,13 +67,13 @@ def test_all_hh_mod_ev(
         "alpha_threshold",
         "threshold_ratio",
         # "precision_test_mean",
-        "precision_test_sd",
-        "recall_test_mean",
-        "recall_test_sd",
-        "mcc_test_sd",
-        "mcc_test_mean",
-        "pr_auc_test_mean",
-        "pr_auc_test_sd",
+        "precision_sd",
+        "recall_mean",
+        "recall_sd",
+        "mcc_sd",
+        "mcc_mean",
+        "pr_auc_mean",
+        "pr_auc_sd",
         "maxDepth",
         "numTrees",
     ]
@@ -83,19 +83,15 @@ def test_all_hh_mod_ev(
 
     assert (
         0.6
-        < tr.query("model == 'logistic_regression'")["precision_test_mean"].iloc[0]
+        < tr.query("model == 'logistic_regression'")["precision_mean"].iloc[0]
         <= 1.0
     )
     assert tr.query("model == 'logistic_regression'")["alpha_threshold"].iloc[0] == 0.5
     assert (
-        0.7
-        < tr.query("model == 'logistic_regression'")["pr_auc_test_mean"].iloc[0]
-        <= 1.0
+        0.7 < tr.query("model == 'logistic_regression'")["pr_auc_mean"].iloc[0] <= 1.0
     )
     assert (
-        0.9
-        < tr.query("model == 'logistic_regression'")["recall_test_mean"].iloc[0]
-        <= 1.0
+        0.9 < tr.query("model == 'logistic_regression'")["recall_mean"].iloc[0] <= 1.0
     )
 
     preds = spark.table("hh_model_eval_predictions").toPandas()

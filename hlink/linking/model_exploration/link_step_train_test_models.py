@@ -23,6 +23,7 @@ import pyspark.sql
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, count, count_if, mean
 from functools import reduce
+import hlink.linking.core.model_metrics as metrics_core
 import hlink.linking.core.threshold as threshold_core
 import hlink.linking.core.classifier as classifier_core
 
@@ -140,13 +141,18 @@ class ModelEval:
 # Both training and test results can be captured in this type
 @dataclass(kw_only=True)
 class ThresholdTestResult:
-    precision: float
-    recall: float
-    pr_auc: float
-    mcc: float
     model_id: str
     alpha_threshold: float
     threshold_ratio: float
+    true_pos: int
+    true_neg: int
+    false_pos: int
+    false_neg: int
+    precision: float
+    recall: float
+    mcc: float
+    f_measure: float
+    pr_auc: float
 
 
 class LinkStepTrainTestModels(LinkStep):
@@ -529,7 +535,7 @@ class LinkStepTrainTestModels(LinkStep):
         # threshold matrix entries.
         threshold_matrix_size = len(threshold_test_results[0])
 
-        thresholded_metrics_df = _create_thresholded_metrics_df()
+        thresholded_metrics_df = pd.DataFrame()
         for i in range(threshold_matrix_size):
             print(f"Aggregate threshold matrix entry {i}")
             thresholded_metrics_df = _aggregate_per_threshold_results(
@@ -538,13 +544,16 @@ class LinkStepTrainTestModels(LinkStep):
 
         print("***   Final thresholded metrics ***")
 
+        # Convert the parameters column to dtype string so that Spark can handle it
+        thresholded_metrics_df["parameters"] = thresholded_metrics_df[
+            "parameters"
+        ].apply(lambda t: str(t) if pd.notnull(t) else t)
         # thresholded_metrics_df has one row per threshold combination. and each outer fold
-        thresholded_metrics_df = _load_thresholded_metrics_df_params(
-            thresholded_metrics_df
-        )
-        _print_thresholded_metrics_df(
-            thresholded_metrics_df.sort_values(by="mcc_test_mean", ascending=False)
-        )
+        with pd.option_context(
+            "display.max_columns", None, "display.max_colwidth", None
+        ):
+            print(thresholded_metrics_df.sort_values(by="mcc_mean", ascending=False))
+        print("\n")
 
         self._save_training_results(thresholded_metrics_df, self.task.spark)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
@@ -652,23 +661,29 @@ class LinkStepTrainTestModels(LinkStep):
         predictions.createOrReplaceTempView(f"{table_prefix}predictions")
 
         (
-            tp_count,
-            fp_count,
-            fn_count,
-            tn_count,
+            true_pos,
+            false_pos,
+            false_neg,
+            true_neg,
         ) = _get_confusion_matrix(predictions, dep_var)
-        test_precision, test_recall, test_mcc = _get_aggregate_metrics(
-            tp_count, fp_count, fn_count, tn_count
-        )
+        precision = metrics_core.precision(true_pos, false_pos)
+        recall = metrics_core.recall(true_pos, false_neg)
+        mcc = metrics_core.mcc(true_pos, true_neg, false_pos, false_neg)
+        f_measure = metrics_core.f_measure(true_pos, false_pos, false_neg)
 
         result = ThresholdTestResult(
-            precision=test_precision,
-            recall=test_recall,
-            mcc=test_mcc,
-            pr_auc=pr_auc,
             model_id=model,
             alpha_threshold=alpha_threshold,
             threshold_ratio=threshold_ratio,
+            true_pos=true_pos,
+            true_neg=true_neg,
+            false_pos=false_pos,
+            false_neg=false_neg,
+            precision=precision,
+            recall=recall,
+            mcc=mcc,
+            f_measure=f_measure,
+            pr_auc=pr_auc,
         )
 
         return result
@@ -681,28 +696,12 @@ class LinkStepTrainTestModels(LinkStep):
         if desc_df.empty:
             print("Training results dataframe is empty.")
         else:
-            desc_df.dropna(axis=1, how="all", inplace=True)
             spark.createDataFrame(desc_df, samplingRatio=1).write.mode(
                 "overwrite"
             ).saveAsTable(f"{table_prefix}training_results")
             # print(
             #    f"Training results saved to Spark table '{table_prefix}training_results'."
             # )
-
-
-def _calc_mcc(tp: int, tn: int, fp: int, fn: int) -> float:
-    """
-    Given the counts of true positives (tp), true negatives (tn), false
-    positives (fp), and false negatives (fn) for a model run, compute the
-    Matthews Correlation Coefficient (MCC).
-    """
-    if (math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))) != 0:
-        mcc = ((tp * tn) - (fp * fn)) / (
-            math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
-        )
-    else:
-        mcc = 0
-    return mcc
 
 
 def _calc_threshold_matrix(
@@ -757,47 +756,24 @@ def _get_confusion_matrix(
     confusion matrix is the count of true positives, false positives, false
     negatives, and true negatives for the predictions.
 
-    Return a tuple (true_positives, false_positives, false_negatives,
-    true_negatives).
+    Return a tuple (true_pos, false_pos, false_neg, true_neg).
     """
     prediction_col = col("prediction")
     label_col = col(dep_var)
 
     confusion_matrix = predictions.select(
-        count_if((label_col == 1) & (prediction_col == 1)).alias("true_positives"),
-        count_if((label_col == 0) & (prediction_col == 1)).alias("false_positives"),
-        count_if((label_col == 1) & (prediction_col == 0)).alias("false_negatives"),
-        count_if((label_col == 0) & (prediction_col == 0)).alias("true_negatives"),
+        count_if((label_col == 1) & (prediction_col == 1)).alias("true_pos"),
+        count_if((label_col == 0) & (prediction_col == 1)).alias("false_pos"),
+        count_if((label_col == 1) & (prediction_col == 0)).alias("false_neg"),
+        count_if((label_col == 0) & (prediction_col == 0)).alias("true_neg"),
     )
     [confusion_row] = confusion_matrix.collect()
     return (
-        confusion_row.true_positives,
-        confusion_row.false_positives,
-        confusion_row.false_negatives,
-        confusion_row.true_negatives,
+        confusion_row.true_pos,
+        confusion_row.false_pos,
+        confusion_row.false_neg,
+        confusion_row.true_neg,
     )
-
-
-def _get_aggregate_metrics(
-    true_positives: int, false_positives: int, false_negatives: int, true_negatives: int
-) -> tuple[float, float, float]:
-    """
-    Given the counts of true positives, false positives, false negatives, and
-    true negatives for a model run, compute several metrics to evaluate the
-    model's quality.
-
-    Return a tuple of (precision, recall, Matthews Correlation Coefficient).
-    """
-    if (true_positives + false_positives) == 0:
-        precision = np.nan
-    else:
-        precision = true_positives / (true_positives + false_positives)
-    if (true_positives + false_negatives) == 0:
-        recall = np.nan
-    else:
-        recall = true_positives / (true_positives + false_negatives)
-    mcc = _calc_mcc(true_positives, true_negatives, false_positives, false_negatives)
-    return precision, recall, mcc
 
 
 # The outer list  entries hold results from each outer fold, the inner list has a ThresholdTestResult per threshold
@@ -831,6 +807,24 @@ def _combine_by_threshold_matrix_entry(
     return results
 
 
+def _compute_mean_and_stdev(values: list[float]) -> (float, float):
+    """
+    Given a list of floats, return a tuple (mean, stdev). If there aren't enough
+    values to compute the mean and/or stdev, return np.nan for that entry.
+    """
+    try:
+        mean = statistics.mean(values)
+    except statistics.StatisticsError:
+        mean = np.nan
+
+    try:
+        stdev = statistics.stdev(values)
+    except statistics.StatisticsError:
+        stdev = np.nan
+
+    return (mean, stdev)
+
+
 def _aggregate_per_threshold_results(
     thresholded_metrics_df: pd.DataFrame,
     prediction_results: list[ThresholdTestResult],
@@ -843,40 +837,17 @@ def _aggregate_per_threshold_results(
     threshold_ratio = prediction_results[0].threshold_ratio
 
     # Pull out columns to be aggregated
-    precision_test = [
-        r.precision for r in prediction_results if r.precision is not np.nan
-    ]
-    recall_test = [r.recall for r in prediction_results if r.recall is not np.nan]
-    pr_auc_test = [r.pr_auc for r in prediction_results if r.pr_auc is not np.nan]
-    mcc_test = [r.mcc for r in prediction_results if r.mcc is not np.nan]
+    precision = [r.precision for r in prediction_results if not math.isnan(r.precision)]
+    recall = [r.recall for r in prediction_results if not math.isnan(r.recall)]
+    pr_auc = [r.pr_auc for r in prediction_results if not math.isnan(r.pr_auc)]
+    mcc = [r.mcc for r in prediction_results if not math.isnan(r.mcc)]
+    f_measure = [r.f_measure for r in prediction_results if not math.isnan(r.f_measure)]
 
-    # # variance requires at least two values
-    precision_test_sd = (
-        statistics.stdev(precision_test) if len(precision_test) > 1 else np.nan
-    )
-    recall_test_sd = statistics.stdev(recall_test) if len(recall_test) > 1 else np.nan
-    pr_auc_test_sd = statistics.stdev(pr_auc_test) if len(pr_auc_test) > 1 else np.nan
-    mcc_test_sd = statistics.stdev(mcc_test) if len(mcc_test) > 1 else np.nan
-
-    # Deal with tiny test data. This should never arise in practice but if it did we ought
-    # to issue a warning.
-    if len(precision_test) < 1:
-        #        raise RuntimeError("Not enough training data to get any valid precision values.")
-        precision_test_mean = np.nan
-    else:
-        precision_test_mean = (
-            statistics.mean(precision_test)
-            if len(precision_test) > 1
-            else precision_test[0]
-        )
-
-    if len(recall_test) < 1:
-        # raise RuntimeError("Not enough training data to get any valid recall values.")
-        recall_test_mean = np.nan
-    else:
-        recall_test_mean = (
-            statistics.mean(recall_test) if len(recall_test) > 1 else recall_test[0]
-        )
+    (precision_mean, precision_sd) = _compute_mean_and_stdev(precision)
+    (recall_mean, recall_sd) = _compute_mean_and_stdev(recall)
+    (pr_auc_mean, pr_auc_sd) = _compute_mean_and_stdev(pr_auc)
+    (mcc_mean, mcc_sd) = _compute_mean_and_stdev(mcc)
+    (f_measure_mean, f_measure_sd) = _compute_mean_and_stdev(f_measure)
 
     new_desc = pd.DataFrame(
         {
@@ -884,14 +855,16 @@ def _aggregate_per_threshold_results(
             "parameters": [best_models[0].hyperparams],
             "alpha_threshold": [alpha_threshold],
             "threshold_ratio": [threshold_ratio],
-            "precision_test_mean": [precision_test_mean],
-            "precision_test_sd": [precision_test_sd],
-            "recall_test_mean": [recall_test_mean],
-            "recall_test_sd": [recall_test_sd],
-            "pr_auc_test_mean": [statistics.mean(pr_auc_test)],
-            "pr_auc_test_sd": [pr_auc_test_sd],
-            "mcc_test_mean": [statistics.mean(mcc_test)],
-            "mcc_test_sd": [mcc_test_sd],
+            "precision_mean": [precision_mean],
+            "precision_sd": [precision_sd],
+            "recall_mean": [recall_mean],
+            "recall_sd": [recall_sd],
+            "pr_auc_mean": [pr_auc_mean],
+            "pr_auc_sd": [pr_auc_sd],
+            "mcc_mean": [mcc_mean],
+            "mcc_sd": [mcc_sd],
+            "f_measure_mean": [f_measure_mean],
+            "f_measure_sd": [f_measure_sd],
         },
     )
 
@@ -900,57 +873,6 @@ def _aggregate_per_threshold_results(
     )
 
     return thresholded_metrics_df
-
-
-def _print_thresholded_metrics_df(desc_df: pd.DataFrame) -> None:
-    pd.set_option("display.max_colwidth", None)
-    print(desc_df.iloc[-1])
-
-    print("\n")
-
-
-def _load_thresholded_metrics_df_params(desc_df: pd.DataFrame) -> pd.DataFrame:
-    params = [
-        "maxDepth",
-        "numTrees",
-        "featureSubsetStrategy",
-        "subsample",
-        "minInstancesPerNode",
-        "maxBins",
-        "class_weight",
-        "C",
-        "kernel",
-        "threshold",
-        "maxIter",
-    ]
-
-    load_params = lambda j, param: j.get(param, np.nan)
-    for param in params:
-        desc_df[param] = desc_df["parameters"].apply(load_params, args=(param,))
-    desc_df["class_weight"] = desc_df["class_weight"].apply(
-        lambda x: str(x) if pd.notnull(x) else x
-    )
-    desc_df["parameters"] = desc_df["parameters"].apply(
-        lambda t: str(t) if pd.notnull(t) else t
-    )
-    return desc_df
-
-
-def _create_thresholded_metrics_df() -> pd.DataFrame:
-    return pd.DataFrame(
-        columns=[
-            "model",
-            "parameters",
-            "alpha_threshold",
-            "threshold_ratio",
-            "precision_test_mean",
-            "precision_test_sd",
-            "recall_test_mean",
-            "recall_test_sd",
-            "mcc_test_mean",
-            "mcc_test_sd",
-        ]
-    )
 
 
 def _custom_param_grid_builder(
