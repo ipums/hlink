@@ -44,6 +44,7 @@ class SparkConnection:
     ):
         self.derby_dir = derby_dir
         self.warehouse_dir = warehouse_dir
+        self.checkpoint_dir = checkpoint_dir
         self.db_name = db_name
         self.tmp_dir = tmp_dir
         self.python = python
@@ -122,7 +123,7 @@ class SparkConnection:
         if self.db_name not in [d.name for d in session.catalog.listDatabases()]:
             session.sql(f"CREATE DATABASE IF NOT EXISTS {self.db_name}")
         session.catalog.setCurrentDatabase(self.db_name)
-        session.sparkContext.setCheckpointDir(str(self.tmp_dir))
+        session.sparkContext.setCheckpointDir(str(self.checkpoint_dir))
         self._register_udfs(session)
 
         # If the SynapseML Python package is available, include the Scala
