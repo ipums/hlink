@@ -72,6 +72,28 @@ def test_mcc_example() -> None:
     assert abs(mcc_score - 0.8111208) < 0.0001, "expected MCC to be near 0.8111208"
 
 
+@given(
+    true_pos=NonNegativeInt,
+    true_neg=NonNegativeInt,
+    false_pos=NonNegativeInt,
+    false_neg=NonNegativeInt,
+)
+def test_mcc_is_between_negative_1_and_positive_1(
+    true_pos: int, true_neg: int, false_pos: int, false_neg: int
+) -> None:
+    """
+    Under "normal circumstances", where the denominator of the Matthews Correlation
+    Coefficient isn't 0, its range is the interval [-1, 1].
+    """
+    assume(true_pos + false_pos > 0)
+    assume(true_pos + false_neg > 0)
+    assume(true_neg + false_pos > 0)
+    assume(true_neg + false_neg > 0)
+
+    mcc_score = mcc(true_pos, true_neg, false_pos, false_neg)
+    assert -1.0 <= mcc_score <= 1.0
+
+
 @pytest.mark.parametrize(
     "true_pos,true_neg,false_pos,false_neg",
     [(0, 0, 0, 0), (0, 1, 0, 1), (0, 1, 1, 0), (1, 0, 0, 1), (1, 0, 1, 0)],
