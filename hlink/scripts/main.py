@@ -153,12 +153,14 @@ def _parse_args():
 def _get_spark(run_name: str, args: argparse.Namespace) -> SparkSession:
     derby_dir = HLINK_DIR / "derby" / run_name
     warehouse_dir = HLINK_DIR / "warehouse" / run_name
+    checkpoint_dir = HLINK_DIR / "checkpoint" / run_name
     tmp_dir = HLINK_DIR / "tmp" / run_name
     python = sys.executable
 
     spark_connection = SparkConnection(
         derby_dir=derby_dir,
         warehouse_dir=warehouse_dir,
+        checkpoint_dir=checkpoint_dir,
         tmp_dir=tmp_dir,
         python=python,
         db_name="linking",

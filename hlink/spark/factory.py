@@ -78,6 +78,7 @@ class SparkFactory:
         spark_conn = SparkConnection(
             str(self.derby_dir),
             str(self.warehouse_dir),
+            "checkpoint",
             str(self.tmp_dir),
             self.python,
             self.db_name,

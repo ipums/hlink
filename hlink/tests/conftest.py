@@ -35,6 +35,7 @@ def spark(tmpdir_factory):
     spark_connection = SparkConnection(
         tmpdir_factory.mktemp("derby"),
         tmpdir_factory.mktemp("warehouse"),
+        tmpdir_factory.mktemp("checkpoint"),
         tmpdir_factory.mktemp("spark_tmp_dir"),
         sys.executable,
         "linking",
