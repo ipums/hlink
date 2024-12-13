@@ -32,52 +32,6 @@ HLINK_DIR = Path("./hlink_config")
 logger = logging.getLogger(__name__)
 
 
-def load_conf(conf_name: str, user: str) -> tuple[Path, dict[str, Any]]:
-    """Load and return the hlink config dictionary.
-
-    Add the following attributes to the config dictionary:
-    "derby_dir", "warehouse_dir", "spark_tmp_dir", "log_dir", "python",
-    "conf_path", "run_name"
-    """
-    if "HLINK_CONF" not in os.environ:
-        global_conf = None
-    else:
-        global_conf_file = os.environ["HLINK_CONF"]
-        with open(global_conf_file) as f:
-            global_conf = json.load(f)
-
-    run_name = Path(conf_name).stem
-
-    if global_conf is None:
-        current_dir = Path.cwd()
-        hlink_dir = current_dir / "hlink_config"
-        base_derby_dir = hlink_dir / "derby"
-        base_warehouse_dir = hlink_dir / "warehouse"
-        base_spark_tmp_dir = hlink_dir / "spark_tmp_dir"
-        path, conf = load_conf_file(conf_name)
-
-        conf["derby_dir"] = base_derby_dir / run_name
-        conf["warehouse_dir"] = base_warehouse_dir / run_name
-        conf["spark_tmp_dir"] = base_spark_tmp_dir / run_name
-        conf["log_dir"] = hlink_dir / "logs"
-        conf["python"] = sys.executable
-    else:
-        user_dir = Path(global_conf["users_dir"]) / user
-        user_dir_fast = Path(global_conf["users_dir_fast"]) / user
-        conf_dir = user_dir / "confs"
-        conf_path = conf_dir / conf_name
-        path, conf = load_conf_file(str(conf_path))
-
-        conf["derby_dir"] = user_dir / "derby" / run_name
-        conf["warehouse_dir"] = user_dir_fast / "warehouse" / run_name
-        conf["spark_tmp_dir"] = user_dir_fast / "tmp" / run_name
-        conf["log_dir"] = user_dir / "logs"
-        conf["python"] = global_conf["python"]
-
-    conf["run_name"] = run_name
-    return path, conf
-
-
 def cli():
     """Called by the hlink script."""
     if "--version" in sys.argv:
