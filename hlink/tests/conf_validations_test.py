@@ -22,7 +22,7 @@ from hlink.linking.link_run import LinkRun
 )
 def test_invalid_conf(conf_dir_path, spark, conf_name, error_msg):
     conf_file = os.path.join(conf_dir_path, conf_name)
-    config = load_conf_file(conf_file)
+    _path, config = load_conf_file(conf_file)
     link_run = LinkRun(spark, config)
 
     with pytest.raises(ValueError, match=error_msg):

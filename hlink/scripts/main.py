@@ -12,9 +12,12 @@ import json
 import importlib.metadata
 import readline
 import sys
-import traceback
-import uuid
 from timeit import default_timer as timer
+import traceback
+from typing import Any
+import uuid
+
+from pyspark.sql import SparkSession
 
 from hlink.spark.session import SparkConnection
 from hlink.configs.load_config import load_conf_file
@@ -25,54 +28,8 @@ from hlink.scripts.main_loop import Main
 from hlink.scripts.lib.conf_validations import analyze_conf
 from hlink.scripts.lib.table_ops import drop_all_tables
 
+HLINK_DIR = Path("./hlink_config")
 logger = logging.getLogger(__name__)
-
-
-def load_conf(conf_name, user):
-    """Load and return the hlink config dictionary.
-
-    Add the following attributes to the config dictionary:
-    "derby_dir", "warehouse_dir", "spark_tmp_dir", "log_dir", "python",
-    "conf_path", "run_name"
-    """
-    if "HLINK_CONF" not in os.environ:
-        global_conf = None
-    else:
-        global_conf_file = os.environ["HLINK_CONF"]
-        with open(global_conf_file) as f:
-            global_conf = json.load(f)
-
-    run_name = Path(conf_name).stem
-
-    if global_conf is None:
-        current_dir = Path.cwd()
-        hlink_dir = current_dir / "hlink_config"
-        base_derby_dir = hlink_dir / "derby"
-        base_warehouse_dir = hlink_dir / "warehouse"
-        base_spark_tmp_dir = hlink_dir / "spark_tmp_dir"
-        conf = load_conf_file(conf_name)
-
-        conf["derby_dir"] = base_derby_dir / run_name
-        conf["warehouse_dir"] = base_warehouse_dir / run_name
-        conf["spark_tmp_dir"] = base_spark_tmp_dir / run_name
-        conf["log_dir"] = hlink_dir / "logs"
-        conf["python"] = sys.executable
-    else:
-        user_dir = Path(global_conf["users_dir"]) / user
-        user_dir_fast = Path(global_conf["users_dir_fast"]) / user
-        conf_dir = user_dir / "confs"
-        conf_path = conf_dir / conf_name
-        conf = load_conf_file(str(conf_path))
-
-        conf["derby_dir"] = user_dir / "derby" / run_name
-        conf["warehouse_dir"] = user_dir_fast / "warehouse" / run_name
-        conf["spark_tmp_dir"] = user_dir_fast / "tmp" / run_name
-        conf["log_dir"] = user_dir / "logs"
-        conf["python"] = global_conf["python"]
-
-    conf["run_name"] = run_name
-    print(f"*** Using config file {conf['conf_path']}")
-    return conf
 
 
 def cli():
@@ -85,7 +42,8 @@ def cli():
 
     try:
         if args.conf:
-            run_conf = load_conf(args.conf, args.user)
+            conf_path, run_conf = load_conf_file(args.conf)
+            print(f"*** Using config file {conf_path}")
         else:
             raise Exception(
                 "ERROR: You must specify a config file to use by including either the --run or --conf flag in your program call."
@@ -103,19 +61,18 @@ def cli():
         traceback.print_exception("", err, None)
         sys.exit(1)
 
-    _setup_logging(run_conf)
+    run_name = conf_path.stem
+    _setup_logging(conf_path, run_name)
 
     logger.info("Initializing Spark")
     spark_init_start = timer()
-    spark = _get_spark(run_conf, args)
+    spark = _get_spark(run_name, args)
     spark_init_end = timer()
     spark_init_time = round(spark_init_end - spark_init_start, 2)
     logger.info(f"Initialized Spark in {spark_init_time}s")
 
     history_file = os.path.expanduser("~/.history_hlink")
     _read_history_file(history_file)
-
-    run_name = run_conf["run_name"]
 
     try:
         if args.execute_tasks:
@@ -193,13 +150,20 @@ def _parse_args():
     return parser.parse_args()
 
 
-def _get_spark(run_conf, args):
+def _get_spark(run_name: str, args: argparse.Namespace) -> SparkSession:
+    derby_dir = HLINK_DIR / "derby" / run_name
+    warehouse_dir = HLINK_DIR / "warehouse" / run_name
+    checkpoint_dir = HLINK_DIR / "checkpoint" / run_name
+    tmp_dir = HLINK_DIR / "tmp" / run_name
+    python = sys.executable
+
     spark_connection = SparkConnection(
-        run_conf["derby_dir"],
-        run_conf["warehouse_dir"],
-        run_conf["spark_tmp_dir"],
-        run_conf["python"],
-        "linking",
+        derby_dir=derby_dir,
+        warehouse_dir=warehouse_dir,
+        checkpoint_dir=checkpoint_dir,
+        tmp_dir=tmp_dir,
+        python=python,
+        db_name="linking",
     )
     spark = spark_connection.local(
         cores=args.cores, executor_memory=args.executor_memory
@@ -235,32 +199,31 @@ def _cli_loop(spark, args, run_conf, run_name):
             main.cmdloop()
             if main.lastcmd == "reload":
                 logger.info("Reloading config file")
-                run_conf = load_conf(args.conf, args.user)
+                conf_path, run_conf = load_conf_file(args.conf)
+                print(f"*** Using config file {conf_path}")
             else:
                 break
         except Exception as err:
             report_and_log_error("", err)
 
 
-def _setup_logging(conf):
-    log_dir = Path(conf["log_dir"])
+def _setup_logging(conf_path, run_name):
+    log_dir = HLINK_DIR / "logs"
     log_dir.mkdir(exist_ok=True, parents=True)
 
     user = getpass.getuser()
     session_id = uuid.uuid4().hex
-    conf_name = conf["run_name"]
     hlink_version = importlib.metadata.version("hlink")
 
-    log_file = log_dir / f"{conf_name}-{session_id}.log"
+    log_file = log_dir / f"{run_name}-{session_id}.log"
 
-    # format_string = f"%(levelname)s %(asctime)s {user} {session_id} %(message)s -- {conf['conf_path']}"
     format_string = "%(levelname)s %(asctime)s -- %(message)s"
-    print(f"*** Hlink log: {log_file}")
+    print(f"*** Hlink log: {log_file.absolute()}")
 
     logging.basicConfig(filename=log_file, level=logging.INFO, format=format_string)
 
     logger.info(f"New session {session_id} by user {user}")
-    logger.info(f"Configured with {conf['conf_path']}")
+    logger.info(f"Configured with {conf_path}")
     logger.info(f"Using hlink version {hlink_version}")
     logger.info(
         "-------------------------------------------------------------------------------------"

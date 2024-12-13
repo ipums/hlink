@@ -3,23 +3,50 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from pathlib import Path
+
+import pytest
+
 from hlink.configs.load_config import load_conf_file
-import os.path
+from hlink.errors import UsageError
 
 
-def test_load_conf_file_json(conf_dir_path):
-    conf_file = os.path.join(conf_dir_path, "test")
-    conf = load_conf_file(conf_file)
+@pytest.mark.parametrize("file_name", ["test", "test.json"])
+def test_load_conf_file_json(conf_dir_path: str, file_name: str) -> None:
+    conf_file = Path(conf_dir_path) / file_name
+    path, conf = load_conf_file(str(conf_file))
     assert conf["id_column"] == "id"
+    assert path == conf_file.with_suffix(".json")
 
 
-def test_load_conf_file_toml(conf_dir_path):
-    conf_file = os.path.join(conf_dir_path, "test1")
-    conf = load_conf_file(conf_file)
+@pytest.mark.parametrize("file_name", ["test1", "test1.toml"])
+def test_load_conf_file_toml(conf_dir_path: str, file_name: str) -> None:
+    conf_file = Path(conf_dir_path) / file_name
+    path, conf = load_conf_file(str(conf_file))
     assert conf["id_column"] == "id-toml"
+    assert path == conf_file.with_suffix(".toml")
 
 
-def test_load_conf_file_json2(conf_dir_path):
-    conf_file = os.path.join(conf_dir_path, "test_conf_flag_run")
-    conf = load_conf_file(conf_file)
+def test_load_conf_file_json2(conf_dir_path: str) -> None:
+    conf_file = Path(conf_dir_path) / "test_conf_flag_run"
+    path, conf = load_conf_file(str(conf_file))
     assert conf["id_column"] == "id_conf_flag"
+    assert path == conf_file.with_suffix(".json")
+
+
+def test_load_conf_file_does_not_exist(tmp_path: Path) -> None:
+    conf_file = tmp_path / "notthere"
+    with pytest.raises(
+        FileNotFoundError, match="Couldn't find any of these three files:"
+    ):
+        load_conf_file(str(conf_file))
+
+
+def test_load_conf_file_unrecognized_extension(tmp_path: Path) -> None:
+    conf_file = tmp_path / "test.yaml"
+    conf_file.touch()
+    with pytest.raises(
+        UsageError,
+        match="The file .+ exists, but it doesn't have a '.toml' or '.json' extension",
+    ):
+        load_conf_file(str(conf_file))

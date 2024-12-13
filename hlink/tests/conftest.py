@@ -35,6 +35,7 @@ def spark(tmpdir_factory):
     spark_connection = SparkConnection(
         tmpdir_factory.mktemp("derby"),
         tmpdir_factory.mktemp("warehouse"),
+        tmpdir_factory.mktemp("checkpoint"),
         tmpdir_factory.mktemp("spark_tmp_dir"),
         sys.executable,
         "linking",
@@ -158,7 +159,7 @@ def conf(conf_dir_path):
 @pytest.fixture(scope="function")
 def integration_conf(input_data_dir_path, conf_dir_path):
     conf_file = os.path.join(conf_dir_path, "integration")
-    conf = load_conf_file(conf_file)
+    _conf_path, conf = load_conf_file(conf_file)
 
     datasource_a = conf["datasource_a"]
     datasource_b = conf["datasource_b"]
