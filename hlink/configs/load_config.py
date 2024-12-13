@@ -11,7 +11,7 @@ import toml
 from hlink.errors import UsageError
 
 
-def load_conf_file(conf_name: str) -> dict[str, Any]:
+def load_conf_file(conf_name: str) -> tuple[Path, dict[str, Any]]:
     """Flexibly load a config file.
 
     Given a path `conf_name`, look for a file at that path. If that file
@@ -20,15 +20,11 @@ def load_conf_file(conf_name: str) -> dict[str, Any]:
     name with a '.toml' extension added and load it if it exists. Then do the
     same for a file with a '.json' extension added.
 
-    After successfully loading a config file, store the absolute path where the
-    config file was found as the value of the "conf_path" key in the returned
-    config dictionary.
-
     Args:
         conf_name: the file to look for
 
     Returns:
-        the contents of the config file
+        a tuple (absolute path to the config file, contents of the config file)
 
     Raises:
         FileNotFoundError: if none of the three checked files exist
@@ -46,14 +42,12 @@ def load_conf_file(conf_name: str) -> dict[str, Any]:
         if file.suffix == ".toml":
             with open(file) as f:
                 conf = toml.load(f)
-                conf["conf_path"] = str(file.resolve())
-                return conf
+                return file.absolute(), conf
 
         if file.suffix == ".json":
             with open(file) as f:
                 conf = json.load(f)
-                conf["conf_path"] = str(file.resolve())
-                return conf
+                return file.absolute(), conf
 
         raise UsageError(
             f"The file {file} exists, but it doesn't have a '.toml' or '.json' extension."

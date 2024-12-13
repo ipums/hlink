@@ -12,9 +12,10 @@ import json
 import importlib.metadata
 import readline
 import sys
-import traceback
-import uuid
 from timeit import default_timer as timer
+import traceback
+from typing import Any
+import uuid
 
 from hlink.spark.session import SparkConnection
 from hlink.configs.load_config import load_conf_file
@@ -28,7 +29,7 @@ from hlink.scripts.lib.table_ops import drop_all_tables
 logger = logging.getLogger(__name__)
 
 
-def load_conf(conf_name, user):
+def load_conf(conf_name: str, user: str) -> tuple[Path, dict[str, Any]]:
     """Load and return the hlink config dictionary.
 
     Add the following attributes to the config dictionary:
@@ -50,7 +51,7 @@ def load_conf(conf_name, user):
         base_derby_dir = hlink_dir / "derby"
         base_warehouse_dir = hlink_dir / "warehouse"
         base_spark_tmp_dir = hlink_dir / "spark_tmp_dir"
-        conf = load_conf_file(conf_name)
+        path, conf = load_conf_file(conf_name)
 
         conf["derby_dir"] = base_derby_dir / run_name
         conf["warehouse_dir"] = base_warehouse_dir / run_name
@@ -62,7 +63,7 @@ def load_conf(conf_name, user):
         user_dir_fast = Path(global_conf["users_dir_fast"]) / user
         conf_dir = user_dir / "confs"
         conf_path = conf_dir / conf_name
-        conf = load_conf_file(str(conf_path))
+        path, conf = load_conf_file(str(conf_path))
 
         conf["derby_dir"] = user_dir / "derby" / run_name
         conf["warehouse_dir"] = user_dir_fast / "warehouse" / run_name
@@ -71,8 +72,8 @@ def load_conf(conf_name, user):
         conf["python"] = global_conf["python"]
 
     conf["run_name"] = run_name
-    print(f"*** Using config file {conf['conf_path']}")
-    return conf
+    print(f"*** Using config file {path}")
+    return path, conf
 
 
 def cli():
@@ -85,7 +86,7 @@ def cli():
 
     try:
         if args.conf:
-            run_conf = load_conf(args.conf, args.user)
+            conf_path, run_conf = load_conf(args.conf, args.user)
         else:
             raise Exception(
                 "ERROR: You must specify a config file to use by including either the --run or --conf flag in your program call."
@@ -103,7 +104,7 @@ def cli():
         traceback.print_exception("", err, None)
         sys.exit(1)
 
-    _setup_logging(run_conf)
+    _setup_logging(conf_path, run_conf)
 
     logger.info("Initializing Spark")
     spark_init_start = timer()
@@ -235,14 +236,14 @@ def _cli_loop(spark, args, run_conf, run_name):
             main.cmdloop()
             if main.lastcmd == "reload":
                 logger.info("Reloading config file")
-                run_conf = load_conf(args.conf, args.user)
+                conf_path, run_conf = load_conf(args.conf, args.user)
             else:
                 break
         except Exception as err:
             report_and_log_error("", err)
 
 
-def _setup_logging(conf):
+def _setup_logging(conf_path, conf):
     log_dir = Path(conf["log_dir"])
     log_dir.mkdir(exist_ok=True, parents=True)
 
@@ -260,7 +261,7 @@ def _setup_logging(conf):
     logging.basicConfig(filename=log_file, level=logging.INFO, format=format_string)
 
     logger.info(f"New session {session_id} by user {user}")
-    logger.info(f"Configured with {conf['conf_path']}")
+    logger.info(f"Configured with {conf_path}")
     logger.info(f"Using hlink version {hlink_version}")
     logger.info(
         "-------------------------------------------------------------------------------------"

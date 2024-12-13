@@ -70,8 +70,8 @@ def test_load_conf_json_exists_no_env(monkeypatch, tmp_path, conf_file, user):
     with open(filename, "w") as f:
         json.dump(contents, f)
 
-    conf = load_conf(filename, user)
-    assert conf["conf_path"] == filename
+    path, _conf = load_conf(filename, user)
+    assert str(path) == filename
 
 
 @pytest.mark.parametrize("conf_name", ("my_conf", "my_conf.json", "my_conf.toml"))
@@ -85,8 +85,8 @@ def test_load_conf_json_exists_ext_added_no_env(monkeypatch, tmp_path, conf_name
     with open(filename, "w") as f:
         json.dump(contents, f)
 
-    conf = load_conf(str(tmp_path / conf_name), user)
-    assert conf["conf_path"] == filename
+    path, _conf = load_conf(str(tmp_path / conf_name), user)
+    assert str(path) == filename
 
 
 @pytest.mark.parametrize("conf_file", ("my_conf.toml",))
@@ -100,8 +100,8 @@ def test_load_conf_toml_exists_no_env(monkeypatch, tmp_path, conf_file, user):
     with open(filename, "w") as f:
         toml.dump(contents, f)
 
-    conf = load_conf(filename, user)
-    assert conf["conf_path"] == filename
+    path, _conf = load_conf(filename, user)
+    assert str(path) == filename
 
 
 @pytest.mark.parametrize("conf_name", ("my_conf", "my_conf.json", "my_conf.toml"))
@@ -115,8 +115,8 @@ def test_load_conf_toml_exists_ext_added_no_env(monkeypatch, tmp_path, conf_name
     with open(filename, "w") as f:
         toml.dump(contents, f)
 
-    conf = load_conf(str(tmp_path / conf_name), user)
-    assert conf["conf_path"] == filename
+    path, _conf = load_conf(str(tmp_path / conf_name), user)
+    assert str(path) == filename
 
 
 @pytest.mark.parametrize("conf_name", ("my_conf", "testing.txt", "what.yaml"))
@@ -147,13 +147,12 @@ def test_load_conf_keys_set_no_env(monkeypatch, tmp_path):
     with open(filename, "w") as f:
         json.dump(contents, f)
 
-    conf = load_conf(filename, "test")
+    _path, conf = load_conf(filename, "test")
 
     for key, value in contents.items():
         assert conf[key] == value
 
     # Check for extra keys added by load_conf()
-    assert "conf_path" in conf
     assert "derby_dir" in conf
     assert "warehouse_dir" in conf
     assert "spark_tmp_dir" in conf
@@ -202,8 +201,8 @@ def test_load_conf_json_exists_in_conf_dir_env(
     with open(file, "w") as f:
         json.dump(contents, f)
 
-    conf = load_conf(conf_file, user)
-    assert conf["conf_path"] == str(file)
+    path, _conf = load_conf(conf_file, user)
+    assert path == file
 
 
 @pytest.mark.parametrize("conf_file", ("my_conf.toml",))
@@ -221,8 +220,8 @@ def test_load_conf_toml_exists_in_conf_dir_env(
     with open(file, "w") as f:
         toml.dump(contents, f)
 
-    conf = load_conf(conf_file, user)
-    assert conf["conf_path"] == str(file)
+    path, _conf = load_conf(conf_file, user)
+    assert path == file
 
 
 @pytest.mark.parametrize("conf_name", ("my_conf", "test", "testingtesting123.txt"))
@@ -241,8 +240,8 @@ def test_load_conf_json_exists_in_conf_dir_ext_added_env(
     with open(file, "w") as f:
         json.dump(contents, f)
 
-    conf = load_conf(conf_name, user)
-    assert conf["conf_path"] == str(file)
+    path, _conf = load_conf(conf_name, user)
+    assert path == file
 
 
 @pytest.mark.parametrize("conf_name", ("my_conf", "test", "testingtesting123.txt"))
@@ -261,8 +260,8 @@ def test_load_conf_toml_exists_in_conf_dir_ext_added_env(
     with open(file, "w") as f:
         toml.dump(contents, f)
 
-    conf = load_conf(conf_name, user)
-    assert conf["conf_path"] == str(file)
+    path, _conf = load_conf(conf_name, user)
+    assert path == file
 
 
 @pytest.mark.parametrize("conf_name", ("my_conf", "testing.txt", "what.yaml"))
@@ -294,13 +293,12 @@ def test_load_conf_keys_set_env(
     with open(file, "w") as f:
         json.dump(contents, f)
 
-    conf = load_conf(filename, user)
+    _path, conf = load_conf(filename, user)
 
     for key, value in contents.items():
         assert conf[key] == value
 
     # Check for extra keys added by load_conf()
-    assert "conf_path" in conf
     assert "derby_dir" in conf
     assert "warehouse_dir" in conf
     assert "spark_tmp_dir" in conf

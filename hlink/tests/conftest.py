@@ -158,7 +158,7 @@ def conf(conf_dir_path):
 @pytest.fixture(scope="function")
 def integration_conf(input_data_dir_path, conf_dir_path):
     conf_file = os.path.join(conf_dir_path, "integration")
-    conf = load_conf_file(conf_file)
+    _conf_path, conf = load_conf_file(conf_file)
 
     datasource_a = conf["datasource_a"]
     datasource_b = conf["datasource_b"]
