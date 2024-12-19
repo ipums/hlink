@@ -334,7 +334,7 @@ split_by_id_a = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 2
-param_grid = true
+model_parameter_search = {strategy = "grid"}
 model_parameters = [ 
     { type = "random_forest", maxDepth = [7], numTrees = [100], threshold = [0.05, 0.005], threshold_ratio = [1.2, 1.3] },
     { type = "logistic_regression", threshold = [0.50, 0.65, 0.80], threshold_ratio = [1.0, 1.1] }
@@ -360,7 +360,7 @@ split_by_id_a = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 10
-param_grid = false
+model_parameter_search = {strategy = "explicit"}
 model_parameters = [
     { type = "random_forest", maxDepth = 6, numTrees = 50, threshold = 0.5, threshold_ratio = 1.0 },
     { type = "probit", threshold = 0.5, threshold_ratio = 1.0 }
@@ -743,7 +743,6 @@ splits = [-1,0,6,11,9999]
   * `decision` -- Type: `string`. Optional. Specifies which decision function to use to create the final prediction. The first option is `drop_duplicate_a`, which drops any links for which a record in the `a` data set has a predicted match more than one time. The second option is `drop_duplicate_with_threshold_ratio` which only takes links for which the `a` record has the highest probability out of any other potential links, and the second best link for the `a` record is less than the `threshold_ratio`.
   * `threshold_ratio` -- Type: `float`. Optional. For use when `decision` is `drop_duplicate_with_threshold_ratio` . Specifies the smallest possible ratio to accept between a best and second best link for a given record.  Can be used to specify a threshold ratio (beta threshold) to use for all models.  Alternatively, unique threshold ratios can be specified in each individual `chosen_model` and `model_parameters` specification.
   * `model_parameters` -- Type: `list`. Specifies models to test out in the `model_exploration` task. See the [models](models) section for more information on model specifications.
-  * `param_grid` -- Type: `boolean`. Optional. If you would like to evaluate multiple hyper-parameters for a single model type in your `model_parameters` specification, you can give hyper-parameter inputs as arrays of length >= 1 instead of integers to allow one model per row specification with multiple model eval outputs.
   * `score_with_model` -- Type: `boolean`. If set to false, will skip the `apply_model` step of the matching task. Use this if you want to use the `run_all_steps` command and are just trying to generate potential links, such as for the creation of training data.
   * `n_training_iterations` -- Type: `integer`. Optional; default value is 10. The number of training iterations to use during the `model_exploration` task.
   * `scale_data` -- Type: `boolean`.  Optional. Whether to scale the data as part of the machine learning pipeline.
@@ -752,6 +751,25 @@ splits = [-1,0,6,11,9999]
   * `feature_importances` -- Type: `boolean`. Optional.  Whether to record
     feature importances or coefficients for the training features when training
     the ML model. Set this to true to enable training step 3.
+* Deprecated Attributes:
+  * `param_grid` (*Deprecated in version 4.0.0*) -- Type: `boolean`. Optional.
+    `param_grid` has been deprecated and will eventually be removed. Please use
+    the more flexible `model_parameter_search` option by replacing `param_grid
+    = false`
+
+    with
+
+    ```toml
+    model_parameter_search = {strategy = "explicit"}
+    ```
+
+    and replacing `param_grid = true`
+
+    with
+
+    ```toml
+    model_parameter_search = {strategy = "grid"}
+    ```
 
 
 ```
@@ -769,7 +787,7 @@ feature_importances = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 10
-param_grid = false
+model_parameter_search = {strategy = "explicit"}
 model_parameters = [
   { type = "random_forest", maxDepth = 6, numTrees = 50 },
   { type = "probit", threshold = 0.5}
@@ -805,7 +823,7 @@ score_with_model = true
 feature_importances = true
 decision = "drop_duplicate_with_threshold_ratio"
 
-param_grid = true
+model_parameter_search = {strategy = "grid"}
 n_training_iterations = 10
 model_parameters = [
     { type = "logistic_regression", threshold = [0.5], threshold_ratio = [1.1]},

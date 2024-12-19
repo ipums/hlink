@@ -88,7 +88,7 @@ However, when this training data set is used for other years, the program does n
     score_with_model = true
     feature_importances = false
     decision = "drop_duplicate_with_threshold_ratio"
-    param_grid = true
+    model_parameter_search = {strategy = "grid"}
     n_training_iterations = 10
     model_parameters = [
         { type = "logistic_regression", threshold = [0.5], threshold_ratio = [1.0, 1.1]},
