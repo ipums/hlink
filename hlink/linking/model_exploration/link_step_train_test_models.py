@@ -876,7 +876,7 @@ def _aggregate_per_threshold_results(
 
 
 def _custom_param_grid_builder(
-    model_parameters: list[dict[str, Any]]
+    model_parameters: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     print("Building param grid for models")
     given_parameters = model_parameters
