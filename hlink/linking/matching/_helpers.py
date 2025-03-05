@@ -5,10 +5,4 @@
 
 
 def get_blocking(conf):
-    if "blocking" in conf:
-        return conf["blocking"]
-    else:
-        print(
-            "DEPRECATION WARNING: The config value 'blocking_steps' has been renamed to 'blocking' and is now just a single array of objects."
-        )
-        return conf["blocking_steps"][0]
+    return conf["blocking"]
