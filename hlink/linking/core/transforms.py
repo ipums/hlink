@@ -515,21 +515,14 @@ def apply_transform(
         return column_select[transform["value"]]
     elif transform_type == "mapping":
         mapped_column = column_select
-        if transform.get("values", False):
-            print(
-                "DEPRECATION WARNING: The 'mapping' transform no longer takes the 'values' parameter with a list of mappings in dictionaries; instead each mapping should be its own transform. Please change your config for future releases."
-            )
-            for mapping in transform["values"]:
-                from_regexp = "|".join(f"^{from_val}$" for from_val in mapping["from"])
-                mapped_column = regexp_replace(
-                    mapped_column, from_regexp, str(mapping["to"])
-                )
-        else:
-            for key, value in transform["mappings"].items():
-                from_regexp = f"^{key}$"
-                mapped_column = regexp_replace(mapped_column, from_regexp, str(value))
+
+        for key, value in transform["mappings"].items():
+            from_regexp = f"^{key}$"
+            mapped_column = regexp_replace(mapped_column, from_regexp, str(value))
+
         if transform.get("output_type", False) == "int":
             mapped_column = mapped_column.cast(LongType())
+
         return mapped_column
     elif transform_type == "swap_words":
         mapped_column = column_select
