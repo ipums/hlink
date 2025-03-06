@@ -288,24 +288,26 @@ transforms = [
 
 ### mapping
 
-Map single or multiple values to a single output value, otherwise known as a "recoding."
+Explicitly map from input values to output values. This is also known as a "recoding".
+Input values which do not appear in the mapping are unchanged. By default, the output
+column is of type string, but you can set `output_type = "int"` to cast the output
+column to type integer instead.
 
 Maps T → U.
 
-```
+```toml
 [[column_mappings]]
 column_name = "birthyr"
 alias = "clean_birthyr"
-transforms = [
-    {
-        type = "mapping",
-        values = [
-            {"from"=[9999,1999], "to" = ""},
-            {"from" = -9998, "to" = 9999}
-        ]
-    }
-]
+
+[[column_mappings.transforms]]
+type = "mapping"
+mappings = {9999 = "", 1999 = "", "-9998" = "9999"}
+output_type = "int"
 ```
+
+*Changed in version 4.0.0: The deprecated `values` key is no longer supported.
+Please use the `mappings` key documented above instead.*
 
 ### substring
 
