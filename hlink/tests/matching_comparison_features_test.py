@@ -654,10 +654,9 @@ def test_step_2_jaro_winkler_rate(
     )["neighbor_namelast_jw_rate_threshold"].iloc[0]
 
 
-def test_step_2_JW_double_array_blocking_conf(spark, matching_conf, matching, capsys):
+def test_step_2_JW_with_blocking(spark, matching_conf, matching):
     """Test matching step 2 to ensure that comparison features are generated (can a regular comparison (as represented by J/W) still run if there's NOT a distance lookup feature)"""
-    matching_conf["blocking_steps"] = [[{"column_name": "sex"}]]
-    matching_conf.pop("blocking")
+    matching_conf["blocking"] = [{"column_name": "sex"}]
 
     matching_conf["comparison_features"] = [
         {
@@ -683,12 +682,6 @@ def test_step_2_JW_double_array_blocking_conf(spark, matching_conf, matching, ca
     assert (
         potential_matches_df.query("id_a == 10 and id_b == 10")["namelast_jw"].iloc[0]
         > 0.87
-    )
-
-    captured = capsys.readouterr()
-    assert (
-        "DEPRECATION WARNING: The config value 'blocking_steps' has been renamed to 'blocking' and is now just a single array of objects."
-        in captured.out
     )
 
 
