@@ -23,8 +23,18 @@ def load_conf_file(
     name with a '.toml' extension added and load it if it exists. Then do the
     same for a file with a '.json' extension added.
 
+    `use_legacy_toml_parser` tells this function to use the legacy TOML library
+    which hlink used to use instead of the current default. This is provided
+    for backwards compatibility. Some previously written config files may
+    depend on bugs in the legacy TOML library, making it hard to migrate to the
+    new TOML v1.0 compliant parser. It is strongly recommended that new code
+    and config files use the default parser. Old code and config files should
+    also try to migrate to the default parser when possible.
+
     Args:
         conf_name: the file to look for
+        use_legacy_toml_parser: (Not Recommended) Use the legacy, buggy TOML
+        parser instead of the default parser.
 
     Returns:
         a tuple (absolute path to the config file, contents of the config file)
@@ -44,13 +54,10 @@ def load_conf_file(
     for file in existing_files:
         if file.suffix == ".toml":
             # Legacy support for using the "toml" library instead of "tomli".
-            # The toml library currently has a lot of unfixed bugs, and so the tomli
-            # library is more reliable. But some of the bugs in toml may cause config
-            # files to be incompatible with tomli until fixed. So we support using
-            # toml instead of tomli if necessary as a backwards compatibility feature.
             #
-            # Eventually we will remove use_legacy_toml_parser and just use tomli
-            # or Python's standard library tomllib.
+            # Eventually we should remove use_legacy_toml_parser and just use
+            # tomli or Python's standard library tomllib, which is available in
+            # Python 3.11+.
             if use_legacy_toml_parser:
                 with open(file) as f:
                     conf = toml.load(f)
