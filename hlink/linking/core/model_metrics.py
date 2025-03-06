@@ -16,6 +16,16 @@ such as cases with division by zero.
 import math
 
 
+def clamp(value: float, minimum: float, maximum: float) -> float:
+    """
+    Clamp the given value, forcing it to be between the minimum and maximum.
+    """
+    if minimum > maximum:
+        raise ValueError("minimum is greater than maximum")
+
+    return max(minimum, min(value, maximum))
+
+
 def f_measure(true_pos: int, false_pos: int, false_neg: int) -> float:
     """
     Compute the F-measure, which is defined as the harmonic mean of precision
@@ -60,7 +70,8 @@ def mcc(true_pos: int, true_neg: int, false_pos: int, false_neg: int) -> float:
         return math.nan
 
     numerator = true_pos * true_neg - false_pos * false_neg
-    return numerator / denominator
+    value = numerator / denominator
+    return clamp(value, minimum=-1.0, maximum=1.0)
 
 
 def precision(true_pos: int, false_pos: int) -> float:

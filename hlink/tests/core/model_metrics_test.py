@@ -4,14 +4,15 @@
 #   https://github.com/ipums/hlink
 import math
 
-from hypothesis import assume, given
+from hypothesis import assume, example, given
 import hypothesis.strategies as st
 import pytest
 
-from hlink.linking.core.model_metrics import f_measure, mcc, precision, recall
+from hlink.linking.core.model_metrics import clamp, f_measure, mcc, precision, recall
 
 NonNegativeInt = st.integers(min_value=0)
 NegativeInt = st.integers(max_value=-1)
+BoundedFloat = st.floats(allow_infinity=False, allow_nan=False)
 
 
 def test_f_measure_example() -> None:
@@ -77,6 +78,9 @@ def test_mcc_example() -> None:
     true_neg=NonNegativeInt,
     false_pos=NonNegativeInt,
     false_neg=NonNegativeInt,
+)
+@example(true_pos=0, true_neg=0, false_pos=51, false_neg=2_070_366_244_862_899).via(
+    "issue #187"
 )
 def test_mcc_is_between_negative_1_and_positive_1(
     true_pos: int, true_neg: int, false_pos: int, false_neg: int
@@ -167,3 +171,30 @@ def test_recall_no_true_pos_or_false_neg() -> None:
     """
     recall_score = recall(0, 0)
     assert math.isnan(recall_score)
+
+
+def test_clamp_in_between() -> None:
+    assert clamp(15, 10, 20) == 15
+
+
+def test_clamp_less_than_minimum() -> None:
+    assert clamp(1, 5, 10) == 5
+
+
+def test_clamp_greater_than_maximum() -> None:
+    assert clamp(200, 10, 30) == 30
+
+
+@given(x=BoundedFloat, y=BoundedFloat, z=BoundedFloat)
+def test_clamp_lies_within_bounds(x: float, y: float, z: float) -> None:
+    assume(y <= z)
+    assert y <= clamp(x, y, z) <= z
+
+
+@given(x=BoundedFloat, y=BoundedFloat, z=BoundedFloat)
+def test_clamp_error_when_minimum_greater_than_maximum(
+    x: float, y: float, z: float
+) -> None:
+    assume(y > z)
+    with pytest.raises(ValueError, match="minimum is greater than maximum"):
+        clamp(x, y, z)
