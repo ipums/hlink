@@ -7,11 +7,14 @@ from pathlib import Path
 from typing import Any
 import json
 import toml
+import tomli
 
 from hlink.errors import UsageError
 
 
-def load_conf_file(conf_name: str) -> tuple[Path, dict[str, Any]]:
+def load_conf_file(
+    conf_name: str, *, use_legacy_toml_parser: bool = False
+) -> tuple[Path, dict[str, Any]]:
     """Flexibly load a config file.
 
     Given a path `conf_name`, look for a file at that path. If that file
@@ -40,9 +43,22 @@ def load_conf_file(conf_name: str) -> tuple[Path, dict[str, Any]]:
 
     for file in existing_files:
         if file.suffix == ".toml":
-            with open(file) as f:
-                conf = toml.load(f)
-                return file.absolute(), conf
+            # Legacy support for using the "toml" library instead of "tomli".
+            # The toml library currently has a lot of unfixed bugs, and so the tomli
+            # library is more reliable. But some of the bugs in toml may cause config
+            # files to be incompatible with tomli until fixed. So we support using
+            # toml instead of tomli if necessary as a backwards compatibility feature.
+            #
+            # Eventually we will remove use_legacy_toml_parser and just use tomli
+            # or Python's standard library tomllib.
+            if use_legacy_toml_parser:
+                with open(file) as f:
+                    conf = toml.load(f)
+                    return file.absolute(), conf
+            else:
+                with open(file, "rb") as f:
+                    conf = tomli.load(f)
+                    return file.absolute(), conf
 
         if file.suffix == ".json":
             with open(file) as f:
