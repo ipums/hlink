@@ -50,3 +50,18 @@ def test_load_conf_file_unrecognized_extension(tmp_path: Path) -> None:
         match="The file .+ exists, but it doesn't have a '.toml' or '.json' extension",
     ):
         load_conf_file(str(conf_file))
+
+
+def test_load_conf_file_json_legacy_parser(conf_dir_path: str) -> None:
+    """
+    The use_legacy_toml_parser argument does not affect json parsing.
+    """
+    conf_file = Path(conf_dir_path) / "test.json"
+    _, conf = load_conf_file(str(conf_file), use_legacy_toml_parser=True)
+    assert conf["id_column"] == "id"
+
+
+def test_load_conf_file_toml_legacy_parser(conf_dir_path: str) -> None:
+    conf_file = Path(conf_dir_path) / "test1.toml"
+    _, conf = load_conf_file(str(conf_file), use_legacy_toml_parser=True)
+    assert conf["id_column"] == "id-toml"

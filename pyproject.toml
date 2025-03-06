@@ -25,6 +25,7 @@ dependencies = [
     "pyspark~=3.5.0",
     "scikit-learn>=1.1.0",
     "toml>=0.10.0",
+    "tomli>=2.0",
 ]
 
 [project.optional-dependencies]
