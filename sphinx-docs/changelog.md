@@ -1,18 +1,37 @@
 # Changelog
 
+## v3.3.0 (2022-12-13)
+
+### Added
+
+* Added logging for user input to the script. This is extremely helpful for diagnosing
+errors. [PR #64][pr64]
+* Added and improved documentation for several comparison types. [PR #47][pr47]
+
+### Changed
+
+* Started writing to a unique log file for each script run. [PR #55][pr55]
+* Updated and improved the tutorial in examples/tutorial. [PR #63][pr63]
+* Changed to pyproject.toml instead of setup.py and setup.cfg. [PR #71][pr71]
+
+### Fixed
+
+* Fixed a bug which caused Jaro-Winkler scores to be 1.0 for two empty strings. The
+scores are now 0.0 on two empty strings. [PR #59][pr59]
+
 ## v3.2.7 (2022-09-14)
 
-## Added
+### Added
 
 * Added a configuration validation that checks that both data sources contain the id column. [PR #13][pr13]
 * Added driver memory options to `SparkConnection`. [PR #40][pr40]
 
-## Changed
+### Changed
 
 * Upgraded from PySpark 3.2 to 3.3. [PR #11][pr11]
 * Capped the number of partitions requested at 10,000. [PR #40][pr40]
 
-## Fixed
+### Fixed
 
 * Fixed a bug where `feature_selections` was always required in the config file.
 It now defaults to an empty list as intended. [PR #15][pr15]
@@ -76,3 +95,9 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr13]: https://github.com/ipums/hlink/pull/13
 [pr15]: https://github.com/ipums/hlink/pull/15
 [pr40]: https://github.com/ipums/hlink/pull/40
+[pr47]: https://github.com/ipums/hlink/pull/47
+[pr55]: https://github.com/ipums/hlink/pull/55
+[pr59]: https://github.com/ipums/hlink/pull/59
+[pr63]: https://github.com/ipums/hlink/pull/63
+[pr64]: https://github.com/ipums/hlink/pull/64
+[pr71]: https://github.com/ipums/hlink/pull/71
