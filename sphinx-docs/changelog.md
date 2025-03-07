@@ -1,5 +1,225 @@
 # Changelog
 
+## v4.0.0 (UNRELEASED)
+
+### Added
+
+* Added support for randomized parameter search to model exploration. [PR #168][pr168]
+* Created an `hlink.linking.core.model_metrics` module with functions for computing
+metrics on model confusion matrices. Added the F-measure model metric to model
+exploration. [PR #180][pr180]
+* Added this changelog!
+
+### Changed
+
+* Overhauled the model exploration task to use a nested cross-validation approach.
+[PR #169][pr169]
+* Changed `hlink.linking.core.classifier` functions to not interact with `threshold`
+and `threshold_ratio`. Please ensure that the parameter dictionaries passed to these
+functions only contain parameters for the chosen model. [PR #175][pr175]
+* Simplified the parameters required for `hlink.linking.core.threshold.predict_using_thresholds`.
+Instead of passing the entire `training` configuration section to this function,
+you now need only pass `training.decision`. [PR #175][pr175]
+* Added a new required `checkpoint_dir` argument to `SparkConnection`, which lets hlink set
+different directories for the tmp and checkpoint directories. [PR #182][pr182]
+* Swapped to using `tomli` as the default TOML parser. This should fix several issues
+with how hlink parses TOML files. `load_conf_file()` provides the `use_legacy_toml_parser`
+argument for backwards compatibility if necessary. [PR #185][pr185]
+
+### Deprecated
+
+* Deprecated the `training.param_grid` attribute in favor of the new, more flexible
+`training.model_parameter_search` table. This is part of supporting the new randomized
+parameter search. [PR #168][pr168]
+
+### Removed
+
+* Removed functionality for outputting "suspicious" training data from model exploration.
+We determined that this is out of the scope of model exploration step 2. This change
+greatly simplifies the model exploration code. [PR #178][pr178]
+* Removed the deprecated `hlink.linking.transformers.interaction_transformer` module.
+This module was deprecated in v3.5.0. Please use
+[`pyspark.ml.feature.Interaction`][pyspark-interaction-docs] instead. [PR #184][pr184]
+* Removed some alternate configuration syntax which has been deprecated since
+v3.0.0. [PR #184][pr184]
+* Removed `hlink.scripts.main.load_conf` in favor of a much simpler approach to
+finding the configuration file and configuring spark. Please call
+`hlink.configs.load_config.load_conf_file` directly instead. `load_conf_file` now
+returns both the path to the configuration file and its contents as a mapping. [PR #182][pr182]
+
+## v3.8.0 (2024-12-04)
+
+### Added
+
+* Hlink now has optional support for the XGBoost and LightGBM gradient boosting
+machine learning libraries. You can find documentation on how to use these libraries
+[here][gradient-descent-ml-docs]. [PR #165][pr165]
+* Added a new `hlink.linking.transformers.RenameVectorAttributes` transformer which
+can rename the attributes or "slots" of Spark vector columns. [PR #165][pr165]
+
+### Fixed
+
+* Corrected misleading documentation for comparisons, which are not the same thing
+as comparison features. You can find the new documentation [here][comparison-docs]. [PR #159][pr159]
+* Corrected the documentation for substitution files, which had the meaning of the
+columns backwards. [PR #166][pr166]
+
+## v3.7.0 (2024-10-10)
+
+### Added
+
+* Added an optional argument to `SparkConnection` to allow setting a custom Spark
+app name. The default is still to set the app name to "linking". [PR #156][pr156]
+
+### Changed
+
+* Improved model exploration step 2's terminal output, logging, and documentation
+to make the step easier to work with. [PR #155][pr155]
+
+### Fixed
+
+* Hlink now logs to module-level loggers instead of the root logger. This gives
+users of the library more control over filtering logs from hlink. [PR #152][pr152]
+
+
+## v3.6.1 (2024-08-14)
+
+### Fixed
+
+* Fixed a crash in matching step 0 triggered when there were multiple exploded columns
+in the blocking section. Multiple exploded columns are now supported. [PR #143][pr143]
+
+## v3.6.0 (2024-06-18)
+
+### Added
+
+* Added OR conditions in blocking. This new feature supports connecting some or
+all blocking conditions together with ORs instead of ANDs. Note that using many ORs in blocking
+may have negative performance implications for large datasets since it increases
+the size of the blocks and makes each block more difficult to compute. You can find
+documentation on OR blocking conditions under the `or_group` bullet point [here][or-groups-docs].
+[PR #138][pr138]
+
+## v3.5.5 (2024-05-31)
+
+### Added
+
+* Added support for a variable number of columns in the array feature selection
+transform, instead of forcing it to use exactly 2 columns. [PR #135][pr135]
+
+## v3.5.4 (2024-02-20)
+
+### Added
+
+* Documented the `concat_two_cols` column mappings transform. You can see the
+documentation [here][concat-two-cols-docs]. [PR #126][pr126]
+* Documented column mapping overrides, which can let you read two columns with
+different names in the input files into a single hlink column. The documentation for
+this feature is [here][column-mapping-overrides-docs]. [PR #129][pr129]
+
+### Fixed
+
+* Fixed a bug where config validation checks did not respect column mapping overrides.
+[PR #131][pr131]
+
+## v3.5.3 (2023-11-02)
+
+### Added
+
+* Added config validation checks for duplicate comparison features, feature selections,
+and column mappings. [PR #113][pr113]
+* Added support for Python 3.12. [PR #119][pr119]
+* Put the config file name in the script prompt. [PR #123][pr123]
+
+### Fixed
+
+* Revert to keeping invalid categories in training data instead of erroring out.
+This case actually does occasionally happen, and so we would rather not error out
+on it. This reverts a change made in [PR #109][pr109], released in v3.5.2. [PR #121][pr121]
+
+## v3.5.2 (2023-10-26)
+
+### Changed
+
+* Made some minor updates to the format of training step 3's output. There are now
+3 columns: `feature_name`, `category`, and `coefficient_or_importance`. Feature
+names are not suffixed with the category value anymore. [PR #112][pr112]
+* BUG reverted in v3.5.3: Error out on invalid categories in training
+data instead of creating a new category for them. [PR #109][pr109]
+
+### Fixed
+
+* Fixed a bug with categorical features in training step 3. Each categorical feature
+was getting a single coefficient when each *category* should get its own coefficient
+instead. [PR #104][pr104], [PR #107][pr107]
+
+
+## v3.5.1 (2023-10-23)
+
+### Added
+
+* A new training step 3 to replace model exploration step 3, which was buggy.
+Training step 3 saves model feature importances or coefficients when `training.feature_importances`
+is set to true. [PR #101][pr101]
+
+### Removed
+
+* The buggy implementation of model exploration step 3. Training step 3 replaces
+this. [PR #101][pr101]
+
+## v3.5.0 (2023-10-16)
+
+### Added
+
+* Added support for Python 3.11. [PR #94][pr94]
+* Created a new `multi_jaro_winkler_search` comparison feature. This is a complex
+comparison feature which supports conditional Jaro-Winkler comparisons between
+lists of columns with similar names. You can read more in the documentation [here][multi-jaro-winkler-search-docs].
+[PR #99][pr99]
+
+### Changed
+
+* Upgraded from PySpark 3.3 to 3.5 [PR #94][pr94]
+
+### Deprecated
+
+* Deprecated the `hlink.linking.transformers.interaction_transformer` module.
+Please use PySpark 3's [`pyspark.ml.feature.Interaction`][pyspark-interaction-docs]
+class instead. Hlink's `interaction_transformer` module is scheduled for removal
+in version 4. [PR #97][pr97]
+
+### Fixed
+
+* Fixed a bug where the script's autocomplete feature sometimes did not work
+correctly. [PR #96][pr96]
+
+## v3.4.0 (2023-08-09)
+
+### Added
+
+* Created a new `convert_ints_to_longs` configuration setting for working with CSV
+files. Documentation for this setting is available [here][ints-to-longs-docs]. [PR #87][pr87]
+* Improved the link tasks documentation by adding more detail. This page is available
+[here][link-tasks-docs]. [PR #86][pr86]
+
+### Removed
+
+* Dropped the `comment` column from the script's `desc` command. This column was
+always full of nulls and cluttered up the screen. [PR #88][pr88]
+
+## v3.3.1 (2023-06-02)
+
+### Changed
+
+* Updated documentation for column mapping transforms. [PR #77][pr77]
+* Updated documentation for the `present_both_years` and `neither_are_null` comparison
+types, clarifying how they are different. [PR #79][pr79]
+
+### Fixed
+
+* Fixed a bug where comparison features were marked as categorical whenever the
+`categorical` key was present, even if it was set to false. [PR #82][pr82]
+
 ## v3.3.0 (2022-12-13)
 
 ### Added
@@ -81,8 +301,14 @@ and false negative data in model exploration. [PR #1][pr1]
 
 ### Fixed
 
-* Fixed a bug where "exact_all_mult" was not handled correctly in config validation.
+* Fixed a bug where `exact_all_mult` was not handled correctly in config validation.
 [PR #2][pr2]
+
+## v3.0.0 (2022-04-27)
+
+### Added
+
+* This is the initial open-source version of hlink.
 
 
 [pr1]: https://github.com/ipums/hlink/pull/1
@@ -101,3 +327,52 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr63]: https://github.com/ipums/hlink/pull/63
 [pr64]: https://github.com/ipums/hlink/pull/64
 [pr71]: https://github.com/ipums/hlink/pull/71
+[pr77]: https://github.com/ipums/hlink/pull/77
+[pr79]: https://github.com/ipums/hlink/pull/79
+[pr82]: https://github.com/ipums/hlink/pull/82
+[pr86]: https://github.com/ipums/hlink/pull/86
+[pr87]: https://github.com/ipums/hlink/pull/87
+[pr88]: https://github.com/ipums/hlink/pull/88
+[pr94]: https://github.com/ipums/hlink/pull/94
+[pr96]: https://github.com/ipums/hlink/pull/96
+[pr97]: https://github.com/ipums/hlink/pull/97
+[pr99]: https://github.com/ipums/hlink/pull/99
+[pr101]: https://github.com/ipums/hlink/pull/101
+[pr104]: https://github.com/ipums/hlink/pull/104
+[pr107]: https://github.com/ipums/hlink/pull/107
+[pr109]: https://github.com/ipums/hlink/pull/109
+[pr112]: https://github.com/ipums/hlink/pull/112
+[pr113]: https://github.com/ipums/hlink/pull/113
+[pr119]: https://github.com/ipums/hlink/pull/119
+[pr121]: https://github.com/ipums/hlink/pull/121
+[pr123]: https://github.com/ipums/hlink/pull/123
+[pr126]: https://github.com/ipums/hlink/pull/126
+[pr129]: https://github.com/ipums/hlink/pull/129
+[pr131]: https://github.com/ipums/hlink/pull/131
+[pr135]: https://github.com/ipums/hlink/pull/135
+[pr138]: https://github.com/ipums/hlink/pull/138
+[pr143]: https://github.com/ipums/hlink/pull/143
+[pr152]: https://github.com/ipums/hlink/pull/152
+[pr155]: https://github.com/ipums/hlink/pull/155
+[pr156]: https://github.com/ipums/hlink/pull/156
+[pr159]: https://github.com/ipums/hlink/pull/159
+[pr165]: https://github.com/ipums/hlink/pull/165
+[pr166]: https://github.com/ipums/hlink/pull/166
+[pr168]: https://github.com/ipums/hlink/pull/168
+[pr169]: https://github.com/ipums/hlink/pull/169
+[pr175]: https://github.com/ipums/hlink/pull/175
+[pr178]: https://github.com/ipums/hlink/pull/178
+[pr180]: https://github.com/ipums/hlink/pull/180
+[pr182]: https://github.com/ipums/hlink/pull/182
+[pr184]: https://github.com/ipums/hlink/pull/184
+[pr185]: https://github.com/ipums/hlink/pull/185
+
+[ints-to-longs-docs]: config.html#data-sources
+[link-tasks-docs]: link_tasks
+[pyspark-interaction-docs]: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Interaction.html
+[multi-jaro-winkler-search-docs]: comparison_features.html#multi-jaro-winkler-search
+[concat-two-cols-docs]: column_mappings.html#concat-two-cols
+[column-mapping-overrides-docs]: column_mappings.html#advanced-usage
+[or-groups-docs]: config.html#blocking
+[gradient-descent-ml-docs]: models
+[comparison-docs]: comparisons
