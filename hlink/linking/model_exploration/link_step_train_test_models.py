@@ -947,6 +947,18 @@ def _choose_randomized_parameters(
     return parameter_choices
 
 
+def _handle_param_grid_attribute(training_settings: dict[str, Any]) -> dict[str, Any]:
+    """
+    Given the training settings, handle the param_grid attribute and return the
+    equivalent model_parameter_search table. This falls back to the default of
+    param_grid = false (a.k.a. search strategy explicit) when param_grid is not
+    present.
+    """
+    param_grid = training_settings.get("param_grid", False)
+    strategy = "grid" if param_grid else "explicit"
+    return {"strategy": strategy}
+
+
 def _get_model_parameters(training_settings: dict[str, Any]) -> list[dict[str, Any]]:
     if "param_grid" in training_settings:
         print(
@@ -965,53 +977,50 @@ def _get_model_parameters(training_settings: dict[str, Any]) -> list[dict[str, A
         )
 
     model_parameters = training_settings["model_parameters"]
-    model_parameter_search = training_settings.get("model_parameter_search")
+    fallback_parameter_search = _handle_param_grid_attribute(training_settings)
+    model_parameter_search = training_settings.get(
+        "model_parameter_search", fallback_parameter_search
+    )
     seed = training_settings.get("seed")
-    use_param_grid = training_settings.get("param_grid", False)
 
     if model_parameters == []:
         raise ValueError(
             "model_parameters is empty, so there are no models to evaluate"
         )
 
-    if model_parameter_search is not None:
-        strategy = model_parameter_search["strategy"]
-        if strategy == "explicit":
-            return model_parameters
-        elif strategy == "grid":
-            return _custom_param_grid_builder(model_parameters)
-        elif strategy == "randomized":
-            num_samples = model_parameter_search["num_samples"]
-            rng = random.Random(seed)
-
-            return_parameters = []
-            # These keys are special and should not be sampled or modified. All
-            # other keys are hyper-parameters to the model and should be sampled.
-            frozen_keys = {"type", "threshold", "threshold_ratio"}
-            for _ in range(num_samples):
-                parameter_spec = rng.choice(model_parameters)
-                sample_parameters = {
-                    key: value
-                    for (key, value) in parameter_spec.items()
-                    if key not in frozen_keys
-                }
-                frozen_parameters = {
-                    key: value
-                    for (key, value) in parameter_spec.items()
-                    if key in frozen_keys
-                }
-
-                randomized = _choose_randomized_parameters(rng, sample_parameters)
-                result = {**frozen_parameters, **randomized}
-                return_parameters.append(result)
-
-            return return_parameters
-        else:
-            raise ValueError(
-                f"Unknown model_parameter_search strategy '{strategy}'. "
-                "Please choose one of 'explicit', 'grid', or 'randomized'."
-            )
-    elif use_param_grid:
+    strategy = model_parameter_search["strategy"]
+    if strategy == "explicit":
+        return model_parameters
+    elif strategy == "grid":
         return _custom_param_grid_builder(model_parameters)
+    elif strategy == "randomized":
+        num_samples = model_parameter_search["num_samples"]
+        rng = random.Random(seed)
 
-    return model_parameters
+        return_parameters = []
+        # These keys are special and should not be sampled or modified. All
+        # other keys are hyper-parameters to the model and should be sampled.
+        frozen_keys = {"type", "threshold", "threshold_ratio"}
+        for _ in range(num_samples):
+            parameter_spec = rng.choice(model_parameters)
+            sample_parameters = {
+                key: value
+                for (key, value) in parameter_spec.items()
+                if key not in frozen_keys
+            }
+            frozen_parameters = {
+                key: value
+                for (key, value) in parameter_spec.items()
+                if key in frozen_keys
+            }
+
+            randomized = _choose_randomized_parameters(rng, sample_parameters)
+            result = {**frozen_parameters, **randomized}
+            return_parameters.append(result)
+
+        return return_parameters
+    else:
+        raise ValueError(
+            f"Unknown model_parameter_search strategy '{strategy}'. "
+            "Please choose one of 'explicit', 'grid', or 'randomized'."
+        )
