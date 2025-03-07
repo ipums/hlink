@@ -1,6 +1,9 @@
 # Changelog
 
-## v4.0.0 (UNRELEASED)
+The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
+Hlink adheres to semantic versioning as much as possible.
+
+## v4.0.0 (Unreleased)
 
 ### Added
 
@@ -51,7 +54,7 @@ returns both the path to the configuration file and its contents as a mapping. [
 
 ### Added
 
-* Hlink now has optional support for the XGBoost and LightGBM gradient boosting
+* Added optional support for the XGBoost and LightGBM gradient boosting
 machine learning libraries. You can find documentation on how to use these libraries
 [here][gradient-descent-ml-docs]. [PR #165][pr165]
 * Added a new `hlink.linking.transformers.RenameVectorAttributes` transformer which
@@ -78,7 +81,7 @@ to make the step easier to work with. [PR #155][pr155]
 
 ### Fixed
 
-* Hlink now logs to module-level loggers instead of the root logger. This gives
+* Updated all modules to log to module-level loggers instead of the root logger. This gives
 users of the library more control over filtering logs from hlink. [PR #152][pr152]
 
 
@@ -133,7 +136,7 @@ and column mappings. [PR #113][pr113]
 
 ### Fixed
 
-* Revert to keeping invalid categories in training data instead of erroring out.
+* Reverted to keeping invalid categories in training data instead of erroring out.
 This case actually does occasionally happen, and so we would rather not error out
 on it. This reverts a change made in [PR #109][pr109], released in v3.5.2. [PR #121][pr121]
 
@@ -144,7 +147,7 @@ on it. This reverts a change made in [PR #109][pr109], released in v3.5.2. [PR #
 * Made some minor updates to the format of training step 3's output. There are now
 3 columns: `feature_name`, `category`, and `coefficient_or_importance`. Feature
 names are not suffixed with the category value anymore. [PR #112][pr112]
-* BUG reverted in v3.5.3: Error out on invalid categories in training
+* BUG reverted in v3.5.3: Started erroring out on invalid categories in training
 data instead of creating a new category for them. [PR #109][pr109]
 
 ### Fixed
@@ -158,13 +161,13 @@ instead. [PR #104][pr104], [PR #107][pr107]
 
 ### Added
 
-* A new training step 3 to replace model exploration step 3, which was buggy.
+* Made a new training step 3 to replace model exploration step 3, which was buggy.
 Training step 3 saves model feature importances or coefficients when `training.feature_importances`
 is set to true. [PR #101][pr101]
 
 ### Removed
 
-* The buggy implementation of model exploration step 3. Training step 3 replaces
+* Removed the buggy implementation of model exploration step 3. Training step 3 replaces
 this. [PR #101][pr101]
 
 ## v3.5.0 (2023-10-16)
@@ -179,7 +182,7 @@ lists of columns with similar names. You can read more in the documentation [her
 
 ### Changed
 
-* Upgraded from PySpark 3.3 to 3.5 [PR #94][pr94]
+* Upgraded from PySpark 3.3 to 3.5. [PR #94][pr94]
 
 ### Deprecated
 
@@ -190,7 +193,7 @@ in version 4. [PR #97][pr97]
 
 ### Fixed
 
-* Fixed a bug where the script's autocomplete feature sometimes did not work
+* Fixed a bug where the hlink script's autocomplete feature sometimes did not work
 correctly. [PR #96][pr96]
 
 ## v3.4.0 (2023-08-09)
@@ -376,3 +379,4 @@ and false negative data in model exploration. [PR #1][pr1]
 [or-groups-docs]: config.html#blocking
 [gradient-descent-ml-docs]: models
 [comparison-docs]: comparisons
+[keep-a-changelog]: https://keepachangelog.com/en/1.0.0/
