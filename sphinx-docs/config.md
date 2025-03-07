@@ -13,8 +13,8 @@
 12. [Household Comparisons](#household-comparisons)
 13. [Comparison Features](#comparison-features)
 14. [Pipeline-Generated Features](#pipeline-generated-features)
-15. [Training and Models](#training-and-models)
-16. [Household Training and Models](#household-training-and-models)
+15. [Training and Model Exploration](#training-and-model-exploration)
+16. [Household Training and Model Exploration](#household-training-and-model-exploration)
 
 ## Basic Config File
 
@@ -728,7 +728,7 @@ categorical = true
 splits = [-1,0,6,11,9999]
 ```
 
-## Training and [models](models)
+## Training and [Model Exploration](model_exploration)
 
 * Header name: `training`
 * Description: Specifies the training data set as well as a myriad of attributes related to training a model including the dependent variable within that dataset, the independent variables created from the `comparison_features` section, and the different models you want to use for either model exploration or scoring.  
@@ -738,12 +738,10 @@ splits = [-1,0,6,11,9999]
   * `dataset` -- Type: `string`. Location of the training dataset. Must be a csv file.
   * `dependent_var` -- Type: `string`. Name of dependent variable in training dataset.
   * `independent_vars` -- Type: `list`. List of independent variables to use in the model. These must be either part of `pipeline_features` or `comparison_features`.
-  * `chosen_model` -- Type: `object`. The model to train with in the `training` task and score with in the `matching` task. See the [models](models) section for more information on model specifications.
+  * `chosen_model` -- Type: `object`. The model to train with in the `training` task and score with in the `matching` task. See the [Models](models) section for more information on model specifications.
   * `threshold` -- Type: `float`. The threshold for which to accept model probability values as true predictions.  Can be used to specify a threshold to use for all models, or can be specified within each `chosen_model` and `model_parameters` specification.
-  * `decision` -- Type: `string`. Optional. Specifies which decision function to use to create the final prediction. The first option is `drop_duplicate_a`, which drops any links for which a record in the `a` data set has a predicted match more than one time. The second option is `drop_duplicate_with_threshold_ratio` which only takes links for which the `a` record has the highest probability out of any other potential links, and the second best link for the `a` record is less than the `threshold_ratio`.
   * `threshold_ratio` -- Type: `float`. Optional. For use when `decision` is `drop_duplicate_with_threshold_ratio` . Specifies the smallest possible ratio to accept between a best and second best link for a given record.  Can be used to specify a threshold ratio (beta threshold) to use for all models.  Alternatively, unique threshold ratios can be specified in each individual `chosen_model` and `model_parameters` specification.
-  * `model_parameters` -- Type: `list`. Specifies models to test out in the `model_exploration` task. See the [models](models) section for more information on model specifications.
-  * `param_grid` -- Type: `boolean`. Optional. If you would like to evaluate multiple hyper-parameters for a single model type in your `model_parameters` specification, you can give hyper-parameter inputs as arrays of length >= 1 instead of integers to allow one model per row specification with multiple model eval outputs.
+  * `decision` -- Type: `string`. Optional. Specifies which decision function to use to create the final prediction. The first option is `drop_duplicate_a`, which drops any links for which a record in the `a` data set has a predicted match more than one time. The second option is `drop_duplicate_with_threshold_ratio` which only takes links for which the `a` record has the highest probability out of any other potential links, and the second best link for the `a` record is less than the `threshold_ratio`.
   * `score_with_model` -- Type: `boolean`. If set to false, will skip the `apply_model` step of the matching task. Use this if you want to use the `run_all_steps` command and are just trying to generate potential links, such as for the creation of training data.
   * `n_training_iterations` -- Type: `integer`. Optional; default value is 10. The number of training iterations to use during the `model_exploration` task.
   * `scale_data` -- Type: `boolean`.  Optional. Whether to scale the data as part of the machine learning pipeline.
@@ -752,6 +750,7 @@ splits = [-1,0,6,11,9999]
   * `feature_importances` -- Type: `boolean`. Optional.  Whether to record
     feature importances or coefficients for the training features when training
     the ML model. Set this to true to enable training step 3.
+  * `model_parameters` -- Type: `list`. Specifies models to test out in the `model_exploration` task. See the [Model Exploration](model_exploration) page for a detailed description of how this works.
 
 
 ```
@@ -778,7 +777,7 @@ model_parameters = [
 chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
 ```
 
-## Household training and models
+## Household Training and [Model Exploration](model_exploration)
 
 * Header name: `hh_training`
 * Description: Specifies the household training data set as well as a myriad of attributes related to training a model including the dependent var within that data set, the independent vars created from the `comparison_features` section, and the different models you want to use.  
