@@ -9,7 +9,6 @@ from pyspark.sql import Column, DataFrame
 from pyspark.sql.functions import array, explode, col
 
 import hlink.linking.core.comparison as comparison_core
-from . import _helpers as matching_helpers
 from hlink.linking.link_step import LinkStep
 
 
@@ -41,7 +40,7 @@ class LinkStepExplode(LinkStep):
             )
 
         # self.spark.sql("set spark.sql.shuffle.partitions=4000")
-        blocking = matching_helpers.get_blocking(config)
+        blocking = config["blocking"]
 
         self.task.run_register_python(
             name="exploded_df_a",

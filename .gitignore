@@ -9,6 +9,7 @@ venv
 sphinx-docs/_*
 .coverage
 coverage_*
+.hypothesis/
 
 # Scala
 scala_jar/target

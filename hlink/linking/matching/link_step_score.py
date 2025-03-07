@@ -96,12 +96,13 @@ class LinkStepScore(LinkStep):
         threshold_ratio = threshold_core.get_threshold_ratio(
             config[training_conf], chosen_model_params, default=1.3
         )
+        decision = config[training_conf].get("decision")
         predictions = threshold_core.predict_using_thresholds(
             score_tmp,
             alpha_threshold,
             threshold_ratio,
-            config[training_conf],
             config["id_column"],
+            decision,
         )
         predictions.write.mode("overwrite").saveAsTable(f"{table_prefix}predictions")
         pmp = self.task.spark.table(f"{table_prefix}potential_matches_pipeline")
