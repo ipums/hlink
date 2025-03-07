@@ -15,6 +15,7 @@ Welcome to hlink's documentation!
    running_the_program
    Advanced Workflows <use_examples.md>
    config
+   changelog
 
 Configuration API
 =================

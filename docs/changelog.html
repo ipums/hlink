@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Changelog &#8212; hlink 3.8.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=948f11bf"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Column Mappings" href="column_mappings.html" />
+    <link rel="prev" title="Configuration" href="config.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<p>The format of this changelog is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep A Changelog</a>.
+Hlink adheres to semantic versioning as much as possible.</p>
+<section id="v4-0-0-unreleased">
+<h2>v4.0.0 (Unreleased)<a class="headerlink" href="#v4-0-0-unreleased" title="Link to this heading">¶</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for randomized parameter search to model exploration. <a class="reference external" href="https://github.com/ipums/hlink/pull/168">PR #168</a></p></li>
+<li><p>Created an <code class="docutils literal notranslate"><span class="pre">hlink.linking.core.model_metrics</span></code> module with functions for computing
+metrics on model confusion matrices. Added the F-measure model metric to model
+exploration. <a class="reference external" href="https://github.com/ipums/hlink/pull/180">PR #180</a></p></li>
+<li><p>Added this changelog! <a class="reference external" href="https://github.com/ipums/hlink/pull/189">PR #189</a></p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Overhauled the model exploration task to use a nested cross-validation approach.
+<a class="reference external" href="https://github.com/ipums/hlink/pull/169">PR #169</a></p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">hlink.linking.core.classifier</span></code> functions to not interact with <code class="docutils literal notranslate"><span class="pre">threshold</span></code>
+and <code class="docutils literal notranslate"><span class="pre">threshold_ratio</span></code>. Please ensure that the parameter dictionaries passed to these
+functions only contain parameters for the chosen model. <a class="reference external" href="https://github.com/ipums/hlink/pull/175">PR #175</a></p></li>
+<li><p>Simplified the parameters required for <code class="docutils literal notranslate"><span class="pre">hlink.linking.core.threshold.predict_using_thresholds</span></code>.
+Instead of passing the entire <code class="docutils literal notranslate"><span class="pre">training</span></code> configuration section to this function,
+you now need only pass <code class="docutils literal notranslate"><span class="pre">training.decision</span></code>. <a class="reference external" href="https://github.com/ipums/hlink/pull/175">PR #175</a></p></li>
+<li><p>Added a new required <code class="docutils literal notranslate"><span class="pre">checkpoint_dir</span></code> argument to <code class="docutils literal notranslate"><span class="pre">SparkConnection</span></code>, which lets hlink set
+different directories for the tmp and checkpoint directories. <a class="reference external" href="https://github.com/ipums/hlink/pull/182">PR #182</a></p></li>
+<li><p>Swapped to using <code class="docutils literal notranslate"><span class="pre">tomli</span></code> as the default TOML parser. This should fix several issues
+with how hlink parses TOML files. <code class="docutils literal notranslate"><span class="pre">load_conf_file()</span></code> provides the <code class="docutils literal notranslate"><span class="pre">use_legacy_toml_parser</span></code>
+argument for backwards compatibility if necessary. <a class="reference external" href="https://github.com/ipums/hlink/pull/185">PR #185</a></p></li>
+</ul>
+</section>
+<section id="deprecated">
+<h3>Deprecated<a class="headerlink" href="#deprecated" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Deprecated the <code class="docutils literal notranslate"><span class="pre">training.param_grid</span></code> attribute in favor of the new, more flexible
+<code class="docutils literal notranslate"><span class="pre">training.model_parameter_search</span></code> table. This is part of supporting the new randomized
+parameter search. <a class="reference external" href="https://github.com/ipums/hlink/pull/168">PR #168</a></p></li>
+</ul>
+</section>
+<section id="removed">
+<h3>Removed<a class="headerlink" href="#removed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed functionality for outputting “suspicious” training data from model exploration.
+We determined that this is out of the scope of model exploration step 2. This change
+greatly simplifies the model exploration code. <a class="reference external" href="https://github.com/ipums/hlink/pull/178">PR #178</a></p></li>
+<li><p>Removed the deprecated <code class="docutils literal notranslate"><span class="pre">hlink.linking.transformers.interaction_transformer</span></code> module.
+This module was deprecated in v3.5.0. Please use
+<a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Interaction.html"><code class="docutils literal notranslate"><span class="pre">pyspark.ml.feature.Interaction</span></code></a> instead. <a class="reference external" href="https://github.com/ipums/hlink/pull/184">PR #184</a></p></li>
+<li><p>Removed some alternate configuration syntax which has been deprecated since
+v3.0.0. <a class="reference external" href="https://github.com/ipums/hlink/pull/184">PR #184</a></p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">hlink.scripts.main.load_conf</span></code> in favor of a much simpler approach to
+finding the configuration file and configuring spark. Please call
+<code class="docutils literal notranslate"><span class="pre">hlink.configs.load_config.load_conf_file</span></code> directly instead. <code class="docutils literal notranslate"><span class="pre">load_conf_file</span></code> now
+returns both the path to the configuration file and its contents as a mapping. <a class="reference external" href="https://github.com/ipums/hlink/pull/182">PR #182</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-8-0-2024-12-04">
+<h2>v3.8.0 (2024-12-04)<a class="headerlink" href="#v3-8-0-2024-12-04" title="Link to this heading">¶</a></h2>
+<section id="id1">
+<h3>Added<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added optional support for the XGBoost and LightGBM gradient boosting
+machine learning libraries. You can find documentation on how to use these libraries
+<a class="reference internal" href="models.html"><span class="doc">here</span></a>. <a class="reference external" href="https://github.com/ipums/hlink/pull/165">PR #165</a></p></li>
+<li><p>Added a new <code class="docutils literal notranslate"><span class="pre">hlink.linking.transformers.RenameVectorAttributes</span></code> transformer which
+can rename the attributes or “slots” of Spark vector columns. <a class="reference external" href="https://github.com/ipums/hlink/pull/165">PR #165</a></p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Corrected misleading documentation for comparisons, which are not the same thing
+as comparison features. You can find the new documentation <a class="reference internal" href="comparisons.html"><span class="doc">here</span></a>. <a class="reference external" href="https://github.com/ipums/hlink/pull/159">PR #159</a></p></li>
+<li><p>Corrected the documentation for substitution files, which had the meaning of the
+columns backwards. <a class="reference external" href="https://github.com/ipums/hlink/pull/166">PR #166</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-7-0-2024-10-10">
+<h2>v3.7.0 (2024-10-10)<a class="headerlink" href="#v3-7-0-2024-10-10" title="Link to this heading">¶</a></h2>
+<section id="id2">
+<h3>Added<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added an optional argument to <code class="docutils literal notranslate"><span class="pre">SparkConnection</span></code> to allow setting a custom Spark
+app name. The default is still to set the app name to “linking”. <a class="reference external" href="https://github.com/ipums/hlink/pull/156">PR #156</a></p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Changed<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Improved model exploration step 2’s terminal output, logging, and documentation
+to make the step easier to work with. <a class="reference external" href="https://github.com/ipums/hlink/pull/155">PR #155</a></p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Fixed<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated all modules to log to module-level loggers instead of the root logger. This gives
+users of the library more control over filtering logs from hlink. <a class="reference external" href="https://github.com/ipums/hlink/pull/152">PR #152</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-6-1-2024-08-14">
+<h2>v3.6.1 (2024-08-14)<a class="headerlink" href="#v3-6-1-2024-08-14" title="Link to this heading">¶</a></h2>
+<section id="id5">
+<h3>Fixed<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a crash in matching step 0 triggered when there were multiple exploded columns
+in the blocking section. Multiple exploded columns are now supported. <a class="reference external" href="https://github.com/ipums/hlink/pull/143">PR #143</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-6-0-2024-06-18">
+<h2>v3.6.0 (2024-06-18)<a class="headerlink" href="#v3-6-0-2024-06-18" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h3>Added<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added OR conditions in blocking. This new feature supports connecting some or
+all blocking conditions together with ORs instead of ANDs. Note that using many ORs in blocking
+may have negative performance implications for large datasets since it increases
+the size of the blocks and makes each block more difficult to compute. You can find
+documentation on OR blocking conditions under the <code class="docutils literal notranslate"><span class="pre">or_group</span></code> bullet point <a class="reference external" href="config.html#blocking">here</a>.
+<a class="reference external" href="https://github.com/ipums/hlink/pull/138">PR #138</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-5-5-2024-05-31">
+<h2>v3.5.5 (2024-05-31)<a class="headerlink" href="#v3-5-5-2024-05-31" title="Link to this heading">¶</a></h2>
+<section id="id7">
+<h3>Added<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for a variable number of columns in the array feature selection
+transform, instead of forcing it to use exactly 2 columns. <a class="reference external" href="https://github.com/ipums/hlink/pull/135">PR #135</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-5-4-2024-02-20">
+<h2>v3.5.4 (2024-02-20)<a class="headerlink" href="#v3-5-4-2024-02-20" title="Link to this heading">¶</a></h2>
+<section id="id8">
+<h3>Added<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Documented the <code class="docutils literal notranslate"><span class="pre">concat_two_cols</span></code> column mappings transform. You can see the
+documentation <a class="reference external" href="column_mappings.html#concat-two-cols">here</a>. <a class="reference external" href="https://github.com/ipums/hlink/pull/126">PR #126</a></p></li>
+<li><p>Documented column mapping overrides, which can let you read two columns with
+different names in the input files into a single hlink column. The documentation for
+this feature is <a class="reference external" href="column_mappings.html#advanced-usage">here</a>. <a class="reference external" href="https://github.com/ipums/hlink/pull/129">PR #129</a></p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Fixed<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where config validation checks did not respect column mapping overrides.
+<a class="reference external" href="https://github.com/ipums/hlink/pull/131">PR #131</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-5-3-2023-11-02">
+<h2>v3.5.3 (2023-11-02)<a class="headerlink" href="#v3-5-3-2023-11-02" title="Link to this heading">¶</a></h2>
+<section id="id10">
+<h3>Added<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added config validation checks for duplicate comparison features, feature selections,
+and column mappings. <a class="reference external" href="https://github.com/ipums/hlink/pull/113">PR #113</a></p></li>
+<li><p>Added support for Python 3.12. <a class="reference external" href="https://github.com/ipums/hlink/pull/119">PR #119</a></p></li>
+<li><p>Put the config file name in the script prompt. <a class="reference external" href="https://github.com/ipums/hlink/pull/123">PR #123</a></p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>Fixed<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Reverted to keeping invalid categories in training data instead of erroring out.
+This case actually does occasionally happen, and so we would rather not error out
+on it. This reverts a change made in <a class="reference external" href="https://github.com/ipums/hlink/pull/109">PR #109</a>, released in v3.5.2. <a class="reference external" href="https://github.com/ipums/hlink/pull/121">PR #121</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-5-2-2023-10-26">
+<h2>v3.5.2 (2023-10-26)<a class="headerlink" href="#v3-5-2-2023-10-26" title="Link to this heading">¶</a></h2>
+<section id="id12">
+<h3>Changed<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Made some minor updates to the format of training step 3’s output. There are now
+3 columns: <code class="docutils literal notranslate"><span class="pre">feature_name</span></code>, <code class="docutils literal notranslate"><span class="pre">category</span></code>, and <code class="docutils literal notranslate"><span class="pre">coefficient_or_importance</span></code>. Feature
+names are not suffixed with the category value anymore. <a class="reference external" href="https://github.com/ipums/hlink/pull/112">PR #112</a></p></li>
+<li><p>BUG reverted in v3.5.3: Started erroring out on invalid categories in training
+data instead of creating a new category for them. <a class="reference external" href="https://github.com/ipums/hlink/pull/109">PR #109</a></p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>Fixed<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug with categorical features in training step 3. Each categorical feature
+was getting a single coefficient when each <em>category</em> should get its own coefficient
+instead. <a class="reference external" href="https://github.com/ipums/hlink/pull/104">PR #104</a>, <a class="reference external" href="https://github.com/ipums/hlink/pull/107">PR #107</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-5-1-2023-10-23">
+<h2>v3.5.1 (2023-10-23)<a class="headerlink" href="#v3-5-1-2023-10-23" title="Link to this heading">¶</a></h2>
+<section id="id14">
+<h3>Added<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Made a new training step 3 to replace model exploration step 3, which was buggy.
+Training step 3 saves model feature importances or coefficients when <code class="docutils literal notranslate"><span class="pre">training.feature_importances</span></code>
+is set to true. <a class="reference external" href="https://github.com/ipums/hlink/pull/101">PR #101</a></p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>Removed<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed the buggy implementation of model exploration step 3. Training step 3 replaces
+this. <a class="reference external" href="https://github.com/ipums/hlink/pull/101">PR #101</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-5-0-2023-10-16">
+<h2>v3.5.0 (2023-10-16)<a class="headerlink" href="#v3-5-0-2023-10-16" title="Link to this heading">¶</a></h2>
+<section id="id16">
+<h3>Added<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for Python 3.11. <a class="reference external" href="https://github.com/ipums/hlink/pull/94">PR #94</a></p></li>
+<li><p>Created a new <code class="docutils literal notranslate"><span class="pre">multi_jaro_winkler_search</span></code> comparison feature. This is a complex
+comparison feature which supports conditional Jaro-Winkler comparisons between
+lists of columns with similar names. You can read more in the documentation <a class="reference external" href="comparison_features.html#multi-jaro-winkler-search">here</a>.
+<a class="reference external" href="https://github.com/ipums/hlink/pull/99">PR #99</a></p></li>
+</ul>
+</section>
+<section id="id17">
+<h3>Changed<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Upgraded from PySpark 3.3 to 3.5. <a class="reference external" href="https://github.com/ipums/hlink/pull/94">PR #94</a></p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Deprecated<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Deprecated the <code class="docutils literal notranslate"><span class="pre">hlink.linking.transformers.interaction_transformer</span></code> module.
+Please use PySpark 3’s <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Interaction.html"><code class="docutils literal notranslate"><span class="pre">pyspark.ml.feature.Interaction</span></code></a>
+class instead. Hlink’s <code class="docutils literal notranslate"><span class="pre">interaction_transformer</span></code> module is scheduled for removal
+in version 4. <a class="reference external" href="https://github.com/ipums/hlink/pull/97">PR #97</a></p></li>
+</ul>
+</section>
+<section id="id19">
+<h3>Fixed<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where the hlink script’s autocomplete feature sometimes did not work
+correctly. <a class="reference external" href="https://github.com/ipums/hlink/pull/96">PR #96</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-4-0-2023-08-09">
+<h2>v3.4.0 (2023-08-09)<a class="headerlink" href="#v3-4-0-2023-08-09" title="Link to this heading">¶</a></h2>
+<section id="id20">
+<h3>Added<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Created a new <code class="docutils literal notranslate"><span class="pre">convert_ints_to_longs</span></code> configuration setting for working with CSV
+files. Documentation for this setting is available <a class="reference external" href="config.html#data-sources">here</a>. <a class="reference external" href="https://github.com/ipums/hlink/pull/87">PR #87</a></p></li>
+<li><p>Improved the link tasks documentation by adding more detail. This page is available
+<a class="reference internal" href="link_tasks.html"><span class="doc">here</span></a>. <a class="reference external" href="https://github.com/ipums/hlink/pull/86">PR #86</a></p></li>
+</ul>
+</section>
+<section id="id21">
+<h3>Removed<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Dropped the <code class="docutils literal notranslate"><span class="pre">comment</span></code> column from the script’s <code class="docutils literal notranslate"><span class="pre">desc</span></code> command. This column was
+always full of nulls and cluttered up the screen. <a class="reference external" href="https://github.com/ipums/hlink/pull/88">PR #88</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-3-1-2023-06-02">
+<h2>v3.3.1 (2023-06-02)<a class="headerlink" href="#v3-3-1-2023-06-02" title="Link to this heading">¶</a></h2>
+<section id="id22">
+<h3>Changed<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated documentation for column mapping transforms. <a class="reference external" href="https://github.com/ipums/hlink/pull/77">PR #77</a></p></li>
+<li><p>Updated documentation for the <code class="docutils literal notranslate"><span class="pre">present_both_years</span></code> and <code class="docutils literal notranslate"><span class="pre">neither_are_null</span></code> comparison
+types, clarifying how they are different. <a class="reference external" href="https://github.com/ipums/hlink/pull/79">PR #79</a></p></li>
+</ul>
+</section>
+<section id="id23">
+<h3>Fixed<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where comparison features were marked as categorical whenever the
+<code class="docutils literal notranslate"><span class="pre">categorical</span></code> key was present, even if it was set to false. <a class="reference external" href="https://github.com/ipums/hlink/pull/82">PR #82</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-3-0-2022-12-13">
+<h2>v3.3.0 (2022-12-13)<a class="headerlink" href="#v3-3-0-2022-12-13" title="Link to this heading">¶</a></h2>
+<section id="id24">
+<h3>Added<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added logging for user input to the script. This is extremely helpful for diagnosing
+errors. <a class="reference external" href="https://github.com/ipums/hlink/pull/64">PR #64</a></p></li>
+<li><p>Added and improved documentation for several comparison types. <a class="reference external" href="https://github.com/ipums/hlink/pull/47">PR #47</a></p></li>
+</ul>
+</section>
+<section id="id25">
+<h3>Changed<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Started writing to a unique log file for each script run. <a class="reference external" href="https://github.com/ipums/hlink/pull/55">PR #55</a></p></li>
+<li><p>Updated and improved the tutorial in examples/tutorial. <a class="reference external" href="https://github.com/ipums/hlink/pull/63">PR #63</a></p></li>
+<li><p>Changed to pyproject.toml instead of setup.py and setup.cfg. <a class="reference external" href="https://github.com/ipums/hlink/pull/71">PR #71</a></p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Fixed<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug which caused Jaro-Winkler scores to be 1.0 for two empty strings. The
+scores are now 0.0 on two empty strings. <a class="reference external" href="https://github.com/ipums/hlink/pull/59">PR #59</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-2-7-2022-09-14">
+<h2>v3.2.7 (2022-09-14)<a class="headerlink" href="#v3-2-7-2022-09-14" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h3>Added<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added a configuration validation that checks that both data sources contain the id column. <a class="reference external" href="https://github.com/ipums/hlink/pull/13">PR #13</a></p></li>
+<li><p>Added driver memory options to <code class="docutils literal notranslate"><span class="pre">SparkConnection</span></code>. <a class="reference external" href="https://github.com/ipums/hlink/pull/40">PR #40</a></p></li>
+</ul>
+</section>
+<section id="id28">
+<h3>Changed<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Upgraded from PySpark 3.2 to 3.3. <a class="reference external" href="https://github.com/ipums/hlink/pull/11">PR #11</a></p></li>
+<li><p>Capped the number of partitions requested at 10,000. <a class="reference external" href="https://github.com/ipums/hlink/pull/40">PR #40</a></p></li>
+</ul>
+</section>
+<section id="id29">
+<h3>Fixed<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where <code class="docutils literal notranslate"><span class="pre">feature_selections</span></code> was always required in the config file.
+It now defaults to an empty list as intended. <a class="reference external" href="https://github.com/ipums/hlink/pull/15">PR #15</a></p></li>
+<li><p>Fixed a bug where an error message in <code class="docutils literal notranslate"><span class="pre">conf_validations</span></code> was not formatted correctly. <a class="reference external" href="https://github.com/ipums/hlink/pull/13">PR #13</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-2-6-2022-07-18">
+<h2>v3.2.6 (2022-07-18)<a class="headerlink" href="#v3-2-6-2022-07-18" title="Link to this heading">¶</a></h2>
+<section id="id30">
+<h3>Added<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Made hlink installable with <code class="docutils literal notranslate"><span class="pre">pip</span></code> via PyPI.org.</p></li>
+</ul>
+</section>
+</section>
+<section id="v3-2-1-2022-05-24">
+<h2>v3.2.1 (2022-05-24)<a class="headerlink" href="#v3-2-1-2022-05-24" title="Link to this heading">¶</a></h2>
+<section id="id31">
+<h3>Added<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Improved logging during startup and for the <code class="docutils literal notranslate"><span class="pre">LinkTask.run_all_steps()</span></code> method.
+<a class="reference external" href="https://github.com/ipums/hlink/pull/7">PR #7</a></p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>Changed<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added code to adjust the number of Spark partitions based on the size of the input
+datasets for some link steps. This should help these steps scale better with large
+datasets. <a class="reference external" href="https://github.com/ipums/hlink/pull/10">PR #10</a></p></li>
+</ul>
+</section>
+<section id="id33">
+<h3>Fixed<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where model exploration’s step 3 would run into a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> due to
+trying to manually build up a file path. <a class="reference external" href="https://github.com/ipums/hlink/pull/8">PR #8</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-2-0-2022-05-16">
+<h2>v3.2.0 (2022-05-16)<a class="headerlink" href="#v3-2-0-2022-05-16" title="Link to this heading">¶</a></h2>
+<section id="id34">
+<h3>Changed<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Upgraded from Python 3.6 to 3.10. <a class="reference external" href="https://github.com/ipums/hlink/pull/5">PR #5</a></p></li>
+<li><p>Upgraded from PySpark 2 to PySpark 3. <a class="reference external" href="https://github.com/ipums/hlink/pull/5">PR #5</a></p></li>
+<li><p>Upgraded from Java 8 to Java 11. <a class="reference external" href="https://github.com/ipums/hlink/pull/5">PR #5</a></p></li>
+<li><p>Upgraded from Scala 2.11 to Scala 2.12. <a class="reference external" href="https://github.com/ipums/hlink/pull/5">PR #5</a></p></li>
+<li><p>Upgraded from Scala Commons Text 1.4 to 1.9. This includes some bug fixes which
+may slightly change Jaro-Winkler scores. <a class="reference external" href="https://github.com/ipums/hlink/pull/5">PR #5</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-1-0-2022-05-04">
+<h2>v3.1.0 (2022-05-04)<a class="headerlink" href="#v3-1-0-2022-05-04" title="Link to this heading">¶</a></h2>
+<section id="id35">
+<h3>Added<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Started exporting true positive and true negative data along with false positive
+and false negative data in model exploration. <a class="reference external" href="https://github.com/ipums/hlink/pull/1">PR #1</a></p></li>
+</ul>
+</section>
+<section id="id36">
+<h3>Fixed<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where <code class="docutils literal notranslate"><span class="pre">exact_all_mult</span></code> was not handled correctly in config validation.
+<a class="reference external" href="https://github.com/ipums/hlink/pull/2">PR #2</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v3-0-0-2022-04-27">
+<h2>v3.0.0 (2022-04-27)<a class="headerlink" href="#v3-0-0-2022-04-27" title="Link to this heading">¶</a></h2>
+<section id="id37">
+<h3>Added<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>This is the initial open-source version of hlink.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">hlink</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="link_tasks.html">Link Tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_the_program.html">Running hlink</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_examples.html">Advanced Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v4-0-0-unreleased">v4.0.0 (Unreleased)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-8-0-2024-12-04">v3.8.0 (2024-12-04)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-7-0-2024-10-10">v3.7.0 (2024-10-10)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-6-1-2024-08-14">v3.6.1 (2024-08-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-6-0-2024-06-18">v3.6.0 (2024-06-18)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-5-5-2024-05-31">v3.5.5 (2024-05-31)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-5-4-2024-02-20">v3.5.4 (2024-02-20)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-5-3-2023-11-02">v3.5.3 (2023-11-02)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-5-2-2023-10-26">v3.5.2 (2023-10-26)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-5-1-2023-10-23">v3.5.1 (2023-10-23)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-5-0-2023-10-16">v3.5.0 (2023-10-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-4-0-2023-08-09">v3.4.0 (2023-08-09)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-3-1-2023-06-02">v3.3.1 (2023-06-02)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-3-0-2022-12-13">v3.3.0 (2022-12-13)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-2-7-2022-09-14">v3.2.7 (2022-09-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-2-6-2022-07-18">v3.2.6 (2022-07-18)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-2-1-2022-05-24">v3.2.1 (2022-05-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-2-0-2022-05-16">v3.2.0 (2022-05-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-1-0-2022-05-04">v3.1.0 (2022-05-04)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v3-0-0-2022-04-27">v3.0.0 (2022-04-27)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Configuration API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="column_mappings.html">Column Mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison_features.html">Comparison Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_selection_transforms.html">Feature Selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_features.html">Pipeline Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="substitutions.html">Substitutions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="config.html" title="previous chapter">Configuration</a></li>
+      <li>Next: <a href="column_mappings.html" title="next chapter">Column Mappings</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2019-2022, IPUMS.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/changelog.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
