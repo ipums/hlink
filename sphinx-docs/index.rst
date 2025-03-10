@@ -30,4 +30,5 @@ Configuration API
    Feature Selection <feature_selection_transforms.md>
    Pipeline Features <pipeline_features.md>
    substitutions
+   model_exploration
    models

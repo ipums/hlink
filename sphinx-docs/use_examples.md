@@ -1,6 +1,5 @@
 # Advanced Workflow Examples 
 
-
 ## Export training data after generating features to reuse in different linking years
 
 It is common to have a single training data set that spans two linked years, which is then used to train a model that is applied to a different set of linked years.  For example, we have a training data set that spans linked individuals from the 1900 census to the 1910 census.  We use this training data to predict links in the full count 1900-1910 linking run, but we also use this training data to link year pairs 1910-1920, 1920-1930, and 1930-1940.  
@@ -66,12 +65,9 @@ However, when this training data set is used for other years, the program does n
 
 8) Launch the hlink program using your new config for the new year pair you want to link. Run your link tasks and export relevant data.
 
-## ML model exploration and export of lists of potential false positives/negatives in training data
+## An Example Model Exploration Workflow
+
 `hlink` accepts a matrix of ML models and hyper-parameters to run train/test splits for you, and outputs data you can use to select and tune your models.  You can see example `training` and `hh_training` configuration sections that implement this in the [training](config.html#training-and-models) and [household training](config.html#household-training-and-models) sections of the configuration documentation.
-
-The model exploration link task also allows you to export lists of potential false positives (FPs) and false negatives (FNs) in your training data.  This is calculated when running the train/test splits in the regular model exploration tasks if the `output_suspicious_TD` flag is true.
-
-### Example model exploration and FP/FN export workflow
 
 1) Create a config file that has a `training` and/or `hh_training` section with model parameters to explore. For example:
 
@@ -88,14 +84,11 @@ The model exploration link task also allows you to export lists of potential fal
     # source data years weren't identical to the linked years of your training data.
     use_training_data_features = false
 
-    # VERY IMPORTANT if you want to output FPs/FNs
-    output_suspicious_TD = true
-
     split_by_id_a = true
     score_with_model = true
     feature_importances = false
     decision = "drop_duplicate_with_threshold_ratio"
-    param_grid = true
+    model_parameter_search = {strategy = "grid"}
     n_training_iterations = 10
     model_parameters = [
         { type = "logistic_regression", threshold = [0.5], threshold_ratio = [1.0, 1.1]},
@@ -127,11 +120,4 @@ The model exploration link task also allows you to export lists of potential fal
     hlink $ csv training_results /my/output/1900_1910_training_results.csv
     ```
 
-5) Export the potential FPs and FNs to csv.  For `training` params, the results will be in the `repeat_FPs` and `repeat_FNs` tables, and for `hh_training` in the `hh_repeat_FPs` and `hh_repeat_FNs` tables.
-
-    ```
-    hlink $ csv repeat_FPs /my/output/1900_1910_potential_FPs.csv
-    hlink $ csv repeat_FNs /my/output/1900_1910_potential_FNs.csv
-    ```
-
-6) Use your preferred methods to analyze the data you've just exported.  Update the `chosen_model` in your configuration, and/or create new versions of your training data following your findings and update the path to the new training data in your configs.
+5) Use your preferred methods to analyze the data you've just exported.  Update the `chosen_model` in your configuration, and/or create new versions of your training data following your findings and update the path to the new training data in your configs.

@@ -24,6 +24,7 @@ class SparkFactory:
         spark_dir = Path("spark").resolve()
         self.derby_dir = spark_dir / "derby"
         self.warehouse_dir = spark_dir / "warehouse"
+        self.checkpoint_dir = spark_dir / "checkpoint"
         self.tmp_dir = spark_dir / "tmp"
         self.python = sys.executable
         self.db_name = "linking"
@@ -38,6 +39,10 @@ class SparkFactory:
 
     def set_warehouse_dir(self, warehouse_dir):
         self.warehouse_dir = warehouse_dir
+        return self
+
+    def set_checkpoint_dir(self, checkpoint_dir):
+        self.checkpoint_dir = checkpoint_dir
         return self
 
     def set_tmp_dir(self, tmp_dir):
@@ -78,6 +83,7 @@ class SparkFactory:
         spark_conn = SparkConnection(
             str(self.derby_dir),
             str(self.warehouse_dir),
+            str(self.checkpoint_dir),
             str(self.tmp_dir),
             self.python,
             self.db_name,

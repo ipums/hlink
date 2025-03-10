@@ -11,7 +11,6 @@ import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.dist_table as dist_table_core
 import hlink.linking.core.comparison as comparison_core
 from hlink.linking.util import spark_shuffle_partitions_heuristic
-from . import _helpers as matching_helpers
 
 from hlink.linking.link_step import LinkStep
 
@@ -83,7 +82,7 @@ class LinkStepMatch(LinkStep):
             f"Dataset sizes are A={dataset_size_a}, B={dataset_size_b}, so set Spark partitions to {num_partitions} for this step"
         )
 
-        blocking = matching_helpers.get_blocking(config)
+        blocking = config["blocking"]
 
         t_ctx = {}
         if config.get("comparisons", False):
