@@ -143,8 +143,8 @@ param_grid = true
 is equivalent to
 
 ```toml
-[training.model_parameter_search]
-strategy = "grid"
+[training]
+model_parameter_search = {strategy = "grid"}
 ```
 
 and
@@ -157,8 +157,8 @@ param_grid = false
 is equivalent to
 
 ```toml
-[training.model_parameter_search]
-strategy = "explicit"
+[training]
+model_parameter_search = {strategy = "explicit"}
 ```
 
 ### Types and Thresholds

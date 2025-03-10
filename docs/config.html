@@ -367,7 +367,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 <span class="n">decision</span> <span class="o">=</span> <span class="s2">&quot;drop_duplicate_with_threshold_ratio&quot;</span>
 
 <span class="n">n_training_iterations</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">param_grid</span> <span class="o">=</span> <span class="n">true</span>
+<span class="n">model_parameter_search</span> <span class="o">=</span> <span class="p">{</span><span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;grid&quot;</span><span class="p">}</span>
 <span class="n">model_parameters</span> <span class="o">=</span> <span class="p">[</span> 
     <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span> <span class="n">maxDepth</span> <span class="o">=</span> <span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">numTrees</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">threshold</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">],</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">]</span> <span class="p">},</span>
     <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">,</span> <span class="mf">0.80</span><span class="p">],</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">]</span> <span class="p">}</span>
@@ -393,7 +393,7 @@ It uses machine learning to probabilistically link the two datasets.</p>
 <span class="n">decision</span> <span class="o">=</span> <span class="s2">&quot;drop_duplicate_with_threshold_ratio&quot;</span>
 
 <span class="n">n_training_iterations</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">param_grid</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">model_parameter_search</span> <span class="o">=</span> <span class="p">{</span><span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;explicit&quot;</span><span class="p">}</span>
 <span class="n">model_parameters</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span> <span class="n">maxDepth</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">numTrees</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="p">},</span>
     <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="p">}</span>
@@ -820,6 +820,8 @@ matches. <code class="docutils literal notranslate"><span class="pre">hh_compari
 feature importances or coefficients for the training features when training
 the ML model. Set this to true to enable training step 3.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">model_parameters</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">list</span></code>. Specifies models to test out in the <code class="docutils literal notranslate"><span class="pre">model_exploration</span></code> task. See the <a class="reference internal" href="model_exploration.html"><span class="doc">Model Exploration</span></a> page for a detailed description of how this works.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_parameter_search</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">object</span></code>. Specifies which strategy hlink should
+use to generate test models for <a class="reference internal" href="model_exploration.html"><span class="doc">Model Exploration</span></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">n_training_iterations</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">integer</span></code>. Optional; default value is 10. The number of outer folds to use during the <code class="docutils literal notranslate"><span class="pre">model_exploration</span></code> task. See <a class="reference external" href="model_exploration.html#the-details">here</a> for more details.</p></li>
 </ul>
 </li>
@@ -838,7 +840,7 @@ the ML model. Set this to true to enable training step 3.</p></li>
 <span class="n">decision</span> <span class="o">=</span> <span class="s2">&quot;drop_duplicate_with_threshold_ratio&quot;</span>
 
 <span class="n">n_training_iterations</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">param_grid</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">model_parameter_search</span> <span class="o">=</span> <span class="p">{</span><span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;explicit&quot;</span><span class="p">}</span>
 <span class="n">model_parameters</span> <span class="o">=</span> <span class="p">[</span>
   <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">,</span> <span class="n">maxDepth</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">numTrees</span> <span class="o">=</span> <span class="mi">50</span> <span class="p">},</span>
   <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">}</span>
@@ -878,7 +880,7 @@ the ML model. Set this to true to enable training step 3.</p></li>
 <span class="n">feature_importances</span> <span class="o">=</span> <span class="n">true</span>
 <span class="n">decision</span> <span class="o">=</span> <span class="s2">&quot;drop_duplicate_with_threshold_ratio&quot;</span>
 
-<span class="n">param_grid</span> <span class="o">=</span> <span class="n">true</span>
+<span class="n">model_parameter_search</span> <span class="o">=</span> <span class="p">{</span><span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;grid&quot;</span><span class="p">}</span>
 <span class="n">n_training_iterations</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">model_parameters</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;logistic_regression&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">threshold_ratio</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">]},</span>
@@ -978,7 +980,7 @@ the ML model. Set this to true to enable training step 3.</p></li>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2019-2022, IPUMS.
+      &#169;2019-2025, IPUMS.
       
       |
       Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
