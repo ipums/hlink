@@ -162,8 +162,8 @@ parameter search strategies. Prior to version 4.0.0, you will need to use <code 
 </pre></div>
 </div>
 <p>is equivalent to</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.model_parameter_search]</span>
-<span class="n">strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;grid&quot;</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training]</span>
+<span class="n">model_parameter_search</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">strategy</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;grid&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>and</p>
@@ -172,8 +172,8 @@ parameter search strategies. Prior to version 4.0.0, you will need to use <code 
 </pre></div>
 </div>
 <p>is equivalent to</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training.model_parameter_search]</span>
-<span class="n">strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;explicit&quot;</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[training]</span>
+<span class="n">model_parameter_search</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">strategy</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;explicit&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
 </section>
@@ -287,7 +287,7 @@ Let <code class="docutils literal notranslate"><span class="pre">J</span></code>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2019-2022, IPUMS.
+      &#169;2019-2025, IPUMS.
       
       |
       Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>

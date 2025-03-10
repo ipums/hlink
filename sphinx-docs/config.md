@@ -334,7 +334,7 @@ split_by_id_a = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 2
-param_grid = true
+model_parameter_search = {strategy = "grid"}
 model_parameters = [ 
     { type = "random_forest", maxDepth = [7], numTrees = [100], threshold = [0.05, 0.005], threshold_ratio = [1.2, 1.3] },
     { type = "logistic_regression", threshold = [0.50, 0.65, 0.80], threshold_ratio = [1.0, 1.1] }
@@ -360,7 +360,7 @@ split_by_id_a = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 10
-param_grid = false
+model_parameter_search = {strategy = "explicit"}
 model_parameters = [
     { type = "random_forest", maxDepth = 6, numTrees = 50, threshold = 0.5, threshold_ratio = 1.0 },
     { type = "probit", threshold = 0.5, threshold_ratio = 1.0 }
@@ -750,6 +750,8 @@ splits = [-1,0,6,11,9999]
     feature importances or coefficients for the training features when training
     the ML model. Set this to true to enable training step 3.
   * `model_parameters` -- Type: `list`. Specifies models to test out in the `model_exploration` task. See the [Model Exploration](model_exploration) page for a detailed description of how this works.
+  * `model_parameter_search` -- Type: `object`. Specifies which strategy hlink should
+  use to generate test models for [Model Exploration](model_exploration).
   * `n_training_iterations` -- Type: `integer`. Optional; default value is 10. The number of outer folds to use during the `model_exploration` task. See [here](model_exploration.html#the-details) for more details.
 
 
@@ -768,7 +770,7 @@ feature_importances = true
 decision = "drop_duplicate_with_threshold_ratio"
 
 n_training_iterations = 10
-param_grid = false
+model_parameter_search = {strategy = "explicit"}
 model_parameters = [
   { type = "random_forest", maxDepth = 6, numTrees = 50 },
   { type = "probit", threshold = 0.5}
@@ -804,7 +806,7 @@ score_with_model = true
 feature_importances = true
 decision = "drop_duplicate_with_threshold_ratio"
 
-param_grid = true
+model_parameter_search = {strategy = "grid"}
 n_training_iterations = 10
 model_parameters = [
     { type = "logistic_regression", threshold = [0.5], threshold_ratio = [1.1]},
