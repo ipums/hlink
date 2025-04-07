@@ -23,8 +23,12 @@ class LinkStepBlockOnHouseholds(LinkStep):
         )
 
     def _run(self):
-        id_col = self.task.link_run.config["id_column"]
-        records_to_match = self.task.link_run.config.get("hh_matching", {}).get(
+        config = self.task.link_run.config
+        id_col = config["id_column"]
+        id_a = f"{id_col}_a"
+        id_b = f"{id_col}_b"
+
+        records_to_match = config.get("hh_matching", {}).get(
             "records_to_match", "unmatched_only"
         )
 
@@ -32,7 +36,7 @@ class LinkStepBlockOnHouseholds(LinkStep):
         self.task.run_register_python(
             "indiv_matches",
             lambda: self.task.spark.table("predicted_matches")
-            .select(f"{id_col}_a", f"{id_col}_b")
+            .select(id_a, id_b)
             .distinct(),
             persist=True,
         )
@@ -49,10 +53,10 @@ class LinkStepBlockOnHouseholds(LinkStep):
         # Get the HH serial ids for these matched individuals
         serials_to_match = (
             individuals_matched.join(
-                pdfa, on=[individuals_matched[f"{id_col}_a"] == pdfa[f"{id_col}"]]
+                pdfa, on=[individuals_matched[id_a] == pdfa[id_col]]
             )
-            .select(individuals_matched[f"{id_col}_b"], pdfa.serialp.alias("serialp_a"))
-            .join(pdfb, on=[individuals_matched[f"{id_col}_b"] == pdfb[f"{id_col}"]])
+            .select(individuals_matched[id_b], pdfa.serialp.alias("serialp_a"))
+            .join(pdfb, on=[individuals_matched[id_b] == pdfb[id_col]])
             .select("serialp_a", pdfb.serialp.alias("serialp_b"))
             .distinct()
         )
@@ -62,42 +66,33 @@ class LinkStepBlockOnHouseholds(LinkStep):
         if records_to_match == "unmatched_only":
             logger.debug("Excluding people who were already linked in step I")
             # Get the individual IDs and serialps of the people who were NOT matched in the first round
-            self.task.run_register_python(
-                "unmatched_a",
-                lambda: pdfa.join(
-                    individuals_matched,
-                    on=[pdfa[f"{id_col}"] == individuals_matched[f"{id_col}_a"]],
-                    how="left_anti",
-                ).select(
-                    pdfa[f"{id_col}"].alias(f"{id_col}_a"),
-                    pdfa.serialp.alias("serialp_a"),
-                ),
+            unmatched_a = pdfa.join(
+                individuals_matched,
+                on=[pdfa[id_col] == individuals_matched[id_a]],
+                how="left_anti",
             )
 
-            self.task.run_register_python(
-                "unmatched_b",
-                lambda: pdfb.join(
-                    individuals_matched,
-                    on=[pdfb[f"{id_col}"] == individuals_matched[f"{id_col}_b"]],
-                    how="left_anti",
-                ).select(
-                    pdfb[f"{id_col}"].alias(f"{id_col}_b"),
-                    pdfb.serialp.alias("serialp_b"),
-                ),
+            unmatched_b = pdfb.join(
+                individuals_matched,
+                on=[pdfb[id_col] == individuals_matched[id_b]],
+                how="left_anti",
             )
         elif records_to_match == "all":
-            pdfa_renamed = pdfa.select(
-                col(id_col).alias(f"{id_col}_a"), col("serialp").alias("serialp_a")
-            )
-            pdfb_renamed = pdfb.select(
-                col(id_col).alias(f"{id_col}_b"), col("serialp").alias("serialp_b")
-            )
-            pdfa_renamed.write.saveAsTable("unmatched_a")
-            pdfb_renamed.write.saveAsTable("unmatched_b")
+            unmatched_a = pdfa
+            unmatched_b = pdfb
         else:
             raise ValueError(
                 f"Invalid choice for hh_matching.records_to_match: '{records_to_match}'"
             )
+
+        unmatched_a_selected = unmatched_a.select(
+            col(id_col).alias(id_a), col("serialp").alias("serialp_a")
+        )
+        unmatched_b_selected = unmatched_b.select(
+            col(id_col).alias(id_b), col("serialp").alias("serialp_b")
+        )
+        self.task.run_register_python("unmatched_a", lambda: unmatched_a_selected)
+        self.task.run_register_python("unmatched_b", lambda: unmatched_b_selected)
 
         uma = self.task.spark.table("unmatched_a")
         umb = self.task.spark.table("unmatched_b")
