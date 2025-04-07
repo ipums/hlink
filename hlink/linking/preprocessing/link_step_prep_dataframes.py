@@ -95,17 +95,8 @@ class LinkStepPrepDataframes(LinkStep):
         df_selected = df
         spark = self.task.spark
         column_selects = [col(id_column)]
-        if column_definitions and isinstance(column_definitions[0], list):
-            print(
-                "DEPRECATION WARNING: The config value 'column_mappings' is no longer a nested (double) array and is now an array of objects. Please change your config for future releases."
-            )
-            flat_column_mappings = [
-                item for sublist in column_definitions for item in sublist
-            ]
-        else:
-            flat_column_mappings = column_definitions
 
-        for column_mapping in flat_column_mappings:
+        for column_mapping in column_definitions:
             df_selected, column_selects = column_mapping_core.select_column_mapping(
                 column_mapping, df_selected, is_a, column_selects
             )

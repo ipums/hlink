@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hlink"
-version = "3.8.0"
+version = "4.0.0b1"
 description = "Fast supervised pyspark record linkage software"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -25,11 +25,13 @@ dependencies = [
     "pyspark~=3.5.0",
     "scikit-learn>=1.1.0",
     "toml>=0.10.0",
+    "tomli>=2.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.1.0",
+    "hypothesis>=6.0",
     "black>=23.0",
     "flake8>=5.0",
     "pre-commit>=2.0",
@@ -52,6 +54,13 @@ lightgbm = [
 xgboost = [
     "xgboost>=2.0",
     "pyarrow>=4.0",
+    # As of 2024-12-10, the latest scikit-learn version (1.6.0) is incompatible
+    # with the latest xgboost version (2.1.3). scikit-learn 1.6.0 came out
+    # yesterday, 2024-12-09, so I'm guessing that this a temporary bug that
+    # will be resolved with an update to one of the two libraries sometime
+    # sooner rather than later. Until then, we can pin scikit-learn to < 1.6
+    # when using xgboost.
+    "scikit-learn<1.6.0",
 ]
 
 [project.scripts]

@@ -51,8 +51,8 @@ def test_step_2_alpha_beta_thresholds(
         score_tmp,
         alpha_threshold,
         threshold_ratio,
-        matching_conf["training"],
         matching_conf["id_column"],
+        matching_conf["training"].get("decision"),
     )
     predictions.write.mode("overwrite").saveAsTable("predictions")
 

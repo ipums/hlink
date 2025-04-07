@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "hlink"
-copyright = "2019-2022, IPUMS"
+copyright = "2019-2025, IPUMS"
 author = "Jacob Wellington, Kelly Thompson, Jonas Helgertz, Riley Harper"
 
 version = importlib.metadata.version("hlink")

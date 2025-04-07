@@ -343,3 +343,71 @@ def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> N
     transform = {"type": "not_supported"}
     with pytest.raises(ValueError, match="Invalid transform type"):
         apply_transform(column_select, transform, is_a)
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_mapping(spark: SparkSession, is_a: bool) -> None:
+    transform = {"type": "mapping", "mappings": {"first": "abcd", "second": "efg"}}
+    input_col = col("input")
+    output_col = apply_transform(input_col, transform, is_a)
+
+    df = spark.createDataFrame(
+        [
+            ["first"],
+            ["second"],
+            ["third"],
+            ["secondagain"],
+        ],
+        "input:string",
+    )
+
+    transformed = df.select(output_col.alias("output"))
+    rows = transformed.collect()
+
+    # Note that the mapping must exactly match the value to transform it, so the
+    # value "secondagain" is unchanged.
+    assert rows == [
+        Row(output="abcd"),
+        Row(output="efg"),
+        Row(output="third"),
+        Row(output="secondagain"),
+    ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_mapping_integer_column(
+    spark: SparkSession, is_a: bool
+) -> None:
+    """
+    The mapping transform works over integer columns, and you can cast the output
+    to an integer by passing output_type = "int".
+    """
+    transform = {
+        "type": "mapping",
+        "mappings": {"1": "10", "2": "30", "3": ""},
+        "output_type": "int",
+    }
+    input_col = col("input")
+    output_col = apply_transform(input_col, transform, is_a)
+
+    df = spark.createDataFrame(
+        [
+            [5],
+            [4],
+            [3],
+            [2],
+            [1],
+        ],
+        "input:integer",
+    )
+
+    transformed = df.select(output_col.alias("output"))
+    rows = transformed.collect()
+
+    assert rows == [
+        Row(output=5),
+        Row(output=4),
+        Row(output=None),
+        Row(output=30),
+        Row(output=10),
+    ]
