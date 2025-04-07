@@ -3,7 +3,12 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import logging
+
 from hlink.linking.link_step import LinkStep
+
+
+logger = logging.getLogger(__name__)
 
 
 class LinkStepBlockOnHouseholds(LinkStep):
@@ -31,6 +36,11 @@ class LinkStepBlockOnHouseholds(LinkStep):
         pdfb = self.task.spark.table("prepped_df_b")
         individuals_matched = self.task.spark.table("indiv_matches")
 
+        logger.debug(f"prepped_df_a has {pdfa.count()} records")
+        logger.debug(f"prepped_df_b has {pdfb.count()} records")
+        logger.debug(f"indiv_matches has {individuals_matched.count()} records")
+
+        logger.debug("Getting household serial IDs for matched individuals")
         # Get the HH serial ids for these matched individuals
         serials_to_match = (
             individuals_matched.join(
@@ -44,6 +54,7 @@ class LinkStepBlockOnHouseholds(LinkStep):
 
         self.task.run_register_python("serials_to_match", lambda: serials_to_match)
 
+        logger.debug("Excluding people who were already linked in step I")
         # Get the individual IDs and serialps of the people who were NOT matched in the first round
         self.task.run_register_python(
             "unmatched_a",
@@ -71,12 +82,20 @@ class LinkStepBlockOnHouseholds(LinkStep):
         umb = self.task.spark.table("unmatched_b")
         stm = self.task.spark.table("serials_to_match")
 
+        logger.debug(f"unmatched_a has {uma.count()} records")
+        logger.debug(f"unmatched_b has {umb.count()} records")
+        logger.debug(f"serials_to_match has {stm.count()} records")
+
+        logger.debug("Blocking on household serial ID and generating potential matches")
         # Generate potential matches with those unmatched people who were in a household (serialp) with a match, blocking only on household id
         self.task.run_register_python(
             "hh_blocked_matches",
             lambda: stm.join(uma, "serialp_a").join(umb, "serialp_b").distinct(),
             persist=True,
         )
+
+        hh_blocked_matches = self.task.spark.table("hh_blocked_matches")
+        logger.debug(f"hh_blocked_matches has {hh_blocked_matches.count()} records")
 
         print(
             "Potential matches from households which contained a scored match have been saved to table 'hh_blocked_matches'."
