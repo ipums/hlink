@@ -3,6 +3,8 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+from pyspark.sql import Row, SparkSession
+
 from hlink.linking.matching.link_step_score import LinkStepScore
 from hlink.tests.conftest import load_table_from_csv
 
@@ -305,3 +307,69 @@ def test_step_0_1_hh_blocking_and_filtering(
     assert potential_matches_hh_df.query("histid_a == '1005A'").shape[0] == 1
 
     assert all(elem <= 10 for elem in list(potential_matches_hh_df["agediff"]))
+
+
+def test_step_block_on_households_no_rematching_by_default(
+    spark: SparkSession, hh_matching
+) -> None:
+    prepped_df_a = spark.createDataFrame(
+        [[1, 1], [2, 1], [3, 1]], "id:integer,serialp:integer"
+    )
+    prepped_df_b = spark.createDataFrame(
+        [[1000, 2], [1001, 2], [1002, 3]], "id:integer,serialp:integer"
+    )
+    predicted_matches = spark.createDataFrame(
+        [[1, 1000], [2, 1002]], "id_a:integer,id_b:integer"
+    )
+
+    prepped_df_a.write.saveAsTable("prepped_df_a")
+    prepped_df_b.write.saveAsTable("prepped_df_b")
+    predicted_matches.write.saveAsTable("predicted_matches")
+
+    hh_matching.run_step(0)
+
+    hh_blocked_matches = spark.table("hh_blocked_matches").collect()
+
+    # By default, only records in prepped_df_a and prepped_df_b which are not
+    # linked in predicted_matches are available for linking in hh_matching.
+    # Then we block exclusively on household. So the only potential match is
+    # 3 <-> 1001.
+    [row] = hh_blocked_matches
+    assert row.id_a == 3
+    assert row.id_b == 1001
+    assert row.serialp_a == 1
+    assert row.serialp_b == 2
+
+
+def test_step_block_on_households_allow_rematching(
+    spark: SparkSession, hh_matching, conf
+) -> None:
+    prepped_df_a = spark.createDataFrame(
+        [[1, 1], [2, 1], [3, 1], [4, 5]], "id:integer,serialp:integer"
+    )
+    prepped_df_b = spark.createDataFrame(
+        [[1000, 2], [1001, 2], [1002, 3], [1003, 4]], "id:integer,serialp:integer"
+    )
+    predicted_matches = spark.createDataFrame(
+        [[1, 1000], [2, 1002]], "id_a:integer,id_b:integer"
+    )
+
+    prepped_df_a.write.saveAsTable("prepped_df_a")
+    prepped_df_b.write.saveAsTable("prepped_df_b")
+    predicted_matches.write.saveAsTable("predicted_matches")
+
+    conf["hh_matching"] = {}
+    conf["hh_matching"]["records_to_match"] = "all"
+    hh_matching.run_step(0)
+
+    hh_blocked_matches = spark.table("hh_blocked_matches").sort("id_a", "id_b")
+    rows = hh_blocked_matches.collect()
+    assert len(rows) == 9
+    assert rows[0].id_a == 1
+    assert rows[0].id_b == 1000
+    assert rows[-1].id_a == 3
+    assert rows[-1].id_b == 1002
+    # id_a 4 and id_b 1003 are not included, since they are not linked to any
+    # households via predicted_matches. They don't make it into any blocks.
+    assert 4 not in set(row.id_a for row in rows)
+    assert 1003 not in set(row.id_b for row in rows)
