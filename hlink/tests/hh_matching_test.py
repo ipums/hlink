@@ -3,7 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
-from pyspark.sql import Row, SparkSession
+from pyspark.sql import SparkSession
 
 from hlink.linking.matching.link_step_score import LinkStepScore
 from hlink.tests.conftest import load_table_from_csv
@@ -358,8 +358,7 @@ def test_step_block_on_households_allow_rematching(
     prepped_df_b.write.saveAsTable("prepped_df_b")
     predicted_matches.write.saveAsTable("predicted_matches")
 
-    conf["hh_matching"] = {}
-    conf["hh_matching"]["records_to_match"] = "all"
+    conf["hh_matching"] = {"records_to_match": "all"}
     hh_matching.run_step(0)
 
     hh_blocked_matches = spark.table("hh_blocked_matches").sort("id_a", "id_b")
@@ -373,3 +372,94 @@ def test_step_block_on_households_allow_rematching(
     # households via predicted_matches. They don't make it into any blocks.
     assert 4 not in set(row.id_a for row in rows)
     assert 1003 not in set(row.id_b for row in rows)
+
+
+def test_hh_potential_matches_predicted_matches_without_rematching(
+    spark: SparkSession, hh_matching, hh_matching_stubs, conf
+) -> None:
+    """
+    Without rematching (hh_matching.records_to_match = "unmatched_only"), the
+    hh_potential_matches table is disjoint from the predicted_matches table.
+    They don't share any records from dataset A or from dataset B.
+    """
+    conf["id_column"] = "histid"
+    conf["hh_training"] = {"prediction_col": "prediction"}
+    conf["hh_matching"] = {"records_to_match": "unmatched_only"}
+    conf["hh_comparisons"] = {
+        "comparison_type": "threshold",
+        "feature_name": "agediff",
+        "threshold_expr": "<= 10",
+    }
+    conf["comparison_features"] = [
+        {"alias": "agediff", "column_name": "birthyr", "comparison_type": "abs_diff"}
+    ]
+
+    path_a, path_b, path_matches, path_pred_matches = hh_matching_stubs
+
+    load_table_from_csv(hh_matching, path_a, "prepped_df_a")
+    load_table_from_csv(hh_matching, path_b, "prepped_df_b")
+    load_table_from_csv(hh_matching, path_matches, "scored_potential_matches")
+    load_table_from_csv(hh_matching, path_pred_matches, "predicted_matches")
+
+    hh_matching.run_step(0)
+    hh_matching.run_step(1)
+
+    predicted_matches = spark.table("predicted_matches")
+    hh_potential_matches = spark.table("hh_potential_matches")
+
+    # No histid_a or histid_b value should be shared between predicted_matches
+    # and hh_potential_matches.
+    shared_histid_a = predicted_matches.join(
+        hh_potential_matches, on="histid_a", how="inner"
+    )
+    shared_histid_b = predicted_matches.join(
+        hh_potential_matches, on="histid_b", how="inner"
+    )
+
+    assert shared_histid_a.count() == 0
+    assert shared_histid_b.count() == 0
+
+
+def test_hh_potential_matches_predicted_matches_with_rematching(
+    spark: SparkSession, hh_matching, hh_matching_stubs, conf
+) -> None:
+    """
+    With rematching (hh_matching.records_to_match = "all"), it is possible that
+    predicted_matches and hh_potential_matches will share some histid_a and/or
+    histid_b values. In fact, this is guaranteed if predicted_matches is not empty
+    and the matches from predicted_matches are not filtered out by hh_comparisons.
+    """
+    conf["id_column"] = "histid"
+    conf["hh_training"] = {"prediction_col": "prediction"}
+    conf["hh_matching"] = {"records_to_match": "all"}
+    conf["hh_comparisons"] = {
+        "comparison_type": "threshold",
+        "feature_name": "agediff",
+        "threshold_expr": "<= 10",
+    }
+    conf["comparison_features"] = [
+        {"alias": "agediff", "column_name": "birthyr", "comparison_type": "abs_diff"}
+    ]
+
+    path_a, path_b, path_matches, path_pred_matches = hh_matching_stubs
+
+    load_table_from_csv(hh_matching, path_a, "prepped_df_a")
+    load_table_from_csv(hh_matching, path_b, "prepped_df_b")
+    load_table_from_csv(hh_matching, path_matches, "scored_potential_matches")
+    load_table_from_csv(hh_matching, path_pred_matches, "predicted_matches")
+
+    hh_matching.run_step(0)
+    hh_matching.run_step(1)
+
+    predicted_matches = spark.table("predicted_matches")
+    hh_potential_matches = spark.table("hh_potential_matches")
+
+    shared_histid_a = predicted_matches.join(
+        hh_potential_matches, on="histid_a", how="inner"
+    )
+    shared_histid_b = predicted_matches.join(
+        hh_potential_matches, on="histid_b", how="inner"
+    )
+
+    assert shared_histid_a.count() > 0
+    assert shared_histid_b.count() > 0
