@@ -27,6 +27,9 @@ class LinkStepBlockOnHouseholds(LinkStep):
         id_col = config["id_column"]
         id_a = f"{id_col}_a"
         id_b = f"{id_col}_b"
+        hhid_col = "serialp"
+        hhid_a = f"{hhid_col}_a"
+        hhid_b = f"{hhid_col}_b"
 
         records_to_match = config.get("hh_matching", {}).get(
             "records_to_match", "unmatched_only"
@@ -55,9 +58,9 @@ class LinkStepBlockOnHouseholds(LinkStep):
             individuals_matched.join(
                 pdfa, on=[individuals_matched[id_a] == pdfa[id_col]]
             )
-            .select(individuals_matched[id_b], pdfa.serialp.alias("serialp_a"))
+            .select(individuals_matched[id_b], pdfa[hhid_col].alias(hhid_a))
             .join(pdfb, on=[individuals_matched[id_b] == pdfb[id_col]])
-            .select("serialp_a", pdfb.serialp.alias("serialp_b"))
+            .select(hhid_a, pdfb[hhid_col].alias(hhid_b))
             .distinct()
         )
 
@@ -65,7 +68,7 @@ class LinkStepBlockOnHouseholds(LinkStep):
 
         if records_to_match == "unmatched_only":
             logger.debug("Excluding people who were already linked in step I")
-            # Get the individual IDs and serialps of the people who were NOT matched in the first round
+            # Get the individual IDs and household IDs of the people who were NOT matched in the first round
             unmatched_a = pdfa.join(
                 individuals_matched,
                 on=[pdfa[id_col] == individuals_matched[id_a]],
@@ -86,10 +89,10 @@ class LinkStepBlockOnHouseholds(LinkStep):
             )
 
         unmatched_a_selected = unmatched_a.select(
-            col(id_col).alias(id_a), col("serialp").alias("serialp_a")
+            col(id_col).alias(id_a), col(hhid_col).alias(hhid_a)
         )
         unmatched_b_selected = unmatched_b.select(
-            col(id_col).alias(id_b), col("serialp").alias("serialp_b")
+            col(id_col).alias(id_b), col(hhid_col).alias(hhid_b)
         )
         self.task.run_register_python("unmatched_a", lambda: unmatched_a_selected)
         self.task.run_register_python("unmatched_b", lambda: unmatched_b_selected)
@@ -103,10 +106,10 @@ class LinkStepBlockOnHouseholds(LinkStep):
         logger.debug(f"serials_to_match has {stm.count()} records")
 
         logger.debug("Blocking on household serial ID and generating potential matches")
-        # Generate potential matches with those unmatched people who were in a household (serialp) with a match, blocking only on household id
+        # Generate potential matches with those unmatched people who were in a household with a match, blocking only on household id
         self.task.run_register_python(
             "hh_blocked_matches",
-            lambda: stm.join(uma, "serialp_a").join(umb, "serialp_b").distinct(),
+            lambda: stm.join(uma, hhid_a).join(umb, hhid_b).distinct(),
             persist=True,
         )
 
