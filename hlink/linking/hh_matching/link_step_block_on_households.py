@@ -31,9 +31,13 @@ class LinkStepBlockOnHouseholds(LinkStep):
         hhid_a = f"{hhid_col}_a"
         hhid_b = f"{hhid_col}_b"
 
+        logging.debug(f"The id column is {id_col}")
+        logging.debug(f"The household ID column is {hhid_col}")
+
         records_to_match = config.get("hh_matching", {}).get(
             "records_to_match", "unmatched_only"
         )
+        logger.debug(f"hh_matching.records_to_match is {records_to_match}")
 
         # Get the IDs for the potential matches that were deemed a match
         self.task.run_register_python(
@@ -81,6 +85,7 @@ class LinkStepBlockOnHouseholds(LinkStep):
                 how="left_anti",
             )
         elif records_to_match == "all":
+            logger.debug("Including people who were already linked in step I")
             unmatched_a = pdfa
             unmatched_b = pdfb
         else:
