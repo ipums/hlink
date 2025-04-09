@@ -15,6 +15,7 @@
 14. [Pipeline-Generated Features](#pipeline-generated-features)
 15. [Training and Model Exploration](#training-and-model-exploration)
 16. [Household Training and Model Exploration](#household-training-and-model-exploration)
+17. [Household Matching](#household-matching)
 
 ## Basic Config File
 
@@ -814,4 +815,26 @@ model_parameters = [
 ]
 
 chosen_model = { type = "logistic_regression", threshold = 0.5, threshold_ratio = 1.0 }
+```
+
+## Household Matching
+
+* Header name: `hh_matching`
+* Description: Settings for the `hh_matching` task.
+* Required: False
+* Type: Object
+* Attributes:
+  * `records_to_match` -- Type: `string`. Optional; default "unmatched_only". This option
+  controls which records are eligible for linking in the `hh_matching` task. The
+  default value of "unmatched_only" means that only records which are *not* linked
+  by the `matching` task are eligible for linking in `hh_matching`. You can set this
+  option to "all" to instead mark all records as eligible for matching in `hh_matching`,
+  even if they are already matched by the `matching` task. Note that setting this option
+  to "all" may lead to conflicts between the output of the two tasks, as there is
+  no guarantee that a person matched in `matching` will receive the same link in `hh_matching`.
+  *Added in version 4.1.0.*
+
+```toml
+[hh_matching]
+records_to_match = "all"
 ```

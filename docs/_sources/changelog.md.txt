@@ -3,6 +3,16 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
+## Not Yet Released
+
+### Added
+
+* Added a new configuration option `hh_matching.records_to_match` that controls
+  which records are eligible for re-matching in the `hh_matching` task. You can
+  find the documentation for this option in the new [Household Matching][household-matching-docs]
+  section on the Configuration page.
+
+
 ## v4.0.0 (2025-04-07)
 
 ### Added
@@ -371,6 +381,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr185]: https://github.com/ipums/hlink/pull/185
 [pr189]: https://github.com/ipums/hlink/pull/189
 
+[household-matching-docs]: config.html#household-matching
 [ints-to-longs-docs]: config.html#data-sources
 [link-tasks-docs]: link_tasks
 [pyspark-interaction-docs]: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Interaction.html
