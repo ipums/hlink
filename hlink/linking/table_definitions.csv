@@ -20,6 +20,7 @@ training_features,Training: Transformed data with features,1
 hh_training_features,Household Training: Transformed HH training data with features,1
 training_features_prepped,Training: Training data with features and imputed values and encoded categorical features,1
 hh_training_features_prepped,Household Training: HH training data with features and imputed values and encoded categorical features,1
+hh_training_feature_importances,Household Training: Feature importances for the trained model,0
 training_feature_importances,Training: Feature importances for the trained model,0
 model_eval_training_data,Model Exploration: Raw training data as read from specified file,1
 model_eval_training_vectorized,Model Exploration: Training data after applying comparison feature and pipeline transformations,1

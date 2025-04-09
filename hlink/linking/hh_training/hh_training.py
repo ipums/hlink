@@ -12,6 +12,9 @@ from hlink.linking.training.link_step_create_comparison_features import (
 from hlink.linking.training.link_step_train_and_save_model import (
     LinkStepTrainAndSaveModel,
 )
+from hlink.linking.training.link_step_save_model_metadata import (
+    LinkStepSaveModelMetadata,
+)
 
 
 class HHTraining(LinkTask):
@@ -25,4 +28,5 @@ class HHTraining(LinkTask):
             LinkStepIngestFile(self),
             LinkStepCreateComparisonFeatures(self),
             LinkStepTrainAndSaveModel(self),
+            LinkStepSaveModelMetadata(self),
         ]
