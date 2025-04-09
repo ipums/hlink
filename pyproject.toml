@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=71.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -40,7 +40,7 @@ dev = [
     # setuptools is only necessary because Python 3.12 removed the distutils
     # package. pyspark 3.5.X still imports this package, so we need it on
     # Python 3.12 to run the tests and have hlink work at all.
-    "setuptools",
+    "setuptools>=71.0",
     # These are pinned so tightly because their version numbers appear in the docs.
     # So if you use a different version, it creates a huge diff in the docs.
     # TODO: auto-generate docs on push to GitHub instead of committing them to the
