@@ -28,6 +28,7 @@ jobs:
     - name: Check dependency versions
       run: |
         docker run $HLINK_TAG-${{ matrix.python_version}} python -V
+        docker run $HLINK_TAG-${{ matrix.python_version }} pip list
         echo "Java version:"
         docker run $HLINK_TAG-${{ matrix.python_version}} java -version
     
