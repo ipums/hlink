@@ -1397,7 +1397,7 @@ def training_conf(spark, conf, training_data_path, datasource_training):
 
 
 @pytest.fixture(scope="function")
-def hh_training_conf(spark, conf, hh_training_data_path):
+def hh_training_conf(spark, conf, hh_training_data_path, datasource_training):
     """Create the prepped_df_(a/b) dataframes and populate basic config values"""
     conf["id_column"] = "histid"
     conf["drop_data_from_scored_matches"] = False
@@ -1416,6 +1416,7 @@ def hh_training_conf(spark, conf, hh_training_data_path):
         ],
         "score_with_model": True,
         "use_training_data_features": False,
+        "feature_importances": True,
         "decision": "drop_duplicate_with_threshold_ratio",
         "get_precision_recall_curve": True,
         "chosen_model": {

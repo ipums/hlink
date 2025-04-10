@@ -64,7 +64,16 @@ def test_household_matching_training_integration(
     )
 
     hh_training.run_step(2)
-
+    hh_training.run_step(3)
+    tf = spark.table("hh_training_feature_importances").toPandas()
+    for var in hh_training_conf["hh_training"]["independent_vars"]:
+        assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
+    assert all(
+        [
+            col in ["feature_name", "category", "coefficient_or_importance"]
+            for col in tf.columns
+        ]
+    )
     hh_matching.run_step(0)
 
     assert spark.table("indiv_matches").count() == 20
