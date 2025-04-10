@@ -103,3 +103,47 @@ def test_predict_using_thresholds_missing_probability_column_error(
         predict_using_thresholds(
             df, alpha_threshold=0.5, threshold_ratio=1.5, id_col="id", decision=decision
         )
+
+
+def test_predict_using_thresholds_probabilities_crossing_alpha_threshold(
+    spark: SparkSession,
+) -> None:
+    """
+    When dropping duplicates with a threshold ratio, the threshold ratio should
+    always be computed and compared if the best probability is at least at the
+    alpha threshold and there is a second best probability, even if that second
+    best probability is less than the alpha threshold. See issue #199.
+    """
+    input_rows = [
+        [1, 1000, 0.8],
+        [1, 1001, 0.4],
+        [2, 2000, 0.6],
+        [2, 2001, 0.49],
+        [3, 3000, 0.5],
+        [3, 3001, 0.2],
+        [3, 3002, 0.3],
+    ]
+    df = spark.createDataFrame(
+        input_rows, "id_a:integer,id_b:integer,probability:double"
+    )
+    decision = "drop_duplicate_with_threshold_ratio"
+    alpha_threshold = 0.5
+    threshold_ratio = 1.5
+
+    thresholded = (
+        predict_using_thresholds(df, alpha_threshold, threshold_ratio, "id", decision)
+        .sort("id_a", "id_b")
+        .select("id_a", "id_b", "prediction")
+    )
+
+    rows = thresholded.collect()
+    OutputRow = Row("id_a", "id_b", "prediction")
+    assert rows == [
+        OutputRow(1, 1000, 1),
+        OutputRow(1, 1001, 0),
+        OutputRow(2, 2000, 0),
+        OutputRow(2, 2001, 0),
+        OutputRow(3, 3000, 1),
+        OutputRow(3, 3001, 0),
+        OutputRow(3, 3002, 0),
+    ]
