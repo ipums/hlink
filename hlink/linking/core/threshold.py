@@ -57,17 +57,16 @@ def predict_using_thresholds(
     predict_using_thresholds() uses both the alpha_threshold and
     threshold_ratio.
 
-    predict_using_thresholds() groups the matches by their id in data set A, and
-    selects from each group the potential match with the highest probability.
-    Then, if there is a second-highest probability in the group and it is at
-    least alpha_threshold, predict_using_thresholds() computes the ratio of the
-    highest probability to the second highest probability and stores it as the
-    ratio column. Finally, predict_using_thresholds() picks out of each group
-    the potential match with the highest probability and marks it with
-    prediction = 1 if
+    predict_using_thresholds() groups the matches by their id in data set A,
+    and selects from each group the potential match with the highest
+    probability. Then, if there is a second-highest probability in the group,
+    predict_using_thresholds() computes the ratio of the highest probability to
+    the second highest probability and stores it as the ratio column. Finally,
+    predict_using_thresholds() picks out of each group the potential match with
+    the highest probability and marks it with prediction = 1 if
 
       A. its probability is at least alpha_threshold and
-      B. either there is no second-highest probability over alpha_threshold, or
+      B. either there is no second-highest probability, or
       the ratio of the highest probability to the second-highest is greater
       than threshold_ratio.
 
@@ -143,15 +142,15 @@ def _apply_threshold_ratio(
 
     should_compute_probability_ratio = (
         col("second_best_prob").isNotNull()
-        & (col("second_best_prob") >= alpha_threshold)
+        & (col("probability") >= alpha_threshold)
         & (col("prob_rank") == 1)
     )
     # To be a match, the row must...
     # 1. Have prob_rank 1, so that it's the most likely match,
     # 2. Have a probability of at least alpha_threshold,
     # and
-    # 3. Either have no ratio (since there's no second best probability of at
-    #    least alpha_threshold), or have a ratio of more than threshold_ratio.
+    # 3. Either have no ratio (since there's no second best probability), or
+    #    have a ratio of more than threshold_ratio.
     is_match = (
         (col("probability") >= alpha_threshold)
         & (col("prob_rank") == 1)
