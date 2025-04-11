@@ -147,3 +147,30 @@ def test_predict_using_thresholds_probabilities_crossing_alpha_threshold(
         OutputRow(3, 3001, 0),
         OutputRow(3, 3002, 0),
     ]
+
+
+def test_predict_using_thresholds_drop_duplicates_no_threshold_ratio_available(
+    spark: SparkSession,
+) -> None:
+    """
+    When there is only a single scored match for a given pair of IDs, just
+    compare against the alpha threshold.
+    """
+    input_rows = [
+        ["A", "B", 0.8],
+        ["C", "D", 0.6],
+    ]
+    df = spark.createDataFrame(input_rows, "id_a:string,id_b:string,probability:float")
+    thresholded = predict_using_thresholds(
+        df,
+        alpha_threshold=0.75,
+        threshold_ratio=1.5,
+        id_col="id",
+        decision="drop_duplicate_with_threshold_ratio",
+    )
+
+    rows = thresholded.sort("id_a").select("id_a", "id_b", "prediction").collect()
+    assert rows == [
+        Row(id_a="A", id_b="B", prediction=1),
+        Row(id_a="C", id_b="D", prediction=0),
+    ]
