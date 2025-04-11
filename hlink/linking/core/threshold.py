@@ -140,10 +140,8 @@ def _apply_threshold_ratio(
     prob_rank = rank().over(windowSpec)
     prob_lead = lead("probability", 1).over(windowSpec)
 
-    should_compute_probability_ratio = (
-        col("second_best_prob").isNotNull()
-        & (col("probability") >= alpha_threshold)
-        & (col("prob_rank") == 1)
+    should_compute_probability_ratio = col("second_best_prob").isNotNull() & (
+        col("prob_rank") == 1
     )
     # To be a match, the row must...
     # 1. Have prob_rank 1, so that it's the most likely match,
