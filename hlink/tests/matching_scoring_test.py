@@ -90,7 +90,10 @@ def test_step_2_alpha_beta_thresholds(
     assert tp.query("histid_a == '3a' and histid_b == '4b'")["prediction"].iloc[0] == 1
 
     assert tp.query("histid_a == '6a' and histid_b == '9b'")["prediction"].iloc[0] == 0
-    assert pd.isnull(tp.query("histid_a == '6a' and histid_b == '9b'")["ratio"].iloc[0])
+    assert pd.notnull(
+        tp.query("histid_a == '6a' and histid_b == '9b'")["ratio"].iloc[0]
+    )
+    assert pd.isnull(tp.query("histid_a == '6a' and histid_b == '8b'")["ratio"].iloc[0])
 
     assert "4b" not in list(pm["histid_b"])
     assert "10b" not in list(pm["histid_b"])
