@@ -221,7 +221,7 @@ def test_step_3_with_probit_model(
     hh_training_data_path,
     hh_integration_test_data,
 ):
-    """Run training step 3 with a probit ML model."""
+    """Run hh_training step 3 with a probit ML model."""
     hh_training_conf["comparison_features"] = [
         {
             "alias": "byrdiff",
@@ -308,3 +308,240 @@ def test_step_3_with_probit_model(
         <= tfi.query("feature_name == 'byrdiff'")["coefficient_or_importance"].item()
         <= -0.2
     )
+
+
+@requires_lightgbm
+def test_lightgbm_with_interacted_features(
+    spark, hh_training, hh_training_conf, hh_integration_test_data
+):
+    """
+    Interacted features add colons to vector attribute names, which cause
+    problems for LightGBM. Hlink handles this automatically by renaming the
+    vector attributes to remove the colons before invoking LightGBM.
+    """
+    prepped_df_a_path, prepped_df_b_path, hh_training_data_path = (
+        hh_integration_test_data
+    )
+    hh_training_conf["comparison_features"] = [
+        {
+            "alias": "bpl",
+            "column_name": "bpl_clean",
+            "comparison_type": "fetch_a",
+            "categorical": True,
+        },
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast_clean",
+            "comparison_type": "jaro_winkler",
+        },
+    ]
+    hh_training_conf["pipeline_features"] = [
+        {
+            "input_columns": ["bpl", "namelast_jw"],
+            "output_column": "bpl_interacted_namelast_jw",
+            "transformer_type": "interaction",
+        }
+    ]
+    hh_training_conf["hh_training"]["dataset"] = hh_training_data_path
+    hh_training_conf["hh_training"]["dependent_var"] = "match"
+    hh_training_conf["hh_training"]["independent_vars"] = [
+        "namelast_jw",
+        "bpl",
+        "bpl_interacted_namelast_jw",
+    ]
+    hh_training_conf["hh_training"]["chosen_model"] = {
+        "type": "lightgbm",
+        "maxDepth": 7,
+        "numIterations": 5,
+        "minDataInLeaf": 1,
+        "threshold": 0.5,
+    }
+    hh_training_conf["hh_training"]["score_with_model"] = True
+    hh_training_conf["hh_training"]["feature_importances"] = True
+    prepped_df_a = spark.read.csv(prepped_df_a_path, header=True, inferSchema=True)
+    prepped_df_b = spark.read.csv(prepped_df_b_path, header=True, inferSchema=True)
+
+    prepped_df_a.write.mode("overwrite").saveAsTable("prepped_df_a")
+    prepped_df_b.write.mode("overwrite").saveAsTable("prepped_df_b")
+
+    hh_training.run_all_steps()
+
+    importances_df = spark.table("hh_training_feature_importances")
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "weight",
+        "gain",
+    ]
+
+
+@requires_lightgbm
+def test_lightgbm_with_bucketized_features(
+    spark, hh_training, hh_training_conf, hh_integration_test_data
+):
+    """
+    Bucketized features add commas to vector attribute names, which cause
+    problems for LightGBM. Hlink handles this automatically by renaming the
+    vector attributes to remove the commas before invoking LightGBM.
+    """
+    prepped_df_a_path, prepped_df_b_path, hh_training_data_path = (
+        hh_integration_test_data
+    )
+    hh_training_conf["comparison_features"] = [
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast_clean",
+            "comparison_type": "jaro_winkler",
+        },
+    ]
+    hh_training_conf["pipeline_features"] = [
+        {
+            "input_column": "namelast_jw",
+            "output_column": "namelast_jw_buckets",
+            "transformer_type": "bucketizer",
+            "categorical": True,
+            "splits": [0.0, 0.33, 0.67, 1.0],
+        }
+    ]
+    hh_training_conf["hh_training"]["dataset"] = hh_training_data_path
+    hh_training_conf["hh_training"]["dependent_var"] = "match"
+    hh_training_conf["hh_training"]["independent_vars"] = [
+        "namelast_jw_buckets",
+    ]
+    hh_training_conf["hh_training"]["chosen_model"] = {
+        "type": "lightgbm",
+        "threshold": 0.5,
+    }
+    hh_training_conf["hh_training"]["score_with_model"] = True
+    hh_training_conf["hh_training"]["feature_importances"] = True
+
+    prepped_df_a = spark.read.csv(prepped_df_a_path, header=True, inferSchema=True)
+    prepped_df_b = spark.read.csv(prepped_df_b_path, header=True, inferSchema=True)
+
+    prepped_df_a.write.mode("overwrite").saveAsTable("prepped_df_a")
+    prepped_df_b.write.mode("overwrite").saveAsTable("prepped_df_b")
+
+    hh_training.run_all_steps()
+
+    importances_df = spark.table("hh_training_feature_importances")
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "weight",
+        "gain",
+    ]
+
+
+@requires_xgboost
+def test_step_3_with_xgboost_model(
+    spark,
+    hh_training,
+    hh_training_conf,
+    datasource_training_input,
+    hh_training_data_path,
+):
+    _, prepped_df_a_path, prepped_df_b_path = datasource_training_input
+    hh_training_conf["comparison_features"] = [
+        {
+            "alias": "ssex",
+            "column_name": "sex",
+            "comparison_type": "equals",
+            "categorical": True,
+        },
+        {
+            "alias": "regionf",
+            "column_name": "region",
+            "comparison_type": "fetch_a",
+            "categorical": True,
+        },
+        {
+            "alias": "namelast_jw",
+            "column_name": "namelast",
+            "comparison_type": "jaro_winkler",
+        },
+    ]
+    hh_training_conf["hh_training"]["dataset"] = hh_training_data_path
+    hh_training_conf["hh_training"]["dependent_var"] = "match"
+    hh_training_conf["hh_training"]["independent_vars"] = ["ssex", "srelate", "byrdiff"]
+    hh_training_conf["hh_training"]["chosen_model"] = {
+        "type": "xgboost",
+        "max_depth": 2,
+        "eta": 0.5,
+        "threshold": 0.7,
+        "threshold_ratio": 1.3,
+    }
+    hh_training_conf["hh_training"]["score_with_model"] = True
+    hh_training_conf["hh_training"]["feature_importances"] = True
+
+    spark.read.csv(prepped_df_a_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("prepped_df_a")
+    spark.read.csv(prepped_df_b_path, header=True, inferSchema=True).write.mode(
+        "overwrite"
+    ).saveAsTable("prepped_df_b")
+
+    hh_training.run_step(0)
+    hh_training.run_step(1)
+    hh_training.run_step(2)
+    hh_training.run_step(3)
+
+    importances_df = spark.table("hh_training_feature_importances")
+    assert importances_df.columns == [
+        "feature_name",
+        "category",
+        "weight",
+        "gain",
+    ]
+
+
+def test_step_3_requires_table(hh_training_conf, hh_training):
+    hh_training_conf["hh_training"]["feature_importances"] = True
+    with pytest.raises(RuntimeError, match="Missing input tables"):
+        hh_training.run_step(3)
+
+
+def test_step_3_skipped_on_no_feature_importances(
+    hh_training_conf, hh_training, spark, capsys
+):
+    """Step 3 is skipped when there is no hh_training.feature_importances attribute
+    in the config."""
+    del hh_training_conf["hh_training"]["feature_importances"]
+    mock_tf_prepped = spark.createDataFrame(
+        [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
+    )
+    mock_tf_prepped.write.saveAsTable("hh_training_features_prepped")
+    hh_training.run_step(3)
+
+    output = capsys.readouterr().out
+    assert "Skipping the save model metadata hh_training step" in output
+
+
+def test_step_3_skipped_on_false_feature_importances(
+    hh_training_conf, hh_training, spark, capsys
+):
+    """Step 3 is skipped when hh_training.feature_importances is set to false in
+    the config."""
+    hh_training_conf["hh_training"]["feature_importances"] = False
+    mock_tf_prepped = spark.createDataFrame(
+        [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
+    )
+    mock_tf_prepped.write.saveAsTable("hh_training_features_prepped")
+
+    hh_training.run_step(3)
+
+    output = capsys.readouterr().out
+    assert "Skipping the save model metadata hh_training step" in output
+
+
+def test_step_3_model_not_found(hh_training_conf, hh_training, spark):
+    """Step 3 raises an exception when the trained model is not available."""
+    hh_training_conf["hh_training"]["feature_importances"] = True
+    mock_tf_prepped = spark.createDataFrame(
+        [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
+    )
+    mock_tf_prepped.write.saveAsTable("hh_training_features_prepped")
+    with pytest.raises(
+        RuntimeError,
+        match="Model not found!  Please run hh_training step 2 to generate and train the chosen model",
+    ):
+        hh_training.run_step(3)

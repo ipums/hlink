@@ -49,12 +49,12 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         if do_get_feature_importances is None or not do_get_feature_importances:
             logger.info(
-                "Skipping training step 3 - save model metadata since training.feature_importances is not set"
+                f"Skipping {table_prefix}training step 3 - save model metadata since {table_prefix}training.feature_importances is not set"
             )
             print(
-                "Skipping the save model metadata training step. "
+                f"Skipping the save model metadata {table_prefix}training step. "
                 "To run this step and save model metadata like feature importances, "
-                "set feature_importances = true in the [training] section of your "
+                f"set feature_importances = true in the [{table_prefix}training] section of your "
                 "config file."
             )
             return
@@ -66,7 +66,7 @@ class LinkStepSaveModelMetadata(LinkStep):
             ]
         except KeyError as e:
             new_error = RuntimeError(
-                "Model not found!  Please run training step 2 to generate and "
+                f"Model not found!  Please run {table_prefix}training step 2 to generate and "
                 "train the chosen model. The model does not persist between runs "
                 "of hlink."
             )
