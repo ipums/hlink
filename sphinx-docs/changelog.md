@@ -5,12 +5,19 @@ Hlink adheres to semantic versioning as much as possible.
 
 ## Not Yet Released
 
+### Added
+
+* Added a new configuration option `hh_matching.records_to_match` that controls
+  which records are eligible for re-matching in the `hh_matching` task. You can
+  find the documentation for this option in the new [Household Matching][household-matching-docs]
+  section on the Configuration page. [PR #201][pr201]
+
 ### Fixed
 
 * Fixed a bug in the calculation of predicted matches. Previously, if there was
-a second-best probability, hlink computed and used the threshold ratio only if
+a second-best probability, hlink applied the threshold ratio only if
 the first and second-best probabilities were both at least at the alpha threshold. Now it always
-computes and uses the threshold ratio when the best probability is at least at
+applies the threshold ratio when the best probability is at least at
 the alpha threshold and there is a second-best probability. [PR #200][pr200]
 
 ## v4.0.0 (2025-04-07)
@@ -381,7 +388,9 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr185]: https://github.com/ipums/hlink/pull/185
 [pr189]: https://github.com/ipums/hlink/pull/189
 [pr200]: https://github.com/ipums/hlink/pull/200
+[pr201]: https://github.com/ipums/hlink/pull/201
 
+[household-matching-docs]: config.html#household-matching
 [ints-to-longs-docs]: config.html#data-sources
 [link-tasks-docs]: link_tasks
 [pyspark-interaction-docs]: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Interaction.html

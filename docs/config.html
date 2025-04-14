@@ -52,6 +52,7 @@
 <li><p><a class="reference external" href="#pipeline-generated-features">Pipeline-Generated Features</a></p></li>
 <li><p><a class="reference external" href="#training-and-model-exploration">Training and Model Exploration</a></p></li>
 <li><p><a class="reference external" href="#household-training-and-model-exploration">Household Training and Model Exploration</a></p></li>
+<li><p><a class="reference external" href="#household-matching">Household Matching</a></p></li>
 </ol>
 <section id="basic-config-file">
 <h2>Basic Config File<a class="headerlink" href="#basic-config-file" title="Link to this heading">¶</a></h2>
@@ -891,6 +892,32 @@ use to generate test models for <a class="reference internal" href="model_explor
 </pre></div>
 </div>
 </section>
+<section id="household-matching">
+<h2>Household Matching<a class="headerlink" href="#household-matching" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Header name: <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code></p></li>
+<li><p>Description: Settings for the <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code> task.</p></li>
+<li><p>Required: False</p></li>
+<li><p>Type: Object</p></li>
+<li><p>Attributes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">records_to_match</span></code> – Type: <code class="docutils literal notranslate"><span class="pre">string</span></code>. Optional; default “unmatched_only”. This option
+controls which records are eligible for linking in the <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code> task. The
+default value of “unmatched_only” means that only records which are <em>not</em> linked
+by the <code class="docutils literal notranslate"><span class="pre">matching</span></code> task are eligible for linking in <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code>. You can set this
+option to “all” to instead mark all records as eligible for matching in <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code>,
+even if they are already matched by the <code class="docutils literal notranslate"><span class="pre">matching</span></code> task. Note that setting this option
+to “all” may lead to conflicts between the output of the two tasks, as there is
+no guarantee that a person matched in <code class="docutils literal notranslate"><span class="pre">matching</span></code> will receive the same link in <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code>.
+<em>Added in version 4.1.0.</em></p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[hh_matching]</span>
+<span class="n">records_to_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -942,6 +969,7 @@ use to generate test models for <a class="reference internal" href="model_explor
 <li class="toctree-l2"><a class="reference internal" href="#pipeline-generated-features">Pipeline-generated Features</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#training-and-model-exploration">Training and Model Exploration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#household-training-and-model-exploration">Household Training and Model Exploration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#household-matching">Household Matching</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
