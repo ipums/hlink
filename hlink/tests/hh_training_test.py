@@ -437,32 +437,24 @@ def test_step_3_with_xgboost_model(
     spark,
     hh_training,
     hh_training_conf,
-    datasource_training_input,
-    hh_training_data_path,
+    hh_matching_stubs,
 ):
-    _, prepped_df_a_path, prepped_df_b_path = datasource_training_input
+    prepped_df_a_path, prepped_df_b_path, path_matches, _ = hh_matching_stubs
     hh_training_conf["comparison_features"] = [
         {
-            "alias": "ssex",
-            "column_name": "sex",
-            "comparison_type": "equals",
-            "categorical": True,
+            "alias": "byrdiff",
+            "column_name": "birthyr",
+            "comparison_type": "abs_diff",
         },
         {
-            "alias": "regionf",
-            "column_name": "region",
-            "comparison_type": "fetch_a",
-            "categorical": True,
-        },
-        {
-            "alias": "namelast_jw",
-            "column_name": "namelast",
+            "alias": "namefrst_jw",
+            "column_name": "namefrst",
             "comparison_type": "jaro_winkler",
         },
     ]
-    hh_training_conf["hh_training"]["dataset"] = hh_training_data_path
-    hh_training_conf["hh_training"]["dependent_var"] = "match"
-    hh_training_conf["hh_training"]["independent_vars"] = ["ssex", "srelate", "byrdiff"]
+    hh_training_conf["hh_training"]["dataset"] = path_matches
+    hh_training_conf["hh_training"]["dependent_var"] = "prediction"
+    hh_training_conf["hh_training"]["independent_vars"] = ["namefrst_jw", "byrdiff"]
     hh_training_conf["hh_training"]["chosen_model"] = {
         "type": "xgboost",
         "max_depth": 2,
