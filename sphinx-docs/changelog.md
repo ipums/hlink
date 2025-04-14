@@ -10,7 +10,7 @@ Hlink adheres to semantic versioning as much as possible.
 * Added a new configuration option `hh_matching.records_to_match` that controls
   which records are eligible for re-matching in the `hh_matching` task. You can
   find the documentation for this option in the new [Household Matching][household-matching-docs]
-  section on the Configuration page.
+  section on the Configuration page. [PR #201][pr201]
 
 ### Fixed
 
@@ -388,6 +388,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr185]: https://github.com/ipums/hlink/pull/185
 [pr189]: https://github.com/ipums/hlink/pull/189
 [pr200]: https://github.com/ipums/hlink/pull/200
+[pr201]: https://github.com/ipums/hlink/pull/201
 
 [household-matching-docs]: config.html#household-matching
 [ints-to-longs-docs]: config.html#data-sources
