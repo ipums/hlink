@@ -15,11 +15,10 @@ def test_all_steps(
     hh_training_conf,
     hh_training,
     state_dist_path,
-    hh_training_data_path,
-    potential_matches_path,
+    training_data_path,
     spark_test_tmp_dir_path,
-    hh_matching,
 ):
+    hh_training_conf["id_column"] = "id"
     hh_training_conf["comparison_features"] = [
         {
             "alias": "regionf",
@@ -55,7 +54,7 @@ def test_all_steps(
         },
     ]
 
-    hh_training_conf["hh_training"]["dataset"] = hh_training_data_path
+    hh_training_conf["hh_training"]["dataset"] = training_data_path
     hh_training_conf["hh_training"]["dependent_var"] = "match"
     hh_training_conf["hh_training"]["independent_vars"] = [
         "namelast_jw",
@@ -92,6 +91,60 @@ def test_all_steps(
     hh_training.run_step(1)
     tf = spark.table("hh_training_features").toPandas()
     assert tf.query("id_a == 20 and id_b == 30")["exact"].iloc[0]
+    assert not tf.query("id_a == 20 and id_b == 50")["exact"].iloc[0]
+    assert not tf.query("id_a == 20 and id_b == 30")["exact_mult"].iloc[0]
+    assert not tf.query("id_a == 20 and id_b == 10")["exact_mult"].iloc[0]
+
+    hh_training.run_step(2)
+    p = hh_training.link_run.trained_models["hh_pre_pipeline"]
+    m = hh_training.link_run.trained_models["hh_trained_model"]
+    transformed_df = m.transform(
+        p.transform(spark.table("hh_training_features"))
+    ).toPandas()
+    row = transformed_df.query("id_a == 10 and id_b == 50").iloc[0]
+    assert row.prediction == 0
+    assert row.state_distance_imp.round(0) == 1909
+
+    hh_training.run_step(3)
+
+    tf = spark.table("hh_training_feature_importances").toPandas()
+    for var in hh_training_conf["hh_training"]["independent_vars"]:
+        assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
+    assert all(
+        [
+            col in ["feature_name", "category", "coefficient_or_importance"]
+            for col in tf.columns
+        ]
+    )
+    assert (tf["coefficient_or_importance"] >= 0).all() and (
+        tf["coefficient_or_importance"] <= 1
+    ).all()
+
+    assert (
+        0.4
+        <= tf.query("feature_name == 'namelast_jw'")["coefficient_or_importance"].item()
+        <= 0.5
+    )
+    assert (
+        0.1
+        <= tf.query("feature_name == 'namelast_jw_buckets' and category == 4")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.2
+    )
+    assert (
+        0.1
+        <= tf.query("feature_name == 'state_distance'")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.21
+    )
+    assert (
+        tf.query("feature_name == 'regionf' and category == 0")[
+            "coefficient_or_importance"
+        ].item()
+        <= 0.1
+    )
 
 
 def test_step_3_interacted_categorical_features(
@@ -161,46 +214,50 @@ def test_step_3_interacted_categorical_features(
 
 
 def test_step_3_with_probit_model(
-    spark, hh_training_conf, hh_training, state_dist_path, datasource_training_input
+    spark,
+    hh_training_conf,
+    hh_training,
+    hh_matching,
+    hh_training_data_path,
+    hh_integration_test_data,
 ):
-    hh_training_data_path, prepped_df_a_path, prepped_df_b_path = (
-        datasource_training_input
-    )
     """Run training step 3 with a probit ML model."""
-    hh_training_conf["id_column"] = "id"
-    hh_training_conf["column_mappings"] = [
-        
-    ]
     hh_training_conf["comparison_features"] = [
         {
-            "alias": "regionf",
-            "column_name": "region",
-            "comparison_type": "fetch_a",
+            "alias": "byrdiff",
+            "column_name": "clean_birthyr",
+            "comparison_type": "abs_diff",
+        },
+        {
+            "alias": "ssex",
+            "column_name": "sex",
+            "comparison_type": "equals",
             "categorical": True,
         },
         {
-            "alias": "namelast_jw",
-            "column_name": "namelast",
+            "alias": "srelate",
+            "column_name": "relate",
+            "comparison_type": "equals",
+            "categorical": True,
+        },
+        {
+            "alias": "namefrst_jw",
+            "column_name": "namefrst_unstd",
             "comparison_type": "jaro_winkler",
         },
         {
-            "alias": "state_distance",
-            "key_count": 1,
-            "column_name": "bpl",
-            "comparison_type": "geo_distance",
-            "loc_a": "statecode1",
-            "loc_b": "statecode2",
-            "distance_col": "dist",
-            "table_name": "state_distances_lookup",
-            "distances_file": state_dist_path,
+            "alias": "namelast_jw",
+            "column_name": "namelast_clean",
+            "comparison_type": "jaro_winkler",
         },
     ]
     hh_training_conf["hh_training"]["dataset"] = hh_training_data_path
     hh_training_conf["hh_training"]["dependent_var"] = "match"
     hh_training_conf["hh_training"]["independent_vars"] = [
-        "namelast_jw",
-        "regionf",
-        "state_distance",
+        "ssex",
+        "srelate",
+        "namefrst_jw",
+        "byrdiff",
     ]
 
     hh_training_conf["hh_training"]["chosen_model"] = {
@@ -210,12 +267,15 @@ def test_step_3_with_probit_model(
     hh_training_conf["hh_training"]["score_with_model"] = True
     hh_training_conf["hh_training"]["feature_importances"] = True
 
+    prepped_df_a_path, prepped_df_b_path, path_pms = hh_integration_test_data
+
     spark.read.csv(prepped_df_a_path, header=True, inferSchema=True).write.mode(
         "overwrite"
     ).saveAsTable("prepped_df_a")
     spark.read.csv(prepped_df_b_path, header=True, inferSchema=True).write.mode(
         "overwrite"
     ).saveAsTable("prepped_df_b")
+    load_table_from_csv(hh_matching, path_pms, "predicted_matches")
 
     hh_training.run_step(0)
     hh_training.run_step(1)
@@ -224,29 +284,27 @@ def test_step_3_with_probit_model(
 
     tfi = spark.table("hh_training_feature_importances").toPandas()
     assert (
-        8.9
-        <= tfi.query("feature_name == 'namelast_jw'")[
+        33.5
+        <= tfi.query("feature_name == 'namefrst_jw'")[
             "coefficient_or_importance"
         ].item()
-        <= 9.0
+        <= 34.0
     )
     assert (
-        tfi.query("feature_name == 'regionf' and category == 0")[
+        tfi.query("feature_name == 'srelate' and category == 0")[
             "coefficient_or_importance"
         ].item()
         == 0
     )
     assert (
-        -7.6
-        <= tfi.query("feature_name == 'regionf' and category == 1")[
+        -0.7
+        <= tfi.query("feature_name == 'ssex' and category == 1")[
             "coefficient_or_importance"
         ].item()
-        <= -7.5
+        <= -0.6
     )
     assert (
-        6.4
-        <= tfi.query("feature_name == 'regionf' and category == 99")[
-            "coefficient_or_importance"
-        ].item()
-        <= 6.5
+        -0.3
+        <= tfi.query("feature_name == 'byrdiff'")["coefficient_or_importance"].item()
+        <= -0.2
     )
