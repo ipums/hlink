@@ -3,6 +3,16 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
+## Not Yet Released
+
+### Fixed
+
+* Fixed a bug in the calculation of predicted matches. Previously, if there was
+a second-best probability, hlink computed and used the threshold ratio only if
+the first and second-best probabilities were both at least at the alpha threshold. Now it always
+computes and uses the threshold ratio when the best probability is at least at
+the alpha threshold and there is a second-best probability. [PR #200][pr200]
+
 ## v4.0.0 (2025-04-07)
 
 ### Added
@@ -370,6 +380,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr184]: https://github.com/ipums/hlink/pull/184
 [pr185]: https://github.com/ipums/hlink/pull/185
 [pr189]: https://github.com/ipums/hlink/pull/189
+[pr200]: https://github.com/ipums/hlink/pull/200
 
 [ints-to-longs-docs]: config.html#data-sources
 [link-tasks-docs]: link_tasks
