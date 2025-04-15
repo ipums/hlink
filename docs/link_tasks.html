@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Link Tasks &#8212; hlink 4.0.0 documentation</title>
+    <title>Link Tasks &#8212; hlink 4.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=3304f9e4"></script>
+    <script src="_static/documentation_options.js?v=42d1b3bd"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -80,12 +80,9 @@ like feature importances or coefficients for the model to help with introspectio
 <li><p>Step 0: Ingest the training data from a CSV file.</p></li>
 <li><p>Step 1: Create comparison features.</p></li>
 <li><p>Step 2: Train and save the model.</p></li>
-</ul>
-<p>The last step is available only for Training, not for Household Training.</p>
-<ul class="simple">
 <li><p>Step 3: Save the coefficients or feature importances of the model for inspection.
 This step is skipped by default. To enable it, set the <code class="docutils literal notranslate"><span class="pre">training.feature_importances</span></code>
-config attribute to true in your config file.</p></li>
+and/or the <code class="docutils literal notranslate"><span class="pre">hh_training.feature_importances</span></code> config attribute(s) to true in your config file.</p></li>
 </ul>
 </section>
 <section id="id3">

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; hlink 4.0.0 documentation</title>
+    <title>Changelog &#8212; hlink 4.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=3304f9e4"></script>
+    <script src="_static/documentation_options.js?v=42d1b3bd"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -37,8 +37,8 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>The format of this changelog is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep A Changelog</a>.
 Hlink adheres to semantic versioning as much as possible.</p>
-<section id="not-yet-released">
-<h2>Not Yet Released<a class="headerlink" href="#not-yet-released" title="Link to this heading">¶</a></h2>
+<section id="v4-1-0-2025-04-15">
+<h2>v4.1.0 (2025-04-15)<a class="headerlink" href="#v4-1-0-2025-04-15" title="Link to this heading">¶</a></h2>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
 <ul class="simple">
@@ -46,6 +46,9 @@ Hlink adheres to semantic versioning as much as possible.</p>
 which records are eligible for re-matching in the <code class="docutils literal notranslate"><span class="pre">hh_matching</span></code> task. You can
 find the documentation for this option in the new <a class="reference external" href="config.html#household-matching">Household Matching</a>
 section on the Configuration page. <a class="reference external" href="https://github.com/ipums/hlink/pull/201">PR #201</a></p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">hh_training.feature_importances</span></code> configuration option for saving model
+feature importances or coefficients as step 3 of
+<a class="reference external" href="config.html#household-training-and-model-exploration">“Household Training”</a> when set to true. <a class="reference external" href="https://github.com/ipums/hlink/pull/202">PR #202</a></p></li>
 </ul>
 </section>
 <section id="fixed">
@@ -507,7 +510,7 @@ and false negative data in model exploration. <a class="reference external" href
 <li class="toctree-l1"><a class="reference internal" href="use_examples.html">Advanced Workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#not-yet-released">Not Yet Released</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v4-1-0-2025-04-15">v4.1.0 (2025-04-15)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v4-0-0-2025-04-07">v4.0.0 (2025-04-07)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v3-8-0-2024-12-04">v3.8.0 (2024-12-04)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v3-7-0-2024-10-10">v3.7.0 (2024-10-10)</a></li>
