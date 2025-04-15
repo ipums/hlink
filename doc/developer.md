@@ -91,13 +91,14 @@ Here are the steps to follow when creating the new version.
 - Decide on the new version number A.B.C, following the scheme above.
 - Set the new version number in `pyproject.toml`.
 - Reinstall hlink with `pip install -e .[dev]` to update the version. Confirm that this worked by running `hlink --version`.
-- Regenerate the Sphinx docs so that they show the correct hlink version number.
+- Update sphinx-docs/changelog.md with the new version number, then regenerate the Sphinx docs so that they show the correct hlink version number.
 - After committing your changes, create a git tag `vA.B.C` and push it to GitHub.
-- Finally, create a GitHub release for the tag and add change notes describing the important
-changes that are part of the release.
+- Finally, create a GitHub release for the tag. This is intended for record-keeping
+for developers, so it's fine to automatically generate the release notes. The user-
+facing changelog is sphinx-docs/changelog.md.
 
-## Deploying a new version to pypi
+## Deploying a New Version to PyPI
 
 1) Make sure that the package is installed with dev dependencies: `pip install -e .[dev]`.
-2) Run: `python -m build`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
-3) Run: `twine upload dist/hlink-x.x.x.tar.gz` where x.x.x is the version number of the software.
+2) Run: `python -m build`. This creates distribution files in the dist directory.
+3) Run: `twine upload dist/hlink-A.B.C.tar.gz dist/hlink-A.B.C-py3-none-any.whl` where A.B.C is the version number of the software.
