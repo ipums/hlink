@@ -3,7 +3,7 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
-## Not Yet Released
+## v4.1.0 (2025-04-15)
 
 ### Added
 
@@ -11,6 +11,10 @@ Hlink adheres to semantic versioning as much as possible.
   which records are eligible for re-matching in the `hh_matching` task. You can
   find the documentation for this option in the new [Household Matching][household-matching-docs]
   section on the Configuration page. [PR #201][pr201]
+
+* Added the `hh_training.feature_importances` configuration option for saving model
+  feature importances or coefficients as step 3 of
+  ["Household Training"][household-training-docs] when set to true. [PR #202][pr202]
 
 ### Fixed
 
@@ -389,8 +393,10 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr189]: https://github.com/ipums/hlink/pull/189
 [pr200]: https://github.com/ipums/hlink/pull/200
 [pr201]: https://github.com/ipums/hlink/pull/201
+[pr202]: https://github.com/ipums/hlink/pull/202
 
 [household-matching-docs]: config.html#household-matching
+[household-training-docs]: config.html#household-training-and-model-exploration
 [ints-to-longs-docs]: config.html#data-sources
 [link-tasks-docs]: link_tasks
 [pyspark-interaction-docs]: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Interaction.html

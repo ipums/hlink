@@ -39,11 +39,9 @@ The first three steps in each of these tasks are the same:
 * Step 0: Ingest the training data from a CSV file.
 * Step 1: Create comparison features.
 * Step 2: Train and save the model.
-
-The last step is available only for Training, not for Household Training.
 * Step 3: Save the coefficients or feature importances of the model for inspection.
   This step is skipped by default. To enable it, set the `training.feature_importances`
-  config attribute to true in your config file.
+  and/or the `hh_training.feature_importances` config attribute(s) to true in your config file.
 
 ### Related Configuration Sections
 
