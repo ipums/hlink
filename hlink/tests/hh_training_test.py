@@ -53,7 +53,7 @@ def test_all_steps(
             "comparison_type": "all_equals",
         },
     ]
-
+    hh_training_conf["hh_training"]["feature_importances"] = True
     hh_training_conf["hh_training"]["dataset"] = training_data_path
     hh_training_conf["hh_training"]["dependent_var"] = "match"
     hh_training_conf["hh_training"]["independent_vars"] = [
@@ -497,7 +497,7 @@ def test_step_3_skipped_on_no_feature_importances(
 ):
     """Step 3 is skipped when there is no hh_training.feature_importances attribute
     in the config."""
-    del hh_training_conf["hh_training"]["feature_importances"]
+    assert "feature_importances" not in hh_training_conf["hh_training"]
     mock_tf_prepped = spark.createDataFrame(
         [], "id_a: int, id_b: int, namelast_jw_imp: float, match: boolean"
     )
