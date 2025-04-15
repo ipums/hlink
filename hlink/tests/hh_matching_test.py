@@ -38,7 +38,7 @@ def test_household_matching_training_integration(
 ):
     """Test all hh_training and hh_matching steps to ensure they work as a pipeline"""
     path_a, path_b, path_pms = hh_integration_test_data
-
+    hh_training_conf["hh_training"]["feature_importances"] = True
     load_table_from_csv(hh_matching, path_a, "prepped_df_a")
     load_table_from_csv(hh_matching, path_b, "prepped_df_b")
     load_table_from_csv(hh_matching, path_pms, "predicted_matches")
@@ -66,7 +66,16 @@ def test_household_matching_training_integration(
     )
 
     hh_training.run_step(2)
-
+    hh_training.run_step(3)
+    tf = spark.table("hh_training_feature_importances").toPandas()
+    for var in hh_training_conf["hh_training"]["independent_vars"]:
+        assert not tf.loc[tf["feature_name"].str.startswith(f"{var}", na=False)].empty
+    assert all(
+        [
+            col in ["feature_name", "category", "coefficient_or_importance"]
+            for col in tf.columns
+        ]
+    )
     hh_matching.run_step(0)
 
     assert spark.table("indiv_matches").count() == 20
