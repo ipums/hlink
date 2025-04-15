@@ -81,7 +81,6 @@ def test_all_steps(
         "featureSubsetStrategy": "sqrt",
     }
     hh_training_conf["hh_training"]["score_with_model"] = True
-    hh_training_conf["hh_training"]["feature_importances"] = True
     hh_training_conf["spark_tmp_dir"] = spark_test_tmp_dir_path
 
     hh_training.link_run.trained_models["trained_model"] = None
