@@ -66,12 +66,12 @@ changes that have been made.
 
 - If the changes are bug fixes and/or small internal changes, increment PATCH.
 - If the changes are additions to the API that should not break user code, then
-increment MINOR and set PATCH back to 0d
+increment MINOR and set PATCH back to 0.
 - If the changes are major and likely to break user code, increment MAJOR and set
-both MINOR and PATCH back to 0.d
+both MINOR and PATCH back to 0.
 
 For example, if the current version is 3.2.1, a bug fix would bump the version to 3.2.2.
-A minor change would bump the version to 3.3.0, and a major change would dump it to 4.0.0.
+A minor change would bump the version to 3.3.0, and a major change would bump it to 4.0.0.
 
 Here are the steps to follow when creating the new version.
 
