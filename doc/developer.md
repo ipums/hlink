@@ -3,7 +3,7 @@ To set up a copy of this project for development,
 
 1. Clone the repository.
 2. Run `pip install --upgrade pip` to ensure that you have a recent version of pip.
-3. Run `pip install -e .[dev]` in the root project directory. This should install all dependencies.
+3. Run `pip install -e .[dev]` in the root project directory. This should install all development dependencies. If you are working with the XGBoost and/or LightGBM machine learning models, then you'll also need to install those extras, like  `pip install -e .[dev,xgboost,lightgbm]`.
 
 ## Running Tests
 
