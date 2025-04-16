@@ -1,21 +1,9 @@
-
-## Program Structure
-
-There are 4 modules of the program. See documentation in each specific class for more information.
-
-1) `scripts` -- This contains the code for all of the CLI (command line interface). It contains the entrypoint into the program as well as all of the commands the user can run. 
-2) `configs` -- This contains the code for reading and parsing the program configurations.
-3) `spark` -- This contains the code for the spark initialization and connection.
-4) `linking` -- This contains the code for all of the linking tasks. There is a separate README.md file in this module to further describe it.
-
-In addition to these 4 modules, the `pyproject.toml` file at the top level of the repo contains the configurations for packaging up the program with pip.
-
 ## Developing Code
 To set up a copy of this project for development,
 
 1. Clone the repository.
 2. Run `pip install --upgrade pip` to ensure that you have a recent version of pip.
-3. Run `pip install -e .[dev]` in the root project directory. This should install all dependencies.
+3. Run `pip install -e .[dev]` in the root project directory. This should install all development dependencies. If you are working with the XGBoost and/or LightGBM machine learning models, then you'll also need to install those extras, like  `pip install -e .[dev,xgboost,lightgbm]`.
 
 ## Running Tests
 
@@ -39,6 +27,7 @@ different Python environments.
 
 ## Building the Scala Jar
 
+Hlink includes a Scala jar which defines Scala user-defined functions for use with Spark.
 To build the Scala jar, do
 
 ```
@@ -46,7 +35,7 @@ cd scala_jar
 sbt assembly
 ```
 
-Then move the scala jar over to the hlink directory with `mv target/scala-2.11/*.jar ../hlink/spark/jars`.
+Then move the built Scala jar over to the hlink directory with `mv target/scala-2.11/*.jar ../hlink/spark/jars`.
 
 ## Working with the Sphinx Docs
 
@@ -63,12 +52,10 @@ To test out your changes without having to push to the official site, Python's `
 works nicely.
 
 ```
-cd docs
-python -m http.server <port>
+python -m http.server -d docs <port>
 ```
 
-starts up an HTTP server running on port `<port>` on your local machine. Visit `127.0.0.1:<port>`
-in your browser to view the HTML.
+starts up an HTTP server running on port `<port>` on the local machine.
 
 ## Creating a New Version and GitHub Release
 
@@ -91,13 +78,14 @@ Here are the steps to follow when creating the new version.
 - Decide on the new version number A.B.C, following the scheme above.
 - Set the new version number in `pyproject.toml`.
 - Reinstall hlink with `pip install -e .[dev]` to update the version. Confirm that this worked by running `hlink --version`.
-- Regenerate the Sphinx docs so that they show the correct hlink version number.
+- Update sphinx-docs/changelog.md with the new version number, then regenerate the Sphinx docs so that they show the correct hlink version number.
 - After committing your changes, create a git tag `vA.B.C` and push it to GitHub.
-- Finally, create a GitHub release for the tag and add change notes describing the important
-changes that are part of the release.
+- Finally, create a GitHub release for the tag. This is intended for record-keeping
+for developers, so it's fine to automatically generate the release notes. The user-
+facing changelog is sphinx-docs/changelog.md.
 
-## Deploying a new version to pypi
+## Deploying a New Version to PyPI
 
 1) Make sure that the package is installed with dev dependencies: `pip install -e .[dev]`.
-2) Run: `python -m build`. This creates a hlink-x.x.x.tar.gz file in the dist directory.
-3) Run: `twine upload dist/hlink-x.x.x.tar.gz` where x.x.x is the version number of the software.
+2) Run `python -m build`. This creates distribution files in the dist directory.
+3) Run `twine upload dist/hlink-A.B.C.tar.gz dist/hlink-A.B.C-py3-none-any.whl`, where A.B.C is the version number of the software.
