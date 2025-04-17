@@ -59,6 +59,23 @@ def select_column_mapping(
     return df_selected.withColumn(alias, column_select), column_selects
 
 
+def _require_key(transform: dict[str, Any], key: str) -> Any:
+    """
+    Extract a key from a transform, or raise a helpful context-aware error if the
+    key is not present.
+    """
+    try:
+        return transform[key]
+    except KeyError as e:
+        transform_type = transform.get("type", "UNKNOWN")
+        raise ValueError(
+            f"""Missing required attribute '{key}' for column mapping transform type '{transform_type}'.\n\
+            The full provided column mapping transform is\n\
+            \n\
+            {transform}"""
+        ) from e
+
+
 #  These apply to the column mappings in the current config
 def apply_transform(
     column_select: Column, transform: dict[str, Any], is_a: bool
@@ -137,7 +154,7 @@ def apply_transform(
 def col_mapping_add_to_a(input_col, transform, context) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
-        return input_col + transform["value"]
+        return input_col + _require_key(transform, "value")
     else:
         return input_col
 
@@ -145,7 +162,8 @@ def col_mapping_add_to_a(input_col, transform, context) -> Column:
 def col_mapping_concat_to_a(input_col, transform, context) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
-        return concat(input_col, lit(transform["value"]))
+        value = _require_key(transform, "value")
+        return concat(input_col, lit(value))
     else:
         return input_col
 
@@ -155,11 +173,13 @@ def col_mapping_concat_to_b(input_col, transform, context) -> Column:
     if is_a:
         return input_col
     else:
-        return concat(input_col, lit(transform["value"]))
+        value = _require_key(transform, "value")
+        return concat(input_col, lit(value))
 
 
 def col_mapping_concat_two_cols(input_col, transform, context) -> Column:
-    return concat(input_col, transform["column_to_append"])
+    column_to_append = _require_key(transform, "column_to_append")
+    return concat(input_col, column_to_append)
 
 
 def col_mapping_lowercase_strip(input_col, transform, context) -> Column:
@@ -187,25 +207,29 @@ def col_mapping_remove_alternate_names(input_col, transform, context) -> Column:
 
 
 def col_mapping_remove_suffixes(input_col, transform, context) -> Column:
-    suffixes = "|".join(transform["values"])
+    values = _require_key(transform, "values")
+    suffixes = "|".join(values)
     suffix_regex = r"\b(?: " + suffixes + r")\s*$"
     return regexp_replace(input_col, suffix_regex, "")
 
 
 def col_mapping_remove_stop_words(input_col, transform, context) -> Column:
-    words = "|".join(transform["values"])
+    values = _require_key(transform, "values")
+    words = "|".join(values)
     suffix_regex = r"\b(?:" + words + r")\b"
     return regexp_replace(input_col, suffix_regex, "")
 
 
 def col_mapping_remove_prefixes(input_col, transform, context) -> Column:
-    prefixes = "|".join(transform["values"])
+    values = _require_key(transform, "values")
+    prefixes = "|".join(values)
     prefix_regex = "^(" + prefixes + ") "
     return regexp_replace(input_col, prefix_regex, "")
 
 
 def col_mapping_condense_prefixes(input_col, transform, context) -> Column:
-    prefixes = "|".join(transform["values"])
+    values = _require_key(transform, "values")
+    prefixes = "|".join(values)
     prefix_regex = r"^(" + prefixes + ") "
     return regexp_replace(input_col, prefix_regex, r"$1")
 
@@ -227,13 +251,15 @@ def col_mapping_length(input_col, transform, context) -> Column:
 
 
 def col_mapping_array_index(input_col, transform, context) -> Column:
-    return input_col[transform["value"]]
+    value = _require_key(transform, "value")
+    return input_col[value]
 
 
 def col_mapping_mapping(input_col, transform, context) -> Column:
     mapped_column = input_col
+    mappings = _require_key(transform, "mappings")
 
-    for key, value in transform["mappings"].items():
+    for key, value in mappings.items():
         from_regexp = f"^{key}$"
         mapped_column = regexp_replace(mapped_column, from_regexp, str(value))
 
@@ -245,7 +271,8 @@ def col_mapping_mapping(input_col, transform, context) -> Column:
 
 def col_mapping_swap_words(input_col, transform, context) -> Column:
     mapped_column = input_col
-    for swap_from, swap_to in transform["values"].items():
+    values = _require_key(transform, "values")
+    for swap_from, swap_to in values.items():
         mapped_column = regexp_replace(
             mapped_column,
             r"(?:(?<=\s)|(?<=^))(" + swap_from + r")(?:(?=\s)|(?=$))",
@@ -255,9 +282,10 @@ def col_mapping_swap_words(input_col, transform, context) -> Column:
 
 
 def col_mapping_substring(input_col: Column, transform, context) -> Column:
-    if len(transform["values"]) == 2:
-        sub_from = transform["values"][0]
-        sub_length = transform["values"][1]
+    values = _require_key(transform, "values")
+    if len(values) == 2:
+        sub_from = values[0]
+        sub_length = values[1]
         return input_col.substr(sub_from, sub_length)
     else:
         raise ValueError(
@@ -266,7 +294,7 @@ def col_mapping_substring(input_col: Column, transform, context) -> Column:
 
 
 def col_mapping_expand(input_col: Column, transform, context) -> Column:
-    expand_length = transform["value"]
+    expand_length = _require_key(transform, "value")
     return array([input_col + i for i in range(-expand_length, expand_length + 1)])
 
 
@@ -277,16 +305,16 @@ def col_mapping_cast_as_int(input_col: Column, transform, context) -> Column:
 def col_mapping_divide_by_int(
     input_col: Column, transform: dict[str, Any], context
 ) -> Column:
-    divisor = transform["value"]
+    divisor = _require_key(transform, "value")
     return input_col.cast("int") / divisor
 
 
 def col_mapping_when_value(
     input_col: Column, transform: dict[str, Any], context
 ) -> Column:
-    threshold = transform["value"]
-    if_value = transform["if_value"]
-    else_value = transform["else_value"]
+    threshold = _require_key(transform, "value")
+    if_value = _require_key(transform, "if_value")
+    else_value = _require_key(transform, "else_value")
     return when(input_col.cast("int") == threshold, if_value).otherwise(else_value)
 
 

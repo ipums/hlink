@@ -1,7 +1,8 @@
+from pyspark.sql.functions import col
 import pytest
 import pandas as pd
 
-from hlink.linking.core.column_mapping import select_column_mapping
+from hlink.linking.core.column_mapping import apply_transform, select_column_mapping
 
 
 TEST_DF_1 = pd.DataFrame(
@@ -306,3 +307,10 @@ def test_select_column_mapping_error_missing_column_name(spark):
     df = spark.createDataFrame(TEST_DF_1)
     with pytest.raises(KeyError):
         select_column_mapping({}, df, is_a=False, column_selects=[])
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_helpful_missing_attribute_error(spark, is_a) -> None:
+    transform = {"type": "remove_stop_words"}
+    with pytest.raises(ValueError, match="Missing required attribute 'values'"):
+        apply_transform(col("testing"), transform, is_a)
