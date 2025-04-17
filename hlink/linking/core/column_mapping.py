@@ -94,64 +94,64 @@ def apply_transform(
     context = {"dataset": dataset}
     transform_type = transform["type"]
     if transform_type == "add_to_a":
-        return col_mapping_add_to_a(column_select, transform, context)
+        return transform_add_to_a(column_select, transform, context)
     if transform_type == "concat_to_a":
-        return col_mapping_concat_to_a(column_select, transform, context)
+        return transform_concat_to_a(column_select, transform, context)
     elif transform_type == "concat_to_b":
-        return col_mapping_concat_to_b(column_select, transform, context)
+        return transform_concat_to_b(column_select, transform, context)
     elif transform_type == "concat_two_cols":
-        return col_mapping_concat_two_cols(column_select, transform, context)
+        return transform_concat_two_cols(column_select, transform, context)
     elif transform_type == "lowercase_strip":
-        return col_mapping_lowercase_strip(column_select, transform, context)
+        return transform_lowercase_strip(column_select, transform, context)
     elif transform_type == "rationalize_name_words":
-        return col_mapping_rationalize_name_words(column_select, transform, context)
+        return transform_rationalize_name_words(column_select, transform, context)
     elif transform_type == "remove_qmark_hyphen":
-        return col_mapping_remove_qmark_hyphen(column_select, transform, context)
+        return transform_remove_qmark_hyphen(column_select, transform, context)
     elif transform_type == "remove_punctuation":
-        return col_mapping_remove_punctuation(column_select, transform, context)
+        return transform_remove_punctuation(column_select, transform, context)
     elif transform_type == "replace_apostrophe":
-        return col_mapping_replace_apostrophe(column_select, transform, context)
+        return transform_replace_apostrophe(column_select, transform, context)
     elif transform_type == "remove_alternate_names":
-        return col_mapping_remove_alternate_names(column_select, transform, context)
+        return transform_remove_alternate_names(column_select, transform, context)
     elif transform_type == "remove_suffixes":
-        return col_mapping_remove_suffixes(column_select, transform, context)
+        return transform_remove_suffixes(column_select, transform, context)
     elif transform_type == "remove_stop_words":
-        return col_mapping_remove_stop_words(column_select, transform, context)
+        return transform_remove_stop_words(column_select, transform, context)
     elif transform_type == "remove_prefixes":
-        return col_mapping_remove_prefixes(column_select, transform, context)
+        return transform_remove_prefixes(column_select, transform, context)
     elif transform_type == "condense_prefixes":
-        return col_mapping_condense_prefixes(column_select, transform, context)
+        return transform_condense_prefixes(column_select, transform, context)
     elif transform_type == "condense_strip_whitespace":
-        return col_mapping_condense_strip_whitespace(column_select, transform, context)
+        return transform_condense_strip_whitespace(column_select, transform, context)
     elif transform_type == "remove_one_letter_names":
-        return col_mapping_remove_one_letter_names(column_select, transform, context)
+        return transform_remove_one_letter_names(column_select, transform, context)
     elif transform_type == "split":
-        return col_mapping_split(column_select, transform, context)
+        return transform_split(column_select, transform, context)
     elif transform_type == "length":
-        return col_mapping_length(column_select, transform, context)
+        return transform_length(column_select, transform, context)
     elif transform_type == "array_index":
-        return col_mapping_array_index(column_select, transform, context)
+        return transform_array_index(column_select, transform, context)
     elif transform_type == "mapping":
-        return col_mapping_mapping(column_select, transform, context)
+        return transform_mapping(column_select, transform, context)
     elif transform_type == "swap_words":
-        return col_mapping_swap_words(column_select, transform, context)
+        return transform_swap_words(column_select, transform, context)
     elif transform_type == "substring":
-        return col_mapping_substring(column_select, transform, context)
+        return transform_substring(column_select, transform, context)
     elif transform_type == "expand":
-        return col_mapping_expand(column_select, transform, context)
+        return transform_expand(column_select, transform, context)
     elif transform_type == "cast_as_int":
-        return col_mapping_cast_as_int(column_select, transform, context)
+        return transform_cast_as_int(column_select, transform, context)
     elif transform_type == "divide_by_int":
-        return col_mapping_divide_by_int(column_select, transform, context)
+        return transform_divide_by_int(column_select, transform, context)
     elif transform_type == "when_value":
-        return col_mapping_when_value(column_select, transform, context)
+        return transform_when_value(column_select, transform, context)
     elif transform_type == "get_floor":
-        return col_mapping_get_floor(column_select, transform, context)
+        return transform_get_floor(column_select, transform, context)
     else:
         raise ValueError(f"Invalid transform type for {transform}")
 
 
-def col_mapping_add_to_a(input_col, transform, context) -> Column:
+def transform_add_to_a(input_col, transform, context) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
         return input_col + _require_key(transform, "value")
@@ -159,7 +159,7 @@ def col_mapping_add_to_a(input_col, transform, context) -> Column:
         return input_col
 
 
-def col_mapping_concat_to_a(input_col, transform, context) -> Column:
+def transform_concat_to_a(input_col, transform, context) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
         value = _require_key(transform, "value")
@@ -168,7 +168,7 @@ def col_mapping_concat_to_a(input_col, transform, context) -> Column:
         return input_col
 
 
-def col_mapping_concat_to_b(input_col, transform, context) -> Column:
+def transform_concat_to_b(input_col, transform, context) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
         return input_col
@@ -177,85 +177,85 @@ def col_mapping_concat_to_b(input_col, transform, context) -> Column:
         return concat(input_col, lit(value))
 
 
-def col_mapping_concat_two_cols(input_col, transform, context) -> Column:
+def transform_concat_two_cols(input_col, transform, context) -> Column:
     column_to_append = _require_key(transform, "column_to_append")
     return concat(input_col, column_to_append)
 
 
-def col_mapping_lowercase_strip(input_col, transform, context) -> Column:
+def transform_lowercase_strip(input_col, transform, context) -> Column:
     return lower(trim(input_col))
 
 
-def col_mapping_rationalize_name_words(input_col, transform, context) -> Column:
+def transform_rationalize_name_words(input_col, transform, context) -> Column:
     return regexp_replace(input_col, r"[^a-z?'\*\-]+", " ")
 
 
-def col_mapping_remove_qmark_hyphen(input_col, transform, context) -> Column:
+def transform_remove_qmark_hyphen(input_col, transform, context) -> Column:
     return regexp_replace(input_col, r"[?\*\-]+", "")
 
 
-def col_mapping_remove_punctuation(input_col, transform, context) -> Column:
+def transform_remove_punctuation(input_col, transform, context) -> Column:
     return regexp_replace(input_col, r"[?\-\\\/\"\':,.\[\]\{\}]+", "")
 
 
-def col_mapping_replace_apostrophe(input_col, transform, context) -> Column:
+def transform_replace_apostrophe(input_col, transform, context) -> Column:
     return regexp_replace(input_col, r"'+", " ")
 
 
-def col_mapping_remove_alternate_names(input_col, transform, context) -> Column:
+def transform_remove_alternate_names(input_col, transform, context) -> Column:
     return regexp_replace(input_col, r"(\w+)( or \w+)+", "$1")
 
 
-def col_mapping_remove_suffixes(input_col, transform, context) -> Column:
+def transform_remove_suffixes(input_col, transform, context) -> Column:
     values = _require_key(transform, "values")
     suffixes = "|".join(values)
     suffix_regex = r"\b(?: " + suffixes + r")\s*$"
     return regexp_replace(input_col, suffix_regex, "")
 
 
-def col_mapping_remove_stop_words(input_col, transform, context) -> Column:
+def transform_remove_stop_words(input_col, transform, context) -> Column:
     values = _require_key(transform, "values")
     words = "|".join(values)
     suffix_regex = r"\b(?:" + words + r")\b"
     return regexp_replace(input_col, suffix_regex, "")
 
 
-def col_mapping_remove_prefixes(input_col, transform, context) -> Column:
+def transform_remove_prefixes(input_col, transform, context) -> Column:
     values = _require_key(transform, "values")
     prefixes = "|".join(values)
     prefix_regex = "^(" + prefixes + ") "
     return regexp_replace(input_col, prefix_regex, "")
 
 
-def col_mapping_condense_prefixes(input_col, transform, context) -> Column:
+def transform_condense_prefixes(input_col, transform, context) -> Column:
     values = _require_key(transform, "values")
     prefixes = "|".join(values)
     prefix_regex = r"^(" + prefixes + ") "
     return regexp_replace(input_col, prefix_regex, r"$1")
 
 
-def col_mapping_condense_strip_whitespace(input_col, transform, context) -> Column:
+def transform_condense_strip_whitespace(input_col, transform, context) -> Column:
     return regexp_replace(trim(input_col), r"\s\s+", " ")
 
 
-def col_mapping_remove_one_letter_names(input_col, transform, context) -> Column:
+def transform_remove_one_letter_names(input_col, transform, context) -> Column:
     return regexp_replace(input_col, r"^((?:\w )+)(\w+)", r"$2")
 
 
-def col_mapping_split(input_col, transform, context) -> Column:
+def transform_split(input_col, transform, context) -> Column:
     return split(input_col, " ")
 
 
-def col_mapping_length(input_col, transform, context) -> Column:
+def transform_length(input_col, transform, context) -> Column:
     return length(input_col)
 
 
-def col_mapping_array_index(input_col, transform, context) -> Column:
+def transform_array_index(input_col, transform, context) -> Column:
     value = _require_key(transform, "value")
     return input_col[value]
 
 
-def col_mapping_mapping(input_col, transform, context) -> Column:
+def transform_mapping(input_col, transform, context) -> Column:
     mapped_column = input_col
     mappings = _require_key(transform, "mappings")
 
@@ -269,7 +269,7 @@ def col_mapping_mapping(input_col, transform, context) -> Column:
     return mapped_column
 
 
-def col_mapping_swap_words(input_col, transform, context) -> Column:
+def transform_swap_words(input_col, transform, context) -> Column:
     mapped_column = input_col
     values = _require_key(transform, "values")
     for swap_from, swap_to in values.items():
@@ -281,7 +281,7 @@ def col_mapping_swap_words(input_col, transform, context) -> Column:
     return mapped_column
 
 
-def col_mapping_substring(input_col: Column, transform, context) -> Column:
+def transform_substring(input_col: Column, transform, context) -> Column:
     values = _require_key(transform, "values")
     if len(values) == 2:
         sub_from = values[0]
@@ -293,23 +293,23 @@ def col_mapping_substring(input_col: Column, transform, context) -> Column:
         )
 
 
-def col_mapping_expand(input_col: Column, transform, context) -> Column:
+def transform_expand(input_col: Column, transform, context) -> Column:
     expand_length = _require_key(transform, "value")
     return array([input_col + i for i in range(-expand_length, expand_length + 1)])
 
 
-def col_mapping_cast_as_int(input_col: Column, transform, context) -> Column:
+def transform_cast_as_int(input_col: Column, transform, context) -> Column:
     return input_col.cast("int")
 
 
-def col_mapping_divide_by_int(
+def transform_divide_by_int(
     input_col: Column, transform: dict[str, Any], context
 ) -> Column:
     divisor = _require_key(transform, "value")
     return input_col.cast("int") / divisor
 
 
-def col_mapping_when_value(
+def transform_when_value(
     input_col: Column, transform: dict[str, Any], context
 ) -> Column:
     threshold = _require_key(transform, "value")
@@ -318,5 +318,5 @@ def col_mapping_when_value(
     return when(input_col.cast("int") == threshold, if_value).otherwise(else_value)
 
 
-def col_mapping_get_floor(input_col: Column, transform, context) -> Column:
+def transform_get_floor(input_col: Column, transform, context) -> Column:
     return floor(input_col).cast("int")
