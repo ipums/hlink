@@ -12,20 +12,13 @@ from pyspark.sql.functions import (
     concat,
     count,
     expr,
-    floor,
-    length,
     lit,
-    lower,
-    regexp_replace,
     sort_array,
     soundex,
-    split,
     struct,
-    trim,
     udf,
-    when,
 )
-from pyspark.sql.types import ArrayType, LongType, StringType
+from pyspark.sql.types import ArrayType, StringType
 from pyspark.ml import Pipeline
 from pyspark.sql import Column, DataFrame, SparkSession, Window
 from pyspark.ml.feature import NGram, RegexTokenizer, CountVectorizer, MinHashLSH
