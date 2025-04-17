@@ -93,62 +93,42 @@ def apply_transform(
     dataset = "a" if is_a else "b"
     context = {"dataset": dataset}
     transform_type = transform["type"]
-    if transform_type == "add_to_a":
-        return transform_add_to_a(column_select, transform, context)
-    if transform_type == "concat_to_a":
-        return transform_concat_to_a(column_select, transform, context)
-    elif transform_type == "concat_to_b":
-        return transform_concat_to_b(column_select, transform, context)
-    elif transform_type == "concat_two_cols":
-        return transform_concat_two_cols(column_select, transform, context)
-    elif transform_type == "lowercase_strip":
-        return transform_lowercase_strip(column_select, transform, context)
-    elif transform_type == "rationalize_name_words":
-        return transform_rationalize_name_words(column_select, transform, context)
-    elif transform_type == "remove_qmark_hyphen":
-        return transform_remove_qmark_hyphen(column_select, transform, context)
-    elif transform_type == "remove_punctuation":
-        return transform_remove_punctuation(column_select, transform, context)
-    elif transform_type == "replace_apostrophe":
-        return transform_replace_apostrophe(column_select, transform, context)
-    elif transform_type == "remove_alternate_names":
-        return transform_remove_alternate_names(column_select, transform, context)
-    elif transform_type == "remove_suffixes":
-        return transform_remove_suffixes(column_select, transform, context)
-    elif transform_type == "remove_stop_words":
-        return transform_remove_stop_words(column_select, transform, context)
-    elif transform_type == "remove_prefixes":
-        return transform_remove_prefixes(column_select, transform, context)
-    elif transform_type == "condense_prefixes":
-        return transform_condense_prefixes(column_select, transform, context)
-    elif transform_type == "condense_strip_whitespace":
-        return transform_condense_strip_whitespace(column_select, transform, context)
-    elif transform_type == "remove_one_letter_names":
-        return transform_remove_one_letter_names(column_select, transform, context)
-    elif transform_type == "split":
-        return transform_split(column_select, transform, context)
-    elif transform_type == "length":
-        return transform_length(column_select, transform, context)
-    elif transform_type == "array_index":
-        return transform_array_index(column_select, transform, context)
-    elif transform_type == "mapping":
-        return transform_mapping(column_select, transform, context)
-    elif transform_type == "swap_words":
-        return transform_swap_words(column_select, transform, context)
-    elif transform_type == "substring":
-        return transform_substring(column_select, transform, context)
-    elif transform_type == "expand":
-        return transform_expand(column_select, transform, context)
-    elif transform_type == "cast_as_int":
-        return transform_cast_as_int(column_select, transform, context)
-    elif transform_type == "divide_by_int":
-        return transform_divide_by_int(column_select, transform, context)
-    elif transform_type == "when_value":
-        return transform_when_value(column_select, transform, context)
-    elif transform_type == "get_floor":
-        return transform_get_floor(column_select, transform, context)
-    else:
+    transforms = {
+        "add_to_a": transform_add_to_a,
+        "concat_to_a": transform_concat_to_a,
+        "concat_to_b": transform_concat_to_b,
+        "concat_two_cols": transform_concat_two_cols,
+        "lowercase_strip": transform_lowercase_strip,
+        "rationalize_name_words": transform_rationalize_name_words,
+        "remove_qmark_hyphen": transform_remove_qmark_hyphen,
+        "remove_punctuation": transform_remove_punctuation,
+        "replace_apostrophe": transform_replace_apostrophe,
+        "remove_alternate_names": transform_remove_alternate_names,
+        "remove_suffixes": transform_remove_suffixes,
+        "remove_stop_words": transform_remove_stop_words,
+        "remove_prefixes": transform_remove_prefixes,
+        "condense_prefixes": transform_condense_prefixes,
+        "condense_strip_whitespace": transform_condense_strip_whitespace,
+        "remove_one_letter_names": transform_remove_one_letter_names,
+        "split": transform_split,
+        "length": transform_length,
+        "array_index": transform_array_index,
+        "mapping": transform_mapping,
+        "swap_words": transform_swap_words,
+        "substring": transform_substring,
+        "expand": transform_expand,
+        "cast_as_int": transform_cast_as_int,
+        "divide_by_int": transform_divide_by_int,
+        "when_value": transform_when_value,
+        "get_floor": transform_get_floor,
+    }
+
+    transform_func = transforms.get(transform_type)
+
+    if transform_func is None:
         raise ValueError(f"Invalid transform type for {transform}")
+
+    return transform_func(column_select, transform, context)
 
 
 def transform_add_to_a(
