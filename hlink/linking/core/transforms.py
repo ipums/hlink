@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 from typing import Any
+from typing_extensions import deprecated
 
 from pyspark.sql.functions import (
     array,
@@ -446,10 +447,21 @@ def generate_transforms(
 
 
 #  These apply to the column mappings in the current config
+@deprecated(
+    """
+    This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform().
+    Please use that function instead.
+
+    [deprecated_in_version=4.2.0]
+    """
+)
 def apply_transform(
     column_select: Column, transform: dict[str, Any], is_a: bool
 ) -> Column:
-    """Return a new column that is the result of applying the given transform
+    """
+    This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform().
+
+    Return a new column that is the result of applying the given transform
     to the given input column (column_select). The is_a parameter controls the
     behavior of the transforms like "add_to_a" which act differently on
     datasets A and B.
