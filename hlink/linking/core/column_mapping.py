@@ -151,7 +151,9 @@ def apply_transform(
         raise ValueError(f"Invalid transform type for {transform}")
 
 
-def transform_add_to_a(input_col, transform, context) -> Column:
+def transform_add_to_a(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
         return input_col + _require_key(transform, "value")
@@ -159,7 +161,9 @@ def transform_add_to_a(input_col, transform, context) -> Column:
         return input_col
 
 
-def transform_concat_to_a(input_col, transform, context) -> Column:
+def transform_concat_to_a(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
         value = _require_key(transform, "value")
@@ -168,7 +172,9 @@ def transform_concat_to_a(input_col, transform, context) -> Column:
         return input_col
 
 
-def transform_concat_to_b(input_col, transform, context) -> Column:
+def transform_concat_to_b(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     is_a = context["dataset"] == "a"
     if is_a:
         return input_col
@@ -177,85 +183,119 @@ def transform_concat_to_b(input_col, transform, context) -> Column:
         return concat(input_col, lit(value))
 
 
-def transform_concat_two_cols(input_col, transform, context) -> Column:
+def transform_concat_two_cols(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     column_to_append = _require_key(transform, "column_to_append")
     return concat(input_col, column_to_append)
 
 
-def transform_lowercase_strip(input_col, transform, context) -> Column:
+def transform_lowercase_strip(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return lower(trim(input_col))
 
 
-def transform_rationalize_name_words(input_col, transform, context) -> Column:
+def transform_rationalize_name_words(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(input_col, r"[^a-z?'\*\-]+", " ")
 
 
-def transform_remove_qmark_hyphen(input_col, transform, context) -> Column:
+def transform_remove_qmark_hyphen(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(input_col, r"[?\*\-]+", "")
 
 
-def transform_remove_punctuation(input_col, transform, context) -> Column:
+def transform_remove_punctuation(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(input_col, r"[?\-\\\/\"\':,.\[\]\{\}]+", "")
 
 
-def transform_replace_apostrophe(input_col, transform, context) -> Column:
+def transform_replace_apostrophe(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(input_col, r"'+", " ")
 
 
-def transform_remove_alternate_names(input_col, transform, context) -> Column:
+def transform_remove_alternate_names(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(input_col, r"(\w+)( or \w+)+", "$1")
 
 
-def transform_remove_suffixes(input_col, transform, context) -> Column:
+def transform_remove_suffixes(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     values = _require_key(transform, "values")
     suffixes = "|".join(values)
     suffix_regex = r"\b(?: " + suffixes + r")\s*$"
     return regexp_replace(input_col, suffix_regex, "")
 
 
-def transform_remove_stop_words(input_col, transform, context) -> Column:
+def transform_remove_stop_words(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     values = _require_key(transform, "values")
     words = "|".join(values)
     suffix_regex = r"\b(?:" + words + r")\b"
     return regexp_replace(input_col, suffix_regex, "")
 
 
-def transform_remove_prefixes(input_col, transform, context) -> Column:
+def transform_remove_prefixes(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     values = _require_key(transform, "values")
     prefixes = "|".join(values)
     prefix_regex = "^(" + prefixes + ") "
     return regexp_replace(input_col, prefix_regex, "")
 
 
-def transform_condense_prefixes(input_col, transform, context) -> Column:
+def transform_condense_prefixes(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     values = _require_key(transform, "values")
     prefixes = "|".join(values)
     prefix_regex = r"^(" + prefixes + ") "
     return regexp_replace(input_col, prefix_regex, r"$1")
 
 
-def transform_condense_strip_whitespace(input_col, transform, context) -> Column:
+def transform_condense_strip_whitespace(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(trim(input_col), r"\s\s+", " ")
 
 
-def transform_remove_one_letter_names(input_col, transform, context) -> Column:
+def transform_remove_one_letter_names(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return regexp_replace(input_col, r"^((?:\w )+)(\w+)", r"$2")
 
 
-def transform_split(input_col, transform, context) -> Column:
+def transform_split(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return split(input_col, " ")
 
 
-def transform_length(input_col, transform, context) -> Column:
+def transform_length(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return length(input_col)
 
 
-def transform_array_index(input_col, transform, context) -> Column:
+def transform_array_index(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     value = _require_key(transform, "value")
     return input_col[value]
 
 
-def transform_mapping(input_col, transform, context) -> Column:
+def transform_mapping(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     mapped_column = input_col
     mappings = _require_key(transform, "mappings")
 
@@ -269,7 +309,9 @@ def transform_mapping(input_col, transform, context) -> Column:
     return mapped_column
 
 
-def transform_swap_words(input_col, transform, context) -> Column:
+def transform_swap_words(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     mapped_column = input_col
     values = _require_key(transform, "values")
     for swap_from, swap_to in values.items():
@@ -281,7 +323,9 @@ def transform_swap_words(input_col, transform, context) -> Column:
     return mapped_column
 
 
-def transform_substring(input_col: Column, transform, context) -> Column:
+def transform_substring(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     values = _require_key(transform, "values")
     if len(values) == 2:
         sub_from = values[0]
@@ -293,12 +337,16 @@ def transform_substring(input_col: Column, transform, context) -> Column:
         )
 
 
-def transform_expand(input_col: Column, transform, context) -> Column:
+def transform_expand(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     expand_length = _require_key(transform, "value")
     return array([input_col + i for i in range(-expand_length, expand_length + 1)])
 
 
-def transform_cast_as_int(input_col: Column, transform, context) -> Column:
+def transform_cast_as_int(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return input_col.cast("int")
 
 
@@ -310,7 +358,7 @@ def transform_divide_by_int(
 
 
 def transform_when_value(
-    input_col: Column, transform: dict[str, Any], context
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
 ) -> Column:
     threshold = _require_key(transform, "value")
     if_value = _require_key(transform, "if_value")
@@ -318,5 +366,7 @@ def transform_when_value(
     return when(input_col.cast("int") == threshold, if_value).otherwise(else_value)
 
 
-def transform_get_floor(input_col: Column, transform, context) -> Column:
+def transform_get_floor(
+    input_col: Column, transform: dict[str, Any], context: dict[str, Any]
+) -> Column:
     return floor(input_col).cast("int")
