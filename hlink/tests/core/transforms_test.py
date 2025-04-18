@@ -6,6 +6,16 @@ from hlink.linking.core.transforms import apply_transform, generate_transforms
 from hlink.linking.link_task import LinkTask
 
 
+ignore_apply_transform_dep_warning = pytest.mark.filterwarnings(
+    r"ignore:\s*This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform"
+)
+"""
+For tests which intentionally call the deprecated apply_transform() function in
+hlink.linking.core.transforms. This mark ignores the deprecation warning so
+that it does not show up in the pytest output.
+"""
+
+
 @pytest.mark.parametrize("is_a", [True, False])
 def test_generate_transforms_array_transform_1_col(
     spark: SparkSession, preprocessing: LinkTask, is_a: bool
@@ -256,6 +266,7 @@ def test_generate_transforms_error_when_unrecognized_transform(
         generate_transforms(spark, df, feature_selections, preprocessing, is_a, "id")
 
 
+@ignore_apply_transform_dep_warning
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
     """The when_value transform supports simple if-then-otherwise logic on
@@ -282,6 +293,7 @@ def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
     ]
 
 
+@ignore_apply_transform_dep_warning
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_remove_punctuation(spark: SparkSession, is_a: bool) -> None:
     transform = {"type": "remove_punctuation"}
@@ -308,6 +320,7 @@ def test_apply_transform_remove_punctuation(spark: SparkSession, is_a: bool) -> 
     ]
 
 
+@ignore_apply_transform_dep_warning
 @pytest.mark.parametrize("values", [[1], [1, 2, 3]])
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_substring_error_when_not_exactly_2_values(
@@ -337,6 +350,7 @@ def test_apply_transform_substring_error_when_not_exactly_2_values(
         apply_transform(input_col, transform, is_a)
 
 
+@ignore_apply_transform_dep_warning
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> None:
     column_select = col("test")
@@ -345,6 +359,7 @@ def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> N
         apply_transform(column_select, transform, is_a)
 
 
+@ignore_apply_transform_dep_warning
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_mapping(spark: SparkSession, is_a: bool) -> None:
     transform = {"type": "mapping", "mappings": {"first": "abcd", "second": "efg"}}
@@ -374,6 +389,7 @@ def test_apply_transform_mapping(spark: SparkSession, is_a: bool) -> None:
     ]
 
 
+@ignore_apply_transform_dep_warning
 @pytest.mark.parametrize("is_a", [True, False])
 def test_apply_transform_mapping_integer_column(
     spark: SparkSession, is_a: bool

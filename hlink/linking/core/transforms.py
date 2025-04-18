@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 from typing import Any
+import warnings
 
 from pyspark.sql.functions import (
     array,
@@ -11,23 +12,18 @@ from pyspark.sql.functions import (
     concat,
     count,
     expr,
-    floor,
-    length,
     lit,
-    lower,
-    regexp_replace,
     sort_array,
     soundex,
-    split,
     struct,
-    trim,
     udf,
-    when,
 )
-from pyspark.sql.types import ArrayType, LongType, StringType
+from pyspark.sql.types import ArrayType, StringType
 from pyspark.ml import Pipeline
 from pyspark.sql import Column, DataFrame, SparkSession, Window
 from pyspark.ml.feature import NGram, RegexTokenizer, CountVectorizer, MinHashLSH
+
+import hlink.linking.core.column_mapping as column_mapping_core
 
 
 def _get_transforms(
@@ -447,7 +443,10 @@ def generate_transforms(
 def apply_transform(
     column_select: Column, transform: dict[str, Any], is_a: bool
 ) -> Column:
-    """Return a new column that is the result of applying the given transform
+    """
+    This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform().
+
+    Return a new column that is the result of applying the given transform
     to the given input column (column_select). The is_a parameter controls the
     behavior of the transforms like "add_to_a" which act differently on
     datasets A and B.
@@ -457,109 +456,14 @@ def apply_transform(
     transform: the transform to apply
     is_a: whether this is dataset A (True) or B (False)
     """
-    transform_type = transform["type"]
-    if transform_type == "add_to_a":
-        if is_a:
-            return column_select + transform["value"]
-        else:
-            return column_select
-    if transform_type == "concat_to_a":
-        if is_a:
-            return concat(column_select, lit(transform["value"]))
-        else:
-            return column_select
-    elif transform_type == "concat_to_b":
-        if is_a:
-            return column_select
-        else:
-            return concat(column_select, lit(transform["value"]))
-    elif transform_type == "concat_two_cols":
-        return concat(column_select, transform["column_to_append"])
-    elif transform_type == "lowercase_strip":
-        return lower(trim(column_select))
-    elif transform_type == "rationalize_name_words":
-        return regexp_replace(column_select, r"[^a-z?'\*\-]+", " ")
-    elif transform_type == "remove_qmark_hyphen":
-        return regexp_replace(column_select, r"[?\*\-]+", "")
-    elif transform_type == "remove_punctuation":
-        return regexp_replace(column_select, r"[?\-\\\/\"\':,.\[\]\{\}]+", "")
-    elif transform_type == "replace_apostrophe":
-        return regexp_replace(column_select, r"'+", " ")
-    elif transform_type == "remove_alternate_names":
-        return regexp_replace(column_select, r"(\w+)( or \w+)+", "$1")
-    elif transform_type == "remove_suffixes":
-        suffixes = "|".join(transform["values"])
-        suffix_regex = r"\b(?: " + suffixes + r")\s*$"
-        return regexp_replace(column_select, suffix_regex, "")
-    elif transform_type == "remove_stop_words":
-        words = "|".join(transform["values"])
-        suffix_regex = r"\b(?:" + words + r")\b"
-        return regexp_replace(column_select, suffix_regex, "")
-    elif transform_type == "remove_prefixes":
-        prefixes = "|".join(transform["values"])
-        prefix_regex = "^(" + prefixes + ") "
-        return regexp_replace(column_select, prefix_regex, "")
-    elif transform_type == "condense_prefixes":
-        prefixes = "|".join(transform["values"])
-        prefix_regex = r"^(" + prefixes + ") "
-        return regexp_replace(column_select, prefix_regex, r"$1")
-    elif transform_type == "condense_strip_whitespace":
-        return regexp_replace(trim(column_select), r"\s\s+", " ")
-    elif transform_type == "remove_one_letter_names":
-        return regexp_replace(column_select, r"^((?:\w )+)(\w+)", r"$2")
-    elif transform_type == "split":
-        return split(column_select, " ")
-    elif transform_type == "length":
-        return length(column_select)
-    elif transform_type == "array_index":
-        return column_select[transform["value"]]
-    elif transform_type == "mapping":
-        mapped_column = column_select
+    warnings.warn(
+        """
+        This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform().
+        Please use that function instead.
 
-        for key, value in transform["mappings"].items():
-            from_regexp = f"^{key}$"
-            mapped_column = regexp_replace(mapped_column, from_regexp, str(value))
-
-        if transform.get("output_type", False) == "int":
-            mapped_column = mapped_column.cast(LongType())
-
-        return mapped_column
-    elif transform_type == "swap_words":
-        mapped_column = column_select
-        for swap_from, swap_to in transform["values"].items():
-            mapped_column = regexp_replace(
-                mapped_column,
-                r"(?:(?<=\s)|(?<=^))(" + swap_from + r")(?:(?=\s)|(?=$))",
-                swap_to,
-            )
-        return mapped_column
-    elif transform_type == "substring":
-        if len(transform["values"]) == 2:
-            sub_from = transform["values"][0]
-            sub_length = transform["values"][1]
-            return column_select.substr(sub_from, sub_length)
-        else:
-            raise ValueError(
-                f"Length of substr transform should be 2. You gave: {transform}"
-            )
-    elif transform_type == "expand":
-        expand_length = transform["value"]
-        return array(
-            [column_select + i for i in range(-expand_length, expand_length + 1)]
-        )
-    elif transform_type == "cast_as_int":
-        return column_select.cast("int")
-    elif transform_type == "divide_by_int":
-        divisor = transform["value"]
-        return column_select.cast("int") / divisor
-    elif transform_type == "when_value":
-        threshold = transform["value"]
-        if_value = transform["if_value"]
-        else_value = transform["else_value"]
-        return when(column_select.cast("int") == threshold, if_value).otherwise(
-            else_value
-        )
-    elif transform_type == "get_floor":
-        return floor(column_select).cast("int")
-    else:
-        raise ValueError(f"Invalid transform type for {transform}")
+        [deprecated_in_version=4.2.0]
+        """,
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
+    return column_mapping_core.apply_transform(column_select, transform, is_a)

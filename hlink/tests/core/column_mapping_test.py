@@ -1,7 +1,9 @@
+from pyspark.sql import SparkSession, Row
+from pyspark.sql.functions import col
 import pytest
 import pandas as pd
 
-from hlink.linking.core.column_mapping import select_column_mapping
+from hlink.linking.core.column_mapping import apply_transform, select_column_mapping
 
 
 TEST_DF_1 = pd.DataFrame(
@@ -306,3 +308,167 @@ def test_select_column_mapping_error_missing_column_name(spark):
     df = spark.createDataFrame(TEST_DF_1)
     with pytest.raises(KeyError):
         select_column_mapping({}, df, is_a=False, column_selects=[])
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_helpful_missing_attribute_error(spark, is_a) -> None:
+    transform = {"type": "remove_stop_words"}
+    with pytest.raises(ValueError, match="Missing required attribute 'values'"):
+        apply_transform(col("testing"), transform, is_a)
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_when_value(spark: SparkSession, is_a: bool) -> None:
+    """The when_value transform supports simple if-then-otherwise logic on
+    columns:
+
+    if the column is equal to "when_value"
+    then return "if_value"
+    otherwise return "else_value"
+    """
+    transform = {"type": "when_value", "value": 6, "if_value": 0, "else_value": 1}
+    column_select = col("marst")
+    output_col = apply_transform(column_select, transform, is_a)
+
+    df = spark.createDataFrame([[3], [6], [2], [6], [1]], "marst:integer")
+    transformed = df.select("marst", output_col.alias("output"))
+    result = transformed.collect()
+
+    assert result == [
+        Row(marst=3, output=1),
+        Row(marst=6, output=0),
+        Row(marst=2, output=1),
+        Row(marst=6, output=0),
+        Row(marst=1, output=1),
+    ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_remove_punctuation(spark: SparkSession, is_a: bool) -> None:
+    transform = {"type": "remove_punctuation"}
+    input_col = col("input")
+    output_col = apply_transform(input_col, transform, is_a)
+
+    df = spark.createDataFrame(
+        [
+            # All of these characters are considered punctuation and should be removed
+            ["?-\\/\"':,.[]{}"],
+            ["abcdefghijklmnop"],
+            # The address of the Minnesota state capitol
+            ["75 Rev. Dr. Martin Luther King, Jr. Blvd. Saint Paul, MN 55155"],
+        ],
+        "input:string",
+    )
+    transformed = df.select(output_col.alias("output"))
+    result = transformed.collect()
+
+    assert result == [
+        Row(output=""),
+        Row(output="abcdefghijklmnop"),
+        Row(output="75 Rev Dr Martin Luther King Jr Blvd Saint Paul MN 55155"),
+    ]
+
+
+@pytest.mark.parametrize("values", [[1], [1, 2, 3]])
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_substring_error_when_not_exactly_2_values(
+    values: list[int], is_a: bool
+) -> None:
+    """
+    The substring transform takes a list of exactly two values, which are the
+    start position of the substring and its length. If the list has the wrong
+    number of values, then apply_transform() raises an error.
+
+    TODO: It would be simpler to have two separate attributes for the substring
+    start and length, like this:
+
+    {
+        "type": "substring",
+        "start_index": 0,
+        "length": 4,
+    }
+
+    See issue #146. Making these changes would eliminate the need for this
+    test.
+    """
+    input_col = col("input")
+    transform = {"type": "substring", "values": values}
+
+    with pytest.raises(ValueError, match="Length of substr transform should be 2"):
+        apply_transform(input_col, transform, is_a)
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_error_when_unrecognized_transform_type(is_a: bool) -> None:
+    column_select = col("test")
+    transform = {"type": "not_supported"}
+    with pytest.raises(ValueError, match="Invalid transform type"):
+        apply_transform(column_select, transform, is_a)
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_mapping(spark: SparkSession, is_a: bool) -> None:
+    transform = {"type": "mapping", "mappings": {"first": "abcd", "second": "efg"}}
+    input_col = col("input")
+    output_col = apply_transform(input_col, transform, is_a)
+
+    df = spark.createDataFrame(
+        [
+            ["first"],
+            ["second"],
+            ["third"],
+            ["secondagain"],
+        ],
+        "input:string",
+    )
+
+    transformed = df.select(output_col.alias("output"))
+    rows = transformed.collect()
+
+    # Note that the mapping must exactly match the value to transform it, so the
+    # value "secondagain" is unchanged.
+    assert rows == [
+        Row(output="abcd"),
+        Row(output="efg"),
+        Row(output="third"),
+        Row(output="secondagain"),
+    ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_apply_transform_mapping_integer_column(
+    spark: SparkSession, is_a: bool
+) -> None:
+    """
+    The mapping transform works over integer columns, and you can cast the output
+    to an integer by passing output_type = "int".
+    """
+    transform = {
+        "type": "mapping",
+        "mappings": {"1": "10", "2": "30", "3": ""},
+        "output_type": "int",
+    }
+    input_col = col("input")
+    output_col = apply_transform(input_col, transform, is_a)
+
+    df = spark.createDataFrame(
+        [
+            [5],
+            [4],
+            [3],
+            [2],
+            [1],
+        ],
+        "input:integer",
+    )
+
+    transformed = df.select(output_col.alias("output"))
+    rows = transformed.collect()
+
+    assert rows == [
+        Row(output=5),
+        Row(output=4),
+        Row(output=None),
+        Row(output=30),
+        Row(output=10),
+    ]
