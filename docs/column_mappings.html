@@ -229,6 +229,46 @@ then remove the <code class="docutils literal notranslate"><span class="pre">or<
 </pre></div>
 </div>
 </section>
+<section id="condense-prefixes">
+<h3>condense_prefixes<a class="headerlink" href="#condense-prefixes" title="Link to this heading">¶</a></h3>
+<p>Used in name cleaning. Removes a trailing space from the given prefixes.</p>
+<p>Maps string → string.</p>
+<p>For example, say that you have some unstandardized data with prefixes recorded
+in different ways, like</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------+
+|      input|
++-----------+
+| O&#39;Driscoll|
+| O Driscoll|
+|  ODriscoll|
+|o&#39; driscoll|
++-----------+
+</pre></div>
+</div>
+<p>You could preprocess this data with a configuration like</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[column_mappings]]</span>
+<span class="n">column_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;input&quot;</span>
+<span class="n">transforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;lowercase_strip&quot;</span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;remove_punctuation&quot;</span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;condense_prefixes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;o&quot;</span><span class="p">]}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Which would give you the output shown in the <code class="docutils literal notranslate"><span class="pre">output</span></code> column below. The intermediate
+stages are shown for clarity, but would not be included in the actual data frame
+in hlink.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------+---------------+------------------+-----------------+---------+
+|      input|lowercase_strip|remove_punctuation|condense_prefixes|   output|
++-----------+---------------+------------------+-----------------+---------+
+| O&#39;Driscoll|     o&#39;driscoll|         odriscoll|        odriscoll|odriscoll|
+| O Driscoll|     o driscoll|        o driscoll|        odriscoll|odriscoll|
+|  ODriscoll|      odriscoll|         odriscoll|        odriscoll|odriscoll|
+|o&#39; driscoll|    o&#39; driscoll|        o driscoll|        odriscoll|odriscoll|
++-----------+---------------+------------------+-----------------+---------+
+</pre></div>
+</div>
+</section>
 <section id="condense-strip-whitespace">
 <h3>condense_strip_whitespace<a class="headerlink" href="#condense-strip-whitespace" title="Link to this heading">¶</a></h3>
 <p>Used in name cleaning. Take white space that may be more than one character or contain
@@ -254,6 +294,17 @@ non-space characters and replace it with a single space.</p>
 <span class="n">alias</span> <span class="o">=</span> <span class="s2">&quot;namefrst_split&quot;</span>
 <span class="n">column_name</span> <span class="o">=</span> <span class="s2">&quot;namefrst_clean&quot;</span>
 <span class="n">transforms</span> <span class="o">=</span> <span class="p">[{</span><span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</section>
+<section id="length">
+<h3>length<a class="headerlink" href="#length" title="Link to this heading">¶</a></h3>
+<p>Compute the length of a string, in characters.</p>
+<p>Maps string → numerical.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[column_mappings]]</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;namefrst_len&quot;</span>
+<span class="n">column_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;namefrst&quot;</span>
+<span class="n">transforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="n">type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;length&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </section>
@@ -292,6 +343,24 @@ column to type integer instead.</p>
 <p><em>Changed in version 4.0.0: The deprecated <code class="docutils literal notranslate"><span class="pre">values</span></code> key is no longer supported.
 Please use the <code class="docutils literal notranslate"><span class="pre">mappings</span></code> key documented above instead.</em></p>
 </section>
+<section id="swap-words">
+<h3>swap_words<a class="headerlink" href="#swap-words" title="Link to this heading">¶</a></h3>
+<p>Replace words in a string with other words. This only replaces full,
+whitespace-separated words. It will not modify words for which a substring of
+the word matches the word to replace.</p>
+<p>Maps string → string.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[column_mappings]]</span>
+<span class="n">column_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;street_unstd&quot;</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;street_swapped&quot;</span>
+<span class="c1"># Replace &quot;bch&quot; with &quot;beach&quot;, &quot;ctr&quot; with &quot;center&quot;, and &quot;rd&quot; with &quot;road&quot;.</span>
+<span class="c1"># Note that this would not modify the input string &quot;boardwalk&quot;, even though it has</span>
+<span class="c1"># the substring &quot;rd&quot; in it.</span>
+<span class="n">transforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;swap_words&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="n">bch</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;beach&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rd</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;road&quot;</span><span class="p">}}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
 <section id="substring">
 <h3>substring<a class="headerlink" href="#substring" title="Link to this heading">¶</a></h3>
 <p>Replace a column with a substring of the data in the column.</p>
@@ -301,6 +370,27 @@ Please use the <code class="docutils literal notranslate"><span class="pre">mapp
 <span class="p">]</span>
 </pre></div>
 </div>
+</section>
+<section id="expand">
+<h3>expand<a class="headerlink" href="#expand" title="Link to this heading">¶</a></h3>
+<p>Expand a column of integers into a column of arrays of integers. This is similar
+to what the matching “explode” step does. If the input value is <code class="docutils literal notranslate"><span class="pre">x</span></code> and the expand
+length is <code class="docutils literal notranslate"><span class="pre">e</span></code>, then the output array contains the integers <code class="docutils literal notranslate"><span class="pre">x-e,...,x,...,x+e</span></code>.</p>
+<p>Maps numerical → array of numerical.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[column_mappings]]</span>
+<span class="n">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;age_expanded&quot;</span>
+<span class="n">column_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;age&quot;</span>
+<span class="c1"># The `value` sets the expand length.</span>
+<span class="n">transforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="n">type</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;expand&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">3</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="cast-as-int">
+<h3>cast_as_int<a class="headerlink" href="#cast-as-int" title="Link to this heading">¶</a></h3>
+<p>Convert the input column to type integer.</p>
+<p>Maps T → numerical.</p>
 </section>
 <section id="divide-by-int">
 <h3>divide_by_int<a class="headerlink" href="#divide-by-int" title="Link to this heading">¶</a></h3>

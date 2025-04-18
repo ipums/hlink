@@ -234,6 +234,53 @@ Maps string → string.
 transforms = [{type = "remove_prefixes", values = ["ah"]}]
 ```
 
+### condense_prefixes
+
+Used in name cleaning. Removes a trailing space from the given prefixes.
+
+Maps string → string.
+
+For example, say that you have some unstandardized data with prefixes recorded
+in different ways, like
+
+```text
++-----------+
+|      input|
++-----------+
+| O'Driscoll|
+| O Driscoll|
+|  ODriscoll|
+|o' driscoll|
++-----------+
+```
+
+You could preprocess this data with a configuration like
+
+```toml
+[[column_mappings]]
+column_name = "input"
+transforms = [
+  {type = "lowercase_strip"},
+  {type = "remove_punctuation"},
+  {type = "condense_prefixes", values = ["o"]}
+]
+```
+
+Which would give you the output shown in the `output` column below. The intermediate
+stages are shown for clarity, but would not be included in the actual data frame
+in hlink.
+
+```text
++-----------+---------------+------------------+-----------------+---------+
+|      input|lowercase_strip|remove_punctuation|condense_prefixes|   output|
++-----------+---------------+------------------+-----------------+---------+
+| O'Driscoll|     o'driscoll|         odriscoll|        odriscoll|odriscoll|
+| O Driscoll|     o driscoll|        o driscoll|        odriscoll|odriscoll|
+|  ODriscoll|      odriscoll|         odriscoll|        odriscoll|odriscoll|
+|o' driscoll|    o' driscoll|        o driscoll|        odriscoll|odriscoll|
++-----------+---------------+------------------+-----------------+---------+
+```
+
 ### condense_strip_whitespace
 
 Used in name cleaning. Take white space that may be more than one character or contain
@@ -266,6 +313,19 @@ Maps string → array of string.
 alias = "namefrst_split"
 column_name = "namefrst_clean"
 transforms = [{type = "split"}]
+```
+
+### length
+
+Compute the length of a string, in characters.
+
+Maps string → numerical.
+
+```toml
+[[column_mappings]]
+alias = "namefrst_len"
+column_name = "namefrst"
+transforms = [{type = "length"}]
 ```
 
 ### array_index
@@ -309,6 +369,26 @@ output_type = "int"
 *Changed in version 4.0.0: The deprecated `values` key is no longer supported.
 Please use the `mappings` key documented above instead.*
 
+### swap_words
+
+Replace words in a string with other words. This only replaces full,
+whitespace-separated words. It will not modify words for which a substring of
+the word matches the word to replace.
+
+Maps string → string.
+
+```toml
+[[column_mappings]]
+column_name = "street_unstd"
+alias = "street_swapped"
+# Replace "bch" with "beach", "ctr" with "center", and "rd" with "road".
+# Note that this would not modify the input string "boardwalk", even though it has
+# the substring "rd" in it.
+transforms = [
+  {type = "swap_words", values = {bch = "beach", ctr = "center", rd = "road"}}
+]
+```
+
 ### substring
 
 Replace a column with a substring of the data in the column.
@@ -320,6 +400,31 @@ transforms = [
     {type = "substring", values = [0, 1]}
 ]
  ```
+
+### expand
+
+Expand a column of integers into a column of arrays of integers. This is similar
+to what the matching "explode" step does. If the input value is `x` and the expand
+length is `e`, then the output array contains the integers `x-e,...,x,...,x+e`.
+
+Maps numerical → array of numerical.
+
+```toml
+[[column_mappings]]
+alias = "age_expanded"
+column_name = "age"
+# The `value` sets the expand length.
+transforms = [
+  {type = "expand", value = 3}
+]
+```
+
+
+### cast_as_int
+
+Convert the input column to type integer.
+
+Maps T → numerical.
 
 ### divide_by_int
 
