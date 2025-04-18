@@ -4,7 +4,7 @@
 #   https://github.com/ipums/hlink
 
 from typing import Any
-from typing_extensions import deprecated
+import warnings
 
 from pyspark.sql.functions import (
     array,
@@ -440,14 +440,6 @@ def generate_transforms(
 
 
 #  These apply to the column mappings in the current config
-@deprecated(
-    """
-    This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform().
-    Please use that function instead.
-
-    [deprecated_in_version=4.2.0]
-    """
-)
 def apply_transform(
     column_select: Column, transform: dict[str, Any], is_a: bool
 ) -> Column:
@@ -464,4 +456,14 @@ def apply_transform(
     transform: the transform to apply
     is_a: whether this is dataset A (True) or B (False)
     """
+    warnings.warn(
+        """
+        This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform().
+        Please use that function instead.
+
+        [deprecated_in_version=4.2.0]
+        """,
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
     return column_mapping_core.apply_transform(column_select, transform, is_a)
