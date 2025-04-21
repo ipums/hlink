@@ -3,6 +3,14 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
+## Not Yet Released
+
+### Added
+
+* Added documentation for the column mapping transforms `condense_prefixes`,
+  `length`, `swap_words`, `expand`, and `cast_as_int`. These transforms have been
+  around for a long time but have been missing documentation until now. [PR #212][pr212]
+
 ## v4.1.0 (2025-04-15)
 
 ### Added
@@ -394,6 +402,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr200]: https://github.com/ipums/hlink/pull/200
 [pr201]: https://github.com/ipums/hlink/pull/201
 [pr202]: https://github.com/ipums/hlink/pull/202
+[pr212]: https://github.com/ipums/hlink/pull/212
 
 [household-matching-docs]: config.html#household-matching
 [household-training-docs]: config.html#household-training-and-model-exploration
