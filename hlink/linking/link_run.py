@@ -53,11 +53,14 @@ class LinkRun:
         config,
         use_preexisting_tables: bool = True,
         print_sql: bool = False,
+        *,
+        custom_column_mapping_transforms=None,
     ):
         self.spark = spark
         self.config = config
         self.use_preexisting_tables = use_preexisting_tables
         self.print_sql = print_sql
+        self.custom_column_mapping_transforms = custom_column_mapping_transforms
 
         self.trained_models = {}
 

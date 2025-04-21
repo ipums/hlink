@@ -6,7 +6,10 @@
 import os
 import pandas as pd
 import pytest
+from pyspark.sql import Row
+from pyspark.sql.functions import reverse
 from pyspark.sql.types import StructType, StructField, LongType
+from hlink.linking.link_run import LinkRun
 from hlink.errors import DataError
 
 
@@ -1882,3 +1885,53 @@ def test_rel_rows_real_data(spark, preprocessing, preprocessing_conf_rel_rows):
         )
         == 7
     )
+
+
+def test_custom_column_mapping_transforms(spark, preprocessing_conf) -> None:
+    preprocessing_conf["column_mappings"] = [
+        {
+            "column_name": "bpl",
+            "alias": "bpl_general",
+            "transforms": [{"type": "divide_by_int", "value": 100}],
+        },
+        {
+            "column_name": "namefrst",
+            "alias": "namefrst_reversed",
+            "transforms": [
+                {"type": "lowercase_strip"},
+                {"type": "reverse_a_custom_test"},
+            ],
+        },
+    ]
+
+    # Reverses strings for dataset A only
+    def transform_reverse_a(input_col, transform, context):
+        if context["dataset"] == "a":
+            return reverse(input_col)
+        else:
+            return input_col
+
+    lr = LinkRun(
+        spark,
+        preprocessing_conf,
+        custom_column_mapping_transforms={"reverse_a_custom_test": transform_reverse_a},
+    )
+
+    lr.preprocessing.run_all_steps()
+
+    prepped_df_a = spark.table("prepped_df_a")
+    prepped_df_b = spark.table("prepped_df_b")
+
+    rows_a = prepped_df_a.select("namefrst_reversed").collect()
+    assert rows_a == [
+        Row(namefrst_reversed="m_nhoj"),
+        Row(namefrst_reversed="iii lle'cram  j"),
+        Row(namefrst_reversed=".rj noj .rm"),
+    ]
+
+    rows_b = prepped_df_b.select("namefrst_reversed").collect()
+    assert rows_b == [
+        Row(namefrst_reversed="john?"),
+        Row(namefrst_reversed=None),
+        Row(namefrst_reversed="je-an or jeanie"),
+    ]
