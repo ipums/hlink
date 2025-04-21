@@ -83,6 +83,7 @@ def select_column_mapping(
     df_selected: DataFrame,
     is_a: bool,
     column_selects: list[str],
+    custom_transforms=None,
 ) -> tuple[DataFrame, list[str]]:
     name = column_mapping["column_name"]
     if "override_column_a" in column_mapping and is_a:
@@ -90,13 +91,17 @@ def select_column_mapping(
         column_select = col(override_name)
         if "override_transforms" in column_mapping:
             for transform in column_mapping["override_transforms"]:
-                column_select = apply_transform(column_select, transform, is_a)
+                column_select = apply_transform(
+                    column_select, transform, is_a, custom_transforms
+                )
     elif "override_column_b" in column_mapping and not is_a:
         override_name = column_mapping["override_column_b"]
         column_select = col(override_name)
         if "override_transforms" in column_mapping:
             for transform in column_mapping["override_transforms"]:
-                column_select = apply_transform(column_select, transform, is_a)
+                column_select = apply_transform(
+                    column_select, transform, is_a, custom_transforms
+                )
     elif "set_value_column_a" in column_mapping and is_a:
         value_to_set = column_mapping["set_value_column_a"]
         column_select = lit(value_to_set)
@@ -106,7 +111,9 @@ def select_column_mapping(
     elif "transforms" in column_mapping:
         column_select = col(name)
         for transform in column_mapping["transforms"]:
-            column_select = apply_transform(column_select, transform, is_a)
+            column_select = apply_transform(
+                column_select, transform, is_a, custom_transforms
+            )
     else:
         column_select = col(name)
 
@@ -135,7 +142,10 @@ def _require_key(transform: dict[str, Any], key: str) -> Any:
 
 #  These apply to the column mappings in the current config
 def apply_transform(
-    column_select: Column, transform: dict[str, Any], is_a: bool
+    column_select: Column,
+    transform: dict[str, Any],
+    is_a: bool,
+    custom_transforms=None,
 ) -> Column:
     """Return a new column that is the result of applying the given transform
     to the given input column (column_select). The is_a parameter controls the
@@ -150,7 +160,7 @@ def apply_transform(
     dataset = "a" if is_a else "b"
     context = {"dataset": dataset}
     transform_type = transform["type"]
-    transforms = {
+    builtin_transforms = {
         "add_to_a": transform_add_to_a,
         "concat_to_a": transform_concat_to_a,
         "concat_to_b": transform_concat_to_b,
@@ -180,7 +190,9 @@ def apply_transform(
         "get_floor": transform_get_floor,
     }
 
-    transform_func = transforms.get(transform_type)
+    custom_transforms = custom_transforms or {}
+    builtin_func = builtin_transforms.get(transform_type)
+    transform_func = custom_transforms.get(transform_type, builtin_func)
 
     if transform_func is None:
         raise ValueError(f"Invalid transform type for {transform}")
