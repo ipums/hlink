@@ -2,6 +2,63 @@
 # For copyright and licensing information, see the NOTICE and LICENSE files
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
+"""
+Column mappings for cleaning and preprocessing input data.
+
+This module provides functions for cleaning and preprocessing columns of Spark
+data frames. It depends on the idea of a "column mapping", which is a
+dictionary which specifies an input column, an optional output column alias,
+and a list of zero or more transforms to apply to the input column.
+
+```python
+# An example column mapping. The "column_name" attribute gives the name of the
+# input column, and "alias" gives the name of the output column. The alias is
+# optional and defaults to the input column name.
+{
+    "column_name": "namefrst",
+    "alias": "namefrst_std",
+    "transforms": [
+        {"type": "lowercase_strip"},
+        {"type": "rationalize_name_words"},
+        {"type": "remove_qmark_hyphen"},
+        {"type": "condense_strip_whitespace"},
+        {"type": "split"},
+        {"type": "array_index", "value": 0},
+    ]
+}
+```
+
+Hlink has many built-in column mapping transforms, computed by the
+`transform_*` functions in this module. Hlink also has support for custom
+column mapping transforms via the `custom_transforms` argument to
+`select_column_mapping`. This argument must be a mapping from strings to
+functions which compute the column mapping transforms. For example, say that
+you wanted to implement a custom column mapping transform named "reverse" which
+reverses a string. The first thing to do is to write a function which computes
+the transform and satisfies the column mapping transform interface.
+
+```python
+from pyspark.sql import Column
+from pyspark.sql.functions import reverse
+
+# input_col is the input Column expression.
+# transform is the column mapping transform dictionary, like
+#   {"type": "reverse"}. This lets the transform accept arbitrary arguments from
+#   the configuration as needed.
+# context is a dictionary with additional context which may be helpful for some
+#   transforms. In particular, it always contains at least the key "dataset",
+#   which indicates whether the current dataset is dataset "a" or "b".
+def transform_reverse(input_col: Column, transform: dict[str, Any], context: dict[str, Any]) -> Column:
+    return reverse(input_col)
+```
+
+Then, when you call `select_column_mapping`, you can pass
+`custom_transforms={"reverse": transform_reverse}`, and hlink will
+automatically use your custom transform when appropriate. Note that custom
+transforms which have the same name as a built-in transform override the
+built-in transform.
+"""
+
 from typing import Any
 
 from pyspark.sql import Column, DataFrame
