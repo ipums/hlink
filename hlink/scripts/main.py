@@ -172,10 +172,12 @@ def _get_spark(run_name: str, args: argparse.Namespace) -> SparkSession:
 
 
 def _read_history_file(history_file):
-    if not os.path.exists(history_file):
-        with open(history_file, "a"):
-            os.utime(history_file, (1330712280, 1330712292))
-    readline.read_history_file(history_file)
+    try:
+        readline.read_history_file(history_file)
+    except FileNotFoundError:
+        # There's no history file, which is fine. Hlink will create a new one
+        # when it shuts down.
+        pass
 
 
 def _cli_loop(spark, args, run_conf, run_name):
