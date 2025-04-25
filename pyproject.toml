@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=71.0", "setuptools-scm"]
+requires = ["setuptools>=77.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,13 +8,13 @@ version = "4.1.0"
 description = "Fast supervised pyspark record linkage software"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE.txt" }
+license = "MPL-2.0-no-copyleft-exception"
+license-files = ["LICENSE.txt"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
 ]
 dependencies = [
     "colorama>=0.4.6",
