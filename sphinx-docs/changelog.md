@@ -11,6 +11,23 @@ Hlink adheres to semantic versioning as much as possible.
   `length`, `swap_words`, `expand`, and `cast_as_int`. These transforms have been
   around for a long time but have been missing documentation until now. [PR #212][pr212]
 
+* Added support for custom column mapping transforms. You can now pass a
+  dictionary of custom transforms to the `LinkRun` constructor, and hlink will
+  automatically invoke them when the configuration calls for them. Please see
+  the `hlink.linking.core.column_mapping` module for more information. [PR #213][pr213]
+
+* Added individual functions which compute the built-in column mapping
+  transforms to `hlink.linking.core.column_mapping`. These are automatically
+  invoked by `select_column_mapping` when the configuration calls for them.
+  [PR #207][pr207]
+
+### Deprecated
+
+* The `hlink.linking.core.transforms.apply_transform` function, which applies
+  column mapping transforms, is now deprecated. Please use
+  `hlink.linking.core.column_mapping.apply_transform` instead.
+  `column_mapping.apply_transform` supports the same interface. [PR #207][pr207]
+
 ## v4.1.0 (2025-04-15)
 
 ### Added
@@ -402,7 +419,9 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr200]: https://github.com/ipums/hlink/pull/200
 [pr201]: https://github.com/ipums/hlink/pull/201
 [pr202]: https://github.com/ipums/hlink/pull/202
+[pr207]: https://github.com/ipums/hlink/pull/207
 [pr212]: https://github.com/ipums/hlink/pull/212
+[pr213]: https://github.com/ipums/hlink/pull/213
 
 [household-matching-docs]: config.html#household-matching
 [household-training-docs]: config.html#household-training-and-model-exploration

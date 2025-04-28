@@ -53,11 +53,24 @@ class LinkRun:
         config,
         use_preexisting_tables: bool = True,
         print_sql: bool = False,
+        *,
+        custom_column_mapping_transforms=None,
     ):
+        """
+        Create a new link run.
+
+        You may define your own column mapping transforms by passing a mapping
+        to the `custom_column_mapping_transforms` argument. The keys of the
+        mapping are the transform types, and the values are the transform
+        functions. See the hlink.linking.core.column_mapping module for details
+        on writing these transform functions. That module also contains a large
+        number of built-in column mapping transforms which may be helpful.
+        """
         self.spark = spark
         self.config = config
         self.use_preexisting_tables = use_preexisting_tables
         self.print_sql = print_sql
+        self.custom_column_mapping_transforms = custom_column_mapping_transforms
 
         self.trained_models = {}
 

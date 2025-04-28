@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, Row
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, lit, reverse
 import pytest
 import pandas as pd
 
@@ -308,6 +308,72 @@ def test_select_column_mapping_error_missing_column_name(spark):
     df = spark.createDataFrame(TEST_DF_1)
     with pytest.raises(KeyError):
         select_column_mapping({}, df, is_a=False, column_selects=[])
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_select_column_mapping_custom_transform(spark, is_a) -> None:
+    df = spark.createDataFrame(TEST_DF_1)
+
+    def transform_reverse(input_col, transform, context):
+        return reverse(input_col)
+
+    column_mapping = {
+        "column_name": "occupation",
+        "alias": "occupation_reversed",
+        "transforms": [
+            {"type": "reverse"},
+        ],
+    }
+
+    df_selected, _ = select_column_mapping(
+        column_mapping, df, is_a, [], custom_transforms={"reverse": transform_reverse}
+    )
+
+    rows = df_selected.sort("id").select("occupation_reversed").collect()
+    assert rows == [
+        Row(occupation_reversed="REMRAF"),
+        Row(occupation_reversed="TSITNEICS RETUPMOC"),
+        Row(occupation_reversed="SSERTIAW"),
+        Row(occupation_reversed="DERITER"),
+        Row(occupation_reversed="REYWAL"),
+        Row(occupation_reversed="ROTCOD"),
+    ]
+
+
+@pytest.mark.parametrize("is_a", [True, False])
+def test_select_column_mapping_custom_transform_override(spark, is_a) -> None:
+    """
+    Custom column mapping transforms override the built-in transforms. This
+    means that adding more built-in transforms does not break user code that
+    already has custom transforms with the same name.
+    """
+    column_mapping = {
+        "column_name": "occupation",
+        "alias": "overriden",
+        "transforms": [{"type": "lowercase_strip"}],
+    }
+
+    def transform_lowercase_strip(input_col, transform, context):
+        return lit("***")
+
+    df = spark.createDataFrame(TEST_DF_1)
+    df_selected, _ = select_column_mapping(
+        column_mapping,
+        df,
+        is_a,
+        [],
+        custom_transforms={"lowercase_strip": transform_lowercase_strip},
+    )
+
+    rows = df_selected.sort("id").select("overriden").collect()
+    assert rows == [
+        Row(overriden="***"),
+        Row(overriden="***"),
+        Row(overriden="***"),
+        Row(overriden="***"),
+        Row(overriden="***"),
+        Row(overriden="***"),
+    ]
 
 
 @pytest.mark.parametrize("is_a", [True, False])

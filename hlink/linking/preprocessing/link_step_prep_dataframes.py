@@ -95,10 +95,15 @@ class LinkStepPrepDataframes(LinkStep):
         df_selected = df
         spark = self.task.spark
         column_selects = [col(id_column)]
+        custom_transforms = self.task.link_run.custom_column_mapping_transforms
 
         for column_mapping in column_definitions:
             df_selected, column_selects = column_mapping_core.select_column_mapping(
-                column_mapping, df_selected, is_a, column_selects
+                column_mapping,
+                df_selected,
+                is_a,
+                column_selects,
+                custom_transforms=custom_transforms,
             )
 
         df_selected = df_selected.select(column_selects)
