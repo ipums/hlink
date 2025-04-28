@@ -40,19 +40,21 @@ Then move the built Scala jar over to the hlink directory with `mv target/scala-
 ## Working with the Sphinx Docs
 
 We use Sphinx to generate the hlink documentation at [hlink.docs.ipums.org](hlink.docs.ipums.org).
-These docs live in the `sphinx-docs` directory as Markdown files, and Sphinx converts them to html
-files that live in the `docs` directory. To write out the Sphinx docs to the `docs` folder, run
+These docs live in the `sphinx-docs` directory as Markdown files, and a GitHub Actions
+workflow automatically builds them with Sphinx on pushes to main. To manually generate
+a local copy of the HTML documentation, run
 
 ```
 cd sphinx-docs
-make
+make html
 ```
 
-To test out your changes without having to push to the official site, Python's `http.server` module
-works nicely.
+This will output the documentation to the \_build/html/ subdirectory of
+sphinx-docs/ by default. To test out your changes without having to push to the
+official site, Python's `http.server` module works nicely.
 
 ```
-python -m http.server -d docs <port>
+python -m http.server -d _build/html <port>
 ```
 
 starts up an HTTP server running on port `<port>` on the local machine.
