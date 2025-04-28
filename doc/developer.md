@@ -80,7 +80,7 @@ Here are the steps to follow when creating the new version.
 - Decide on the new version number A.B.C, following the scheme above.
 - Set the new version number in `pyproject.toml`.
 - Reinstall hlink with `pip install -e .[dev]` to update the version. Confirm that this worked by running `hlink --version`.
-- Update sphinx-docs/changelog.md with the new version number, then regenerate the Sphinx docs so that they show the correct hlink version number.
+- Update sphinx-docs/changelog.md with the new version number and make sure that it is up to date.
 - After committing your changes, create a git tag `vA.B.C` and push it to GitHub.
 - Finally, create a GitHub release for the tag. This is intended for record-keeping
 for developers, so it's fine to automatically generate the release notes. The user-
