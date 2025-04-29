@@ -21,6 +21,11 @@ Hlink adheres to semantic versioning as much as possible.
   invoked by `select_column_mapping` when the configuration calls for them.
   [PR #207][pr207]
 
+### Changed
+
+* Stabilized the XGBoost feature, since the integration provided by the xgboost
+  Python package is no longer unstable. [PR #219][pr219]
+
 ### Deprecated
 
 * The `hlink.linking.core.transforms.apply_transform` function, which applies
@@ -422,6 +427,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr207]: https://github.com/ipums/hlink/pull/207
 [pr212]: https://github.com/ipums/hlink/pull/212
 [pr213]: https://github.com/ipums/hlink/pull/213
+[pr219]: https://github.com/ipums/hlink/pull/219
 
 [household-matching-docs]: config.html#household-matching
 [household-training-docs]: config.html#household-training-and-model-exploration

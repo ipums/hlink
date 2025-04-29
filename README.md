@@ -72,10 +72,6 @@ After installing the dependencies for one or both of these algorithms, you can
 use them as model types in training and model exploration. You can read more
 about these models in the hlink documentation [here](https://hlink.docs.ipums.org/models.html).
 
-*Note: The XGBoost-PySpark integration provided by the xgboost Python package is
-currently unstable. So the hlink xgboost support is experimental and may change
-in the future.*
-
 ## Docs
 
 The documentation site can be found at [hlink.docs.ipums.org](https://hlink.docs.ipums.org).

@@ -121,8 +121,8 @@ maxBins = 6
 
 XGBoost is an alternate, high-performance implementation of gradient boosting.
 It uses [xgboost.spark.SparkXGBClassifier](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.spark.SparkXGBClassifier).
-Since the XGBoost-PySpark integration which the xgboost Python package provides
-is currently unstable, support for the xgboost model type is disabled in hlink
+Since the XGBoost-PySpark integration requires some additional Python packages,
+support for the xgboost model type is disabled in hlink
 by default. hlink will stop with an error if you try to use this model type
 without enabling support for it. To enable support for xgboost, install hlink
 with the `xgboost` extra.

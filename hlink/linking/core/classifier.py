@@ -134,7 +134,7 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
     elif model_type == "xgboost":
         if not _xgboost_available:
             raise ModuleNotFoundError(
-                "To use the experimental 'xgboost' model type, you need to install "
+                "To use the 'xgboost' model type, you need to install "
                 "the xgboost library and its dependencies. Try installing hlink with "
                 "the xgboost extra:\n\n    pip install hlink[xgboost]"
             )
