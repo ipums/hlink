@@ -3,7 +3,7 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
-## Not Yet Released
+## v4.2.0 (2025-04-29)
 
 ### Added
 
@@ -26,12 +26,20 @@ Hlink adheres to semantic versioning as much as possible.
 * Stabilized the XGBoost feature, since the integration provided by the xgboost
   Python package is no longer unstable. [PR #219][pr219]
 
+* Improved the error messages generated when a column mapping transform is
+  missing a required key. [PR #207][pr207]
+
 ### Deprecated
 
 * The `hlink.linking.core.transforms.apply_transform` function, which applies
   column mapping transforms, is now deprecated. Please use
   `hlink.linking.core.column_mapping.apply_transform` instead.
   `column_mapping.apply_transform` supports the same interface. [PR #207][pr207]
+
+### Fixed
+
+* Fixed a bug where command-line hlink would sometimes crash if the command
+  history file was missing. [PR #215][pr215]
 
 ## v4.1.0 (2025-04-15)
 
@@ -427,6 +435,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr207]: https://github.com/ipums/hlink/pull/207
 [pr212]: https://github.com/ipums/hlink/pull/212
 [pr213]: https://github.com/ipums/hlink/pull/213
+[pr215]: https://github.com/ipums/hlink/pull/215
 [pr219]: https://github.com/ipums/hlink/pull/219
 
 [household-matching-docs]: config.html#household-matching
