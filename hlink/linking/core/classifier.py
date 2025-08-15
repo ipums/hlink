@@ -133,6 +133,8 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
                 "its dependencies. Try installing hlink with the lightgbm extra: "
                 "\n\n    pip install hlink[lightgbm]"
             )
+
+        params = _ensure_seeded(params)
         classifier = synapse.ml.lightgbm.LightGBMClassifier(
             **params,
             featuresCol=features_vector,
@@ -149,6 +151,8 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
                 "the xgboost library and its dependencies. Try installing hlink with "
                 "the xgboost extra:\n\n    pip install hlink[xgboost]"
             )
+
+        params = _ensure_seeded(params)
         classifier = xgboost.spark.SparkXGBClassifier(
             **params,
             features_col=features_vector,
