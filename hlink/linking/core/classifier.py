@@ -30,6 +30,17 @@ else:
     _xgboost_available = True
 
 
+def _ensure_seeded(params: dict[str, Any]) -> dict[str, Any]:
+    """
+    Ensure that the given dictionary of parameters has a "seed" parameter.
+
+    This is useful for making results reproducible across different linking
+    runs. If the user doesn't set the "seed" parameter, then this function sets
+    it to 2133 (which is just as good as any other number, I suppose).
+    """
+    return {"seed": 2133, **params}
+
+
 def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
     """Given a model type and hyper-parameters for the model, return a
     classifier of that type with those hyper-parameters, along with a
@@ -60,11 +71,11 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
     post_transformer = SQLTransformer(statement="SELECT * FROM __THIS__")
     features_vector = "features_vector"
     if model_type == "random_forest":
+        params = _ensure_seeded(params)
         classifier = RandomForestClassifier(
             **params,
             labelCol=dep_var,
             featuresCol=features_vector,
-            seed=2133,
             probabilityCol="probability_array",
         )
         post_transformer = SQLTransformer(
@@ -93,23 +104,23 @@ def choose_classifier(model_type: str, params: dict[str, Any], dep_var: str):
         )
 
     elif model_type == "decision_tree":
+        params = _ensure_seeded(params)
         classifier = DecisionTreeClassifier(
             **params,
             featuresCol=features_vector,
             labelCol=dep_var,
             probabilityCol="probability_array",
-            seed=2133,
         )
         post_transformer = SQLTransformer(
             statement="SELECT *, parseProbVector(probability_array, 1) as probability FROM __THIS__"
         )
 
     elif model_type == "gradient_boosted_trees":
+        params = _ensure_seeded(params)
         classifier = GBTClassifier(
             **params,
             featuresCol=features_vector,
             labelCol=dep_var,
-            seed=2133,
         )
         post_transformer = (
             hlink.linking.transformers.rename_prob_column.RenameProbColumn()

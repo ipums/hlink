@@ -3,6 +3,8 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import pytest
+
 from hlink.linking.core.classifier import choose_classifier
 from hlink.tests.markers import requires_lightgbm, requires_xgboost
 
@@ -30,3 +32,17 @@ def test_choose_classifier_supports_xgboost():
     }
     classifier, _post_transformer = choose_classifier("xgboost", params, "match")
     assert classifier.getLabelCol() == "match"
+
+
+@pytest.mark.parametrize(
+    "classifier", ["random_forest", "decision_tree", "gradient_boosted_trees"]
+)
+def test_choose_classifier_can_set_seed_in_params(spark, classifier) -> None:
+    """
+    Ensure that you can pass a "seed" parameter to the classifier. This used to
+    cause an error because of manual handling of the seed parameter. See GitHub
+    Issue #221.
+    """
+    params = {"seed": 151015}
+    classifier, _post_transformer = choose_classifier(classifier, params, "match")
+    assert classifier.getSeed() == 151015
