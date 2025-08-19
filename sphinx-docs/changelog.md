@@ -3,6 +3,21 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
+## v4.2.1 (2025-08-18)
+
+### Fixed
+
+* Fixed a bug where hlink would throw an error if you tried to manually provide
+  a seed to the `random_forest`, `decision_tree`, or `gradient_boosted_trees`
+  machine learning model. Now hlink accepts the `seed` parameter and passes it
+  along to the model. If you do not pass a `seed` parameter, hlink behaves in the
+  same way as before and automatically sets a default seed for you. [PR #222][pr222]
+
+* Fixed a bug where hlink did not automatically set the seed for the XGBoost and
+  LightGBM machine learning models. The new behavior is to accept the `seed` parameter
+  if it is passed by the user, or set a default seed if it is not passed. This matches
+  the new behavior for the other models. [PR #222][pr222]
+
 ## v4.2.0 (2025-04-29)
 
 ### Added
@@ -437,6 +452,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr213]: https://github.com/ipums/hlink/pull/213
 [pr215]: https://github.com/ipums/hlink/pull/215
 [pr219]: https://github.com/ipums/hlink/pull/219
+[pr222]: https://github.com/ipums/hlink/pull/222
 
 [household-matching-docs]: config.html#household-matching
 [household-training-docs]: config.html#household-training-and-model-exploration
