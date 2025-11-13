@@ -1,0 +1,10 @@
+Apache Spark is a unified analytics engine for large-scale data processing.
+Spark provides high-level APIs in Java, Scala, Python and R.
+Spark supports SQL queries, streaming data, machine learning and graph processing.
+Apache Spark runs much faster than traditional MapReduce by using in-memory computing.
+Spark can run on Hadoop, Apache Mesos, Kubernetes, standalone, or in the cloud.
+Spark is designed to be fast and general purpose for big data processing.
+The Spark framework includes Spark SQL, Spark Streaming, MLlib and GraphX.
+Spark SQL allows querying structured data inside Spark programs.
+Spark Streaming enables processing of live data streams.
+Machine learning in Spark is powered by the MLlib library.
