@@ -19,6 +19,7 @@ import uuid
 
 from pyspark.sql import SparkSession
 
+from hlink.spark.factory import SparkFactory
 from hlink.spark.session import SparkConnection
 from hlink.configs.load_config import load_conf_file
 from hlink.errors import SparkError, UsageError
@@ -146,6 +147,10 @@ def _parse_args():
         help="Drop any preexisting Spark tables when hlink starts up.",
         action="store_true",
     )
+    parser.add_argument(
+        "--profiling",
+        help="Set profiler options for the spark job.",
+    )
 
     return parser.parse_args()
 
@@ -157,17 +162,20 @@ def _get_spark(run_name: str, args: argparse.Namespace) -> SparkSession:
     tmp_dir = HLINK_DIR / "tmp" / run_name
     python = sys.executable
 
-    spark_connection = SparkConnection(
-        derby_dir=derby_dir,
-        warehouse_dir=warehouse_dir,
-        checkpoint_dir=checkpoint_dir,
-        tmp_dir=tmp_dir,
-        python=python,
-        db_name="linking",
-    )
-    spark = spark_connection.local(
-        cores=args.cores, executor_memory=args.executor_memory
-    )
+    factory = SparkFactory()
+    factory.set_derby_dir(derby_dir)
+    factory.set_warehouse_dir(warehouse_dir)
+    factory.set_checkpoint_dir(checkpoint_dir)
+    factory.set_tmp_dir(tmp_dir)
+    factory.set_python(python)
+    factory.set_db_name("linking")
+    factory.set_num_cores(args.cores)
+    factory.set_executor_memory(args.executor_memory)
+
+    if args.profiling:
+        factory.set_profiler_options(args.profiling)
+
+    spark = factory.create()
     return spark
 
 

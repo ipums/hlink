@@ -32,6 +32,7 @@ class SparkFactory:
         self.num_cores = 4
         self.executor_memory = "10G"
         self.executor_cores = 16
+        self.profiler_options = None
 
     def set_derby_dir(self, derby_dir):
         self.derby_dir = derby_dir
@@ -79,6 +80,10 @@ class SparkFactory:
         self.executor_cores = executor_cores
         return self
 
+    def set_profiler_options(self, options):
+        self.profiler_options = options
+        return self
+
     def create(self):
         spark_conn = SparkConnection(
             str(self.derby_dir),
@@ -87,5 +92,6 @@ class SparkFactory:
             str(self.tmp_dir),
             self.python,
             self.db_name,
+            profiler_options=self.profiler_options,
         )
         return spark_conn.local(self.num_cores, self.executor_memory)

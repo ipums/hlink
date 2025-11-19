@@ -41,6 +41,7 @@ class SparkConnection:
         python,
         db_name,
         app_name="linking",
+        profiler_options=None,
     ):
         self.derby_dir = derby_dir
         self.warehouse_dir = warehouse_dir
@@ -49,6 +50,7 @@ class SparkConnection:
         self.tmp_dir = tmp_dir
         self.python = python
         self.app_name = app_name
+        self.profiler_options = profiler_options
 
     def spark_conf(self, executor_cores, executor_memory, driver_memory, cores):
         spark_package_path = os.path.dirname(hlink.spark.__file__)
@@ -56,19 +58,22 @@ class SparkConnection:
             spark_package_path, "jars", "hlink_lib-assembly-1.0.jar"
         )
         os.environ["PYSPARK_PYTHON"] = self.python
+        driver_options = f"-Dderby.system.home={self.derby_dir}"
+        if self.profiler_options:
+            driver_options += f" {self.profiler_options}"
         conf = (
             SparkConf()
             .set("spark.pyspark.python", self.python)
             .set("spark.local.dir", self.tmp_dir)
             .set("spark.sql.warehouse.dir", self.warehouse_dir)
-            .set(
-                "spark.driver.extraJavaOptions", f"-Dderby.system.home={self.derby_dir}"
-            )
+            .set("spark.driver.extraJavaOptions", driver_options)
             .set("spark.executorEnv.SPARK_LOCAL_DIRS", self.tmp_dir)
             .set("spark.sql.legacy.allowUntypedScalaUDF", True)
             .setAppName(self.app_name)
             # .set("spark.executor.cores", executor_cores) \
         )
+        if self.profiler_options:
+            conf.set("spark.executor.extraJavaOptions", self.profiler_options)
         if executor_memory:
             conf.set("spark.executor.memory", executor_memory)
         if driver_memory:
