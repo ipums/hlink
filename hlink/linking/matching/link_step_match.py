@@ -150,6 +150,7 @@ class LinkStepMatch(LinkStep):
         if config.get("streamline_potential_match_generation", False):
             t_ctx["dataset_columns"] = [config["id_column"]]
         try:
+            logger.debug("Creating table potential_matches via potential_matches.sql")
             self.task.run_register_sql("potential_matches", t_ctx=t_ctx, persist=True)
         finally:
             self.task.spark.sql("set spark.sql.shuffle.partitions=200")

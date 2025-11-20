@@ -223,6 +223,7 @@ def _setup_logging(conf_path, run_name):
     print(f"*** Hlink log: {log_file.absolute()}")
 
     logging.basicConfig(filename=log_file, level=logging.INFO, format=format_string)
+    logging.getLogger("hlink").setLevel(logging.DEBUG)
 
     logger.info(f"New session {session_id} by user {user}")
     logger.info(f"Configured with {conf_path}")

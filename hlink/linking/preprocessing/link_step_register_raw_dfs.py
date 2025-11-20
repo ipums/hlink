@@ -73,11 +73,14 @@ class LinkStepRegisterRawDfs(LinkStep):
         else:
             df_b = df_b_filtered
 
+        logger.debug("Creating table raw_df_a")
         self.task.run_register_python(
             name="raw_df_a",
             func=lambda: df_a,
             persist=True,
         )
+
+        logger.debug("Creating table raw_df_b")
         self.task.run_register_python(
             name="raw_df_b",
             func=lambda: df_b,

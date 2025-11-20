@@ -40,6 +40,7 @@ class LinkStepPrepDataframes(LinkStep):
         substitution_columns = config.get("substitution_columns", [])
         feature_selections = config.get("feature_selections", [])
 
+        logger.debug("Creating table prepped_df_a")
         self.task.run_register_python(
             name="prepped_df_a",
             func=lambda: self._prep_dataframe(
@@ -52,6 +53,8 @@ class LinkStepPrepDataframes(LinkStep):
             ),
             persist=True,
         )
+
+        logger.debug("Creating table prepped_df_b")
         self.task.run_register_python(
             name="prepped_df_b",
             func=lambda: self._prep_dataframe(
@@ -97,6 +100,7 @@ class LinkStepPrepDataframes(LinkStep):
         column_selects = [col(id_column)]
         custom_transforms = self.task.link_run.custom_column_mapping_transforms
 
+        logger.debug("Selecting column mappings")
         for column_mapping in column_definitions:
             df_selected, column_selects = column_mapping_core.select_column_mapping(
                 column_mapping,
@@ -108,10 +112,12 @@ class LinkStepPrepDataframes(LinkStep):
 
         df_selected = df_selected.select(column_selects)
 
+        logger.debug("Generating substitutions")
         df_selected = substitutions_core.generate_substitutions(
             spark, df_selected, substitution_columns
         )
 
+        logger.debug("Generating transforms")
         df_selected = transforms_core.generate_transforms(
             spark, df_selected, feature_selections, self.task, is_a, id_column
         )

@@ -3,6 +3,7 @@
 # in this project's top-level directory, and also on-line at:
 #   https://github.com/ipums/hlink
 
+import logging
 from typing import Any
 
 from pyspark.sql import Column, DataFrame
@@ -10,6 +11,8 @@ from pyspark.sql.functions import array, explode, col
 
 import hlink.linking.core.comparison as comparison_core
 from hlink.linking.link_step import LinkStep
+
+logger = logging.getLogger(__name__)
 
 
 class LinkStepExplode(LinkStep):
@@ -42,6 +45,7 @@ class LinkStepExplode(LinkStep):
         # self.spark.sql("set spark.sql.shuffle.partitions=4000")
         blocking = config["blocking"]
 
+        logger.debug("Creating table exploded_df_a")
         self.task.run_register_python(
             name="exploded_df_a",
             func=lambda: self._explode(
@@ -53,6 +57,8 @@ class LinkStepExplode(LinkStep):
                 is_a=True,
             ),
         )
+
+        logger.debug("Creating table exploded_df_b")
         self.task.run_register_python(
             name="exploded_df_b",
             func=lambda: self._explode(
@@ -118,6 +124,7 @@ class LinkStepExplode(LinkStep):
 
         all_exploding_columns = [bc for bc in blocking if bc.get("explode", False)]
 
+        logger.debug(f"Exploding {len(all_exploding_columns)} column(s)")
         for exploding_column in all_exploding_columns:
             exploding_column_name = exploding_column["column_name"]
             if exploding_column.get("expand_length", False):

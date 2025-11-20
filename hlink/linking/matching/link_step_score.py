@@ -80,6 +80,7 @@ class LinkStepScore(LinkStep):
                 "Missing a temporary table from the training task. This table will not be persisted between sessions of hlink for technical reasons. Please run training before running this step."
             )
 
+        logger.debug(f"Creating table {table_prefix}potential_matches_pipeline")
         self.task.run_register_python(
             f"{table_prefix}potential_matches_pipeline",
             lambda: pre_pipeline.transform(pm.select(*required_columns)),
@@ -97,6 +98,7 @@ class LinkStepScore(LinkStep):
             config[training_conf], chosen_model_params, default=1.3
         )
         decision = config[training_conf].get("decision")
+        logger.debug("Predicting with thresholds")
         predictions = threshold_core.predict_using_thresholds(
             score_tmp,
             alpha_threshold,
@@ -106,7 +108,11 @@ class LinkStepScore(LinkStep):
         )
         predictions.write.mode("overwrite").saveAsTable(f"{table_prefix}predictions")
         pmp = self.task.spark.table(f"{table_prefix}potential_matches_pipeline")
+        logger.debug(f"Creating table {table_prefix}scored_potential_matches")
         self._save_table_with_requested_columns(pm, pmp, predictions, id_a, id_b)
+        logger.debug(
+            f"Creating table {table_prefix}predicted_matches and removing records with duplicated id_b"
+        )
         self._save_predicted_matches(config, id_a, id_b)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
@@ -174,6 +180,7 @@ class LinkStepScore(LinkStep):
         potential_matches = f"{table_prefix}potential_matches"
         table_name = f"{table_prefix}potential_matches_prepped"
         pm_columns = self.task.spark.table(potential_matches).columns
+        logger.debug("Getting comparison features")
         (
             comp_features,
             advanced_comp_features,
@@ -200,6 +207,7 @@ class LinkStepScore(LinkStep):
                 dist_tables
             )
 
+        logger.debug("Creating all of the comparison features")
         comparison_feature_core.create_feature_tables(
             self.task,
             t_ctx_def,
