@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from math import ceil
 
 
@@ -16,3 +17,13 @@ def spark_shuffle_partitions_heuristic(dataset_size: int) -> int:
     clamped_below = max(MIN_PARTITIONS, partitions_approx)
     clamped = min(MAX_PARTITIONS, clamped_below)
     return clamped
+
+
+@contextmanager
+def set_job_description(desc: str | None, spark_context):
+    previous_desc = spark_context.getLocalProperty("spark.job.description")
+    spark_context.setJobDescription(desc)
+    try:
+        yield
+    finally:
+        spark_context.setJobDescription(previous_desc)
