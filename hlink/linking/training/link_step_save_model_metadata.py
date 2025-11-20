@@ -107,7 +107,6 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         model_type = config[training_conf]["chosen_model"]["type"]
 
-        logger.debug(f"Expanded features with categories are {expanded_features}")
         logger.debug(f"The model type is '{model_type}'")
 
         print("Retrieving model feature importances or coefficients...")
@@ -169,7 +168,6 @@ class LinkStepSaveModelMetadata(LinkStep):
                 ),
             ]
 
-        logger.debug("Creating the DataFrame and saving it as a table")
         feature_names, categories = zip(*expanded_features)
         importance_schema, importance_data = zip(*importance_columns)
         features_df = self.task.spark.createDataFrame(
