@@ -7,6 +7,7 @@ import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.comparison as comparison_core
 
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 
 class LinkStepFilter(LinkStep):
@@ -21,6 +22,7 @@ class LinkStepFilter(LinkStep):
     def _run(self):
         # self.task.spark.sql("set spark.sql.shuffle.partitions=4000")
         config = self.task.link_run.config
+        spark_context = self.task.spark.sparkContext
 
         # establish empty table context dict to pass to SQL template
         t_ctx = {}
@@ -44,19 +46,25 @@ class LinkStepFilter(LinkStep):
                 if f["alias"] in comp_feature_names
             ]
 
-            self.task.run_register_sql(
-                "hh_potential_matches", t_ctx=t_ctx, persist=True
-            )
+            with set_job_description(
+                "create table hh_potential_matches", spark_context
+            ):
+                self.task.run_register_sql(
+                    "hh_potential_matches", t_ctx=t_ctx, persist=True
+                )
 
         else:
-            self.task.run_register_python(
-                "hh_potential_matches",
-                lambda: self.task.spark.table("hh_blocked_matches"),
-                persist=True,
-            )
+            with set_job_description(
+                "create table hh_potential_matches", spark_context
+            ):
+                self.task.run_register_python(
+                    "hh_potential_matches",
+                    lambda: self.task.spark.table("hh_blocked_matches"),
+                    persist=True,
+                )
 
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
         print(
-            "Potential matches from households which meet hh_comparsions thresholds have been saved to table 'hh_potential_matches'."
+            "Potential matches from households which meet hh_comparisons thresholds have been saved to table 'hh_potential_matches'."
         )

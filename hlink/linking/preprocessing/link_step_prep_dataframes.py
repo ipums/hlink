@@ -9,7 +9,7 @@ from pyspark.sql.functions import col
 import hlink.linking.core.column_mapping as column_mapping_core
 import hlink.linking.core.substitutions as substitutions_core
 import hlink.linking.core.transforms as transforms_core
-from hlink.linking.util import spark_shuffle_partitions_heuristic
+from hlink.linking.util import set_job_description, spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
@@ -27,6 +27,7 @@ class LinkStepPrepDataframes(LinkStep):
 
     def _run(self):
         config = self.task.link_run.config
+        spark_context = self.task.spark.sparkContext
 
         dataset_size_a = self.task.spark.table("raw_df_a").count()
         dataset_size_b = self.task.spark.table("raw_df_b").count()
@@ -41,32 +42,34 @@ class LinkStepPrepDataframes(LinkStep):
         feature_selections = config.get("feature_selections", [])
 
         logger.debug("Creating table prepped_df_a")
-        self.task.run_register_python(
-            name="prepped_df_a",
-            func=lambda: self._prep_dataframe(
-                self.task.spark.table("raw_df_a"),
-                config["column_mappings"],
-                substitution_columns,
-                feature_selections,
-                True,
-                config["id_column"],
-            ),
-            persist=True,
-        )
+        with set_job_description("create table prepped_df_a", spark_context):
+            self.task.run_register_python(
+                name="prepped_df_a",
+                func=lambda: self._prep_dataframe(
+                    self.task.spark.table("raw_df_a"),
+                    config["column_mappings"],
+                    substitution_columns,
+                    feature_selections,
+                    True,
+                    config["id_column"],
+                ),
+                persist=True,
+            )
 
         logger.debug("Creating table prepped_df_b")
-        self.task.run_register_python(
-            name="prepped_df_b",
-            func=lambda: self._prep_dataframe(
-                self.task.spark.table("raw_df_b"),
-                config["column_mappings"],
-                substitution_columns,
-                feature_selections,
-                False,
-                config["id_column"],
-            ),
-            persist=True,
-        )
+        with set_job_description("create table prepped_df_b", spark_context):
+            self.task.run_register_python(
+                name="prepped_df_b",
+                func=lambda: self._prep_dataframe(
+                    self.task.spark.table("raw_df_b"),
+                    config["column_mappings"],
+                    substitution_columns,
+                    feature_selections,
+                    False,
+                    config["id_column"],
+                ),
+                persist=True,
+            )
 
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 

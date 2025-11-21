@@ -8,6 +8,7 @@ import logging
 from pyspark.sql.functions import col
 
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 
 logger = logging.getLogger(__name__)
@@ -112,11 +113,13 @@ class LinkStepBlockOnHouseholds(LinkStep):
 
         logger.debug("Blocking on household serial ID and generating potential matches")
         # Generate potential matches with those unmatched people who were in a household with a match, blocking only on household id
-        self.task.run_register_python(
-            "hh_blocked_matches",
-            lambda: stm.join(uma, hhid_a).join(umb, hhid_b).distinct(),
-            persist=True,
-        )
+        spark_context = self.task.spark.sparkContext
+        with set_job_description("create table hh_blocked_matches", spark_context):
+            self.task.run_register_python(
+                "hh_blocked_matches",
+                lambda: stm.join(uma, hhid_a).join(umb, hhid_b).distinct(),
+                persist=True,
+            )
 
         hh_blocked_matches = self.task.spark.table("hh_blocked_matches")
         logger.debug(f"hh_blocked_matches has {hh_blocked_matches.count()} records")

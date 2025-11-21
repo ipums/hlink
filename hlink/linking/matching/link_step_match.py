@@ -10,7 +10,7 @@ from typing import Any
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.dist_table as dist_table_core
 import hlink.linking.core.comparison as comparison_core
-from hlink.linking.util import spark_shuffle_partitions_heuristic
+from hlink.linking.util import set_job_description, spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
@@ -149,8 +149,13 @@ class LinkStepMatch(LinkStep):
 
         if config.get("streamline_potential_match_generation", False):
             t_ctx["dataset_columns"] = [config["id_column"]]
+
+        spark_context = self.task.spark.sparkContext
+        logger.debug("Creating table potential_matches via potential_matches.sql")
         try:
-            logger.debug("Creating table potential_matches via potential_matches.sql")
-            self.task.run_register_sql("potential_matches", t_ctx=t_ctx, persist=True)
+            with set_job_description("create table potential_matches", spark_context):
+                self.task.run_register_sql(
+                    "potential_matches", t_ctx=t_ctx, persist=True
+                )
         finally:
             self.task.spark.sql("set spark.sql.shuffle.partitions=200")

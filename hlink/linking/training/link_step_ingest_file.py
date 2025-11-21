@@ -4,6 +4,7 @@
 #   https://github.com/ipums/hlink
 
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 
 class LinkStepIngestFile(LinkStep):
@@ -16,12 +17,15 @@ class LinkStepIngestFile(LinkStep):
         )
 
     def _run(self):
-        self.task.run_register_python(
-            f"{self.task.table_prefix}training_data",
-            lambda: self.task.spark.read.csv(
-                self.task.link_run.config[f"{self.task.training_conf}"]["dataset"],
-                header=True,
-                inferSchema=True,
-            ),
-            persist=True,
-        )
+        spark_context = self.task.spark.sparkContext
+
+        with set_job_description("load training data", spark_context):
+            self.task.run_register_python(
+                f"{self.task.table_prefix}training_data",
+                lambda: self.task.spark.read.csv(
+                    self.task.link_run.config[f"{self.task.training_conf}"]["dataset"],
+                    header=True,
+                    inferSchema=True,
+                ),
+                persist=True,
+            )

@@ -10,7 +10,7 @@ from pyspark.sql import functions as f
 import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.threshold as threshold_core
 import hlink.linking.core.dist_table as dist_table_core
-from hlink.linking.util import spark_shuffle_partitions_heuristic
+from hlink.linking.util import set_job_description, spark_shuffle_partitions_heuristic
 
 from hlink.linking.link_step import LinkStep
 
@@ -35,6 +35,7 @@ class LinkStepScore(LinkStep):
         training_conf = str(self.task.training_conf)
         table_prefix = self.task.table_prefix
         config = self.task.link_run.config
+        spark_context = self.task.spark.sparkContext
 
         if training_conf not in config or "chosen_model" not in config[training_conf]:
             print(
@@ -52,7 +53,8 @@ class LinkStepScore(LinkStep):
         id_a = config["id_column"] + "_a"
         id_b = config["id_column"] + "_b"
         chosen_model_params = config[training_conf]["chosen_model"].copy()
-        self._create_features(config)
+        with set_job_description("create comparison features", spark_context):
+            self._create_features(config)
         pm = self.task.spark.table(f"{table_prefix}potential_matches_prepped")
 
         ind_var_columns = config[training_conf]["independent_vars"]
@@ -81,11 +83,12 @@ class LinkStepScore(LinkStep):
             )
 
         logger.debug(f"Creating table {table_prefix}potential_matches_pipeline")
-        self.task.run_register_python(
-            f"{table_prefix}potential_matches_pipeline",
-            lambda: pre_pipeline.transform(pm.select(*required_columns)),
-            persist=True,
-        )
+        with set_job_description("prepare the data for the model", spark_context):
+            self.task.run_register_python(
+                f"{table_prefix}potential_matches_pipeline",
+                lambda: pre_pipeline.transform(pm.select(*required_columns)),
+                persist=True,
+            )
         plm = self.task.link_run.trained_models[f"{table_prefix}trained_model"]
         pp_required_cols = set(plm.stages[0].getInputCols() + [id_a, id_b])
         pre_pipeline = self.task.spark.table(
@@ -106,14 +109,26 @@ class LinkStepScore(LinkStep):
             config["id_column"],
             decision,
         )
-        predictions.write.mode("overwrite").saveAsTable(f"{table_prefix}predictions")
+
+        with set_job_description(
+            f"create table {table_prefix}predictions", spark_context
+        ):
+            predictions.write.mode("overwrite").saveAsTable(
+                f"{table_prefix}predictions"
+            )
         pmp = self.task.spark.table(f"{table_prefix}potential_matches_pipeline")
         logger.debug(f"Creating table {table_prefix}scored_potential_matches")
-        self._save_table_with_requested_columns(pm, pmp, predictions, id_a, id_b)
+        with set_job_description(
+            f"create table {table_prefix}scored_potential_matches", spark_context
+        ):
+            self._save_table_with_requested_columns(pm, pmp, predictions, id_a, id_b)
         logger.debug(
             f"Creating table {table_prefix}predicted_matches and removing records with duplicated id_b"
         )
-        self._save_predicted_matches(config, id_a, id_b)
+        with set_job_description(
+            f"create table {table_prefix}predicted_matches", spark_context
+        ):
+            self._save_predicted_matches(config, id_a, id_b)
         self.task.spark.sql("set spark.sql.shuffle.partitions=200")
 
     def _save_table_with_requested_columns(self, pm, pmp, predictions, id_a, id_b):

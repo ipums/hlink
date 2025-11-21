@@ -11,6 +11,7 @@ from pyspark.sql.functions import array, explode, col
 
 import hlink.linking.core.comparison as comparison_core
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class LinkStepExplode(LinkStep):
 
     def _run(self):
         config = self.task.link_run.config
+        spark_context = self.task.spark.sparkContext
         # filter the universe of potential matches before exploding
         t_ctx = {}
         universe_conf = config.get("potential_matches_universe", [])
@@ -46,30 +48,32 @@ class LinkStepExplode(LinkStep):
         blocking = config["blocking"]
 
         logger.debug("Creating table exploded_df_a")
-        self.task.run_register_python(
-            name="exploded_df_a",
-            func=lambda: self._explode(
-                df=self.task.spark.table("match_universe_df_a"),
-                comparisons=config["comparisons"],
-                comparison_features=config["comparison_features"],
-                blocking=blocking,
-                id_column=config["id_column"],
-                is_a=True,
-            ),
-        )
+        with set_job_description("create table exploded_df_a", spark_context):
+            self.task.run_register_python(
+                name="exploded_df_a",
+                func=lambda: self._explode(
+                    df=self.task.spark.table("match_universe_df_a"),
+                    comparisons=config["comparisons"],
+                    comparison_features=config["comparison_features"],
+                    blocking=blocking,
+                    id_column=config["id_column"],
+                    is_a=True,
+                ),
+            )
 
         logger.debug("Creating table exploded_df_b")
-        self.task.run_register_python(
-            name="exploded_df_b",
-            func=lambda: self._explode(
-                df=self.task.spark.table("match_universe_df_b"),
-                comparisons=config["comparisons"],
-                comparison_features=config["comparison_features"],
-                blocking=blocking,
-                id_column=config["id_column"],
-                is_a=False,
-            ),
-        )
+        with set_job_description("create table exploded_df_b", spark_context):
+            self.task.run_register_python(
+                name="exploded_df_b",
+                func=lambda: self._explode(
+                    df=self.task.spark.table("match_universe_df_b"),
+                    comparisons=config["comparisons"],
+                    comparison_features=config["comparison_features"],
+                    blocking=blocking,
+                    id_column=config["id_column"],
+                    is_a=False,
+                ),
+            )
 
     def _explode(
         self,
