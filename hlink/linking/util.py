@@ -21,6 +21,12 @@ def spark_shuffle_partitions_heuristic(dataset_size: int) -> int:
 
 @contextmanager
 def set_job_description(desc: str | None, spark_context):
+    """Set the Spark job description.
+
+    This context manager sets the Spark job description to the given string,
+    then restores the job description to its previous value on exit. Passing
+    desc=None resets the job description to the Spark default.
+    """
     previous_desc = spark_context.getLocalProperty("spark.job.description")
     spark_context.setJobDescription(desc)
     try:
