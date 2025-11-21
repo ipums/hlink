@@ -10,6 +10,7 @@ import hlink.linking.core.pipeline as pipeline_core
 import hlink.linking.core.threshold as threshold_core
 
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 
 class LinkStepTrainAndSaveModel(LinkStep):
@@ -26,6 +27,7 @@ class LinkStepTrainAndSaveModel(LinkStep):
         training_conf = str(self.task.training_conf)
         table_prefix = self.task.table_prefix
         config = self.task.link_run.config
+        spark_context = self.task.spark.sparkContext
 
         if not config[training_conf].get("score_with_model", False):
             raise ValueError(
@@ -58,11 +60,15 @@ class LinkStepTrainAndSaveModel(LinkStep):
 
         pre_pipeline = Pipeline(stages=pipeline_stages[:-1]).fit(tf)
         self.task.link_run.trained_models[f"{table_prefix}pre_pipeline"] = pre_pipeline
-        tf_prepped = pre_pipeline.transform(tf)
 
-        tf_prepped.write.mode("overwrite").saveAsTable(
-            f"{table_prefix}training_features_prepped"
-        )
+        with set_job_description(
+            "prepare the training data for the model", spark_context
+        ):
+            tf_prepped = pre_pipeline.transform(tf)
+
+            tf_prepped.write.mode("overwrite").saveAsTable(
+                f"{table_prefix}training_features_prepped"
+            )
 
         classifier, post_transformer = classifier_core.choose_classifier(
             chosen_model_type, chosen_model_params, dep_var
@@ -71,7 +77,8 @@ class LinkStepTrainAndSaveModel(LinkStep):
         # Train and save pipeline
         pipeline = Pipeline(stages=[vector_assembler, classifier, post_transformer])
 
-        model = pipeline.fit(tf_prepped)
+        with set_job_description("train the model", spark_context):
+            model = pipeline.fit(tf_prepped)
         # model_path = config["spark_tmp_dir"] + "/chosen_model"
         self.task.link_run.trained_models[f"{table_prefix}trained_model"] = model
         # model.write().overwrite().save(model_path)

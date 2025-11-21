@@ -3,6 +3,14 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
+## Not Yet Released
+
+### Added
+
+* Started setting custom Spark job descriptions for some of hlink's long-running
+  jobs. These descriptions appear in the Spark UI and make it easier to understand
+  what hlink is doing. [PR #228][pr228]
+
 ## v4.2.1 (2025-08-18)
 
 ### Fixed
@@ -453,6 +461,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr215]: https://github.com/ipums/hlink/pull/215
 [pr219]: https://github.com/ipums/hlink/pull/219
 [pr222]: https://github.com/ipums/hlink/pull/222
+[pr228]: https://github.com/ipums/hlink/pull/228
 
 [household-matching-docs]: config.html#household-matching
 [household-training-docs]: config.html#household-training-and-model-exploration

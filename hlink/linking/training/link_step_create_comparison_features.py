@@ -7,6 +7,7 @@ import hlink.linking.core.comparison_feature as comparison_feature_core
 import hlink.linking.core.dist_table as dist_table_core
 
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 
 class LinkStepCreateComparisonFeatures(LinkStep):
@@ -86,11 +87,13 @@ class LinkStepCreateComparisonFeatures(LinkStep):
                 dist_tables
             )
 
-        comparison_feature_core.create_feature_tables(
-            self.task,
-            t_ctx_def,
-            advanced_comp_features,
-            hh_comp_features,
-            config["id_column"],
-            table_name=f"{table_prefix}training_features",
-        )
+        spark_context = self.task.spark.sparkContext
+        with set_job_description("create comparison features", spark_context):
+            comparison_feature_core.create_feature_tables(
+                self.task,
+                t_ctx_def,
+                advanced_comp_features,
+                hh_comp_features,
+                config["id_column"],
+                table_name=f"{table_prefix}training_features",
+            )

@@ -14,6 +14,7 @@ from pyspark.sql.types import (
 )
 
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,6 @@ class LinkStepSaveModelMetadata(LinkStep):
 
         model_type = config[training_conf]["chosen_model"]["type"]
 
-        logger.debug(f"Expanded features with categories are {expanded_features}")
         logger.debug(f"The model type is '{model_type}'")
 
         print("Retrieving model feature importances or coefficients...")
@@ -169,7 +169,6 @@ class LinkStepSaveModelMetadata(LinkStep):
                 ),
             ]
 
-        logger.debug("Creating the DataFrame and saving it as a table")
         feature_names, categories = zip(*expanded_features)
         importance_schema, importance_data = zip(*importance_columns)
         features_df = self.task.spark.createDataFrame(
@@ -185,6 +184,9 @@ class LinkStepSaveModelMetadata(LinkStep):
         feature_importances_table = (
             f"{self.task.table_prefix}training_feature_importances"
         )
-        features_df.write.mode("overwrite").saveAsTable(feature_importances_table)
+
+        spark_context = self.task.spark.sparkContext
+        with set_job_description("save training feature importances", spark_context):
+            features_df.write.mode("overwrite").saveAsTable(feature_importances_table)
 
         print(f"{label} have been saved to the {feature_importances_table} table")

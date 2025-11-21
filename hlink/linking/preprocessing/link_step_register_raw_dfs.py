@@ -11,6 +11,7 @@ from pyspark.sql.functions import col
 
 from hlink.errors import DataError
 from hlink.linking.link_step import LinkStep
+from hlink.linking.util import set_job_description
 
 logger = logging.getLogger(__name__)
 
@@ -48,14 +49,19 @@ class LinkStepRegisterRawDfs(LinkStep):
 
     def _run(self):
         config = self.task.link_run.config
+        spark_context = self.task.spark.sparkContext
         path_a, file_type_a = handle_paths(config["datasource_a"], "a")
         path_b, file_type_b = handle_paths(config["datasource_b"], "b")
 
-        self._load_unpartitioned(file_type_a, "_a", path_a)
-        self._load_unpartitioned(file_type_b, "_b", path_b)
+        with set_job_description("load data source A", spark_context):
+            self._load_unpartitioned(file_type_a, "_a", path_a)
+        with set_job_description("load data source B", spark_context):
+            self._load_unpartitioned(file_type_b, "_b", path_b)
 
-        df_a_filtered = self._filter_dataframe(config, "a")
-        df_b_filtered = self._filter_dataframe(config, "b")
+        with set_job_description("filter data source A", spark_context):
+            df_a_filtered = self._filter_dataframe(config, "a")
+        with set_job_description("filter data source B", spark_context):
+            df_b_filtered = self._filter_dataframe(config, "b")
 
         if config["datasource_a"].get("convert_ints_to_longs", False):
             logger.debug(
@@ -73,16 +79,21 @@ class LinkStepRegisterRawDfs(LinkStep):
         else:
             df_b = df_b_filtered
 
-        self.task.run_register_python(
-            name="raw_df_a",
-            func=lambda: df_a,
-            persist=True,
-        )
-        self.task.run_register_python(
-            name="raw_df_b",
-            func=lambda: df_b,
-            persist=True,
-        )
+        logger.debug("Creating table raw_df_a")
+        with set_job_description("create table raw_df_a", spark_context):
+            self.task.run_register_python(
+                name="raw_df_a",
+                func=lambda: df_a,
+                persist=True,
+            )
+
+        logger.debug("Creating table raw_df_b")
+        with set_job_description("create table raw_df_b", spark_context):
+            self.task.run_register_python(
+                name="raw_df_b",
+                func=lambda: df_b,
+                persist=True,
+            )
 
         self._check_for_all_spaces_unrestricted_file("raw_df_a")
         self._check_for_all_spaces_unrestricted_file("raw_df_b")

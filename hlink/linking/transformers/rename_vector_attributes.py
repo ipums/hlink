@@ -69,11 +69,6 @@ class RenameVectorAttributes(Transformer, HasInputCol):
         replacement_str = self.getOrDefault("replaceWith")
         metadata = dataset.schema[input_col].metadata
 
-        logger.debug(
-            f"Renaming the attributes of vector column '{input_col}': "
-            f"replacing {to_replace} with '{replacement_str}'"
-        )
-
         if "attrs" in metadata["ml_attr"]:
             attributes_by_type = metadata["ml_attr"]["attrs"]
 
