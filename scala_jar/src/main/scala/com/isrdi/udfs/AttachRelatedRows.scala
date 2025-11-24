@@ -40,7 +40,7 @@ class AttachRelatedRows {
             }
           }.forall(x => x)
         }
-        filtered_hh_rows.map { row => (row.getAs[Any](id_col), Row.fromSeq(input_cols.map(row.getAs[Any](_)))) }
+        filtered_hh_rows.map { row => (row.getAs[Any](id_col), Row.fromSeq(input_cols.map(row.getAs[Any](_)).toSeq)) }
       }
       hh_rows.map { row =>
         val new_cols = related_rows_list.map { related_rows_list =>
@@ -61,7 +61,7 @@ class AttachRelatedRows {
       val struct_fields = input_cols.map { input_col =>
         val data_type = old_struct_type.find(_.name == input_col).get.dataType
         StructField(input_col, data_type)
-      }
+      }.toSeq
       StructField(output_col, ArrayType(StructType(struct_fields)))
     }
     val schema = ArrayType(StructType(old_struct_fields ++ new_struct_fields))

@@ -66,6 +66,7 @@ class SparkConnection:
             )
             .set("spark.executorEnv.SPARK_LOCAL_DIRS", self.tmp_dir)
             .set("spark.sql.legacy.allowUntypedScalaUDF", True)
+            .set("spark.sql.ansi.enabled", "false")
             .setAppName(self.app_name)
             # .set("spark.executor.cores", executor_cores) \
         )
