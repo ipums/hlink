@@ -10,7 +10,6 @@ from pyspark.sql.functions import col
 from hlink.linking.link_step import LinkStep
 from hlink.linking.util import set_job_description
 
-
 logger = logging.getLogger(__name__)
 
 

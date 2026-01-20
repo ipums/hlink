@@ -42,8 +42,7 @@ class LinkStepCreateComparisonFeatures(LinkStep):
         dep_var = config[training_conf]["dependent_var"]
         if training_conf == "hh_training":
             hh_col = config[training_conf].get("hh_col", "serialp")
-            tdl = self.task.spark.sql(
-                f"""SELECT
+            tdl = self.task.spark.sql(f"""SELECT
                                     td.{id_col}_a,
                                     td.{id_col}_b,
                                     td.{dep_var},
@@ -57,8 +56,7 @@ class LinkStepCreateComparisonFeatures(LinkStep):
                                     left join
                                     prepped_df_b pdfb
                                     on pdfb.{id_col} = td.{id_col}_b
-                                """
-            )
+                                """)
         else:
             tdl = self.task.spark.table(f"{table_prefix}training_data").select(
                 f"{id_col}_a", f"{id_col}_b", dep_var

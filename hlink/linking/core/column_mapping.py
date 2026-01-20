@@ -79,7 +79,6 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql.types import LongType
 
-
 ColumnMappingTransform: TypeAlias = Callable[
     [Column, Mapping[str, Any], Mapping[str, Any]], Column
 ]

@@ -5,7 +5,6 @@ import pytest
 from hlink.linking.core.transforms import apply_transform, generate_transforms
 from hlink.linking.link_task import LinkTask
 
-
 ignore_apply_transform_dep_warning = pytest.mark.filterwarnings(
     r"ignore:\s*This is a deprecated alias for hlink.linking.core.column_mapping.apply_transform"
 )

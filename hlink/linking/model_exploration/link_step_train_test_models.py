@@ -843,11 +843,11 @@ def _aggregate_per_threshold_results(
     mcc = [r.mcc for r in prediction_results if not math.isnan(r.mcc)]
     f_measure = [r.f_measure for r in prediction_results if not math.isnan(r.f_measure)]
 
-    (precision_mean, precision_sd) = _compute_mean_and_stdev(precision)
-    (recall_mean, recall_sd) = _compute_mean_and_stdev(recall)
-    (pr_auc_mean, pr_auc_sd) = _compute_mean_and_stdev(pr_auc)
-    (mcc_mean, mcc_sd) = _compute_mean_and_stdev(mcc)
-    (f_measure_mean, f_measure_sd) = _compute_mean_and_stdev(f_measure)
+    precision_mean, precision_sd = _compute_mean_and_stdev(precision)
+    recall_mean, recall_sd = _compute_mean_and_stdev(recall)
+    pr_auc_mean, pr_auc_sd = _compute_mean_and_stdev(pr_auc)
+    mcc_mean, mcc_sd = _compute_mean_and_stdev(mcc)
+    f_measure_mean, f_measure_sd = _compute_mean_and_stdev(f_measure)
 
     new_desc = pd.DataFrame(
         {
@@ -962,8 +962,7 @@ def _handle_param_grid_attribute(training_settings: dict[str, Any]) -> dict[str,
 def _get_model_parameters(training_settings: dict[str, Any]) -> list[dict[str, Any]]:
     if "param_grid" in training_settings:
         print(
-            dedent(
-                """\
+            dedent("""\
                 Deprecation Warning: training.param_grid is deprecated.
 
                 Please use training.model_parameter_search instead by replacing
@@ -971,8 +970,7 @@ def _get_model_parameters(training_settings: dict[str, Any]) -> list[dict[str, A
                 `param_grid = True` with `model_parameter_search = {strategy = "grid"}` or
                 `param_grid = False` with `model_parameter_search = {strategy = "explicit"}`
 
-                [deprecated_in_version=4.0.0]"""
-            ),
+                [deprecated_in_version=4.0.0]"""),
             file=sys.stderr,
         )
 

@@ -24,13 +24,11 @@ def test_load_substitutions(tmp_path: Path) -> None:
 
 def test_generate_substitutions(spark: SparkSession, tmp_path: Path) -> None:
     tmp_file = tmp_path / "substitutions.csv"
-    tmp_file.write_text(
-        """rose,rosie
+    tmp_file.write_text("""rose,rosie
         sophia,sophy
         sophia,sofia
         amanda,mandy
-        jane,jean"""
-    )
+        jane,jean""")
 
     df = spark.createDataFrame(
         [("agnes", 2), ("mandy", 2), ("sophy", 2), ("rosie", 2), ("jean", 1)],
