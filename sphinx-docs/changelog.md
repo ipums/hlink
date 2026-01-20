@@ -3,7 +3,7 @@
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 Hlink adheres to semantic versioning as much as possible.
 
-## Not Yet Released
+## v4.2.2 (2026-01-20)
 
 ### Added
 
