@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from math import ceil
 
-
 MIN_PARTITIONS = 200
 MAX_PARTITIONS = 10000
 

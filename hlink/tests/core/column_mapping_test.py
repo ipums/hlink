@@ -5,7 +5,6 @@ import pandas as pd
 
 from hlink.linking.core.column_mapping import apply_transform, select_column_mapping
 
-
 TEST_DF_1 = pd.DataFrame(
     {
         "id": [0, 1, 2, 3, 4, 5],
