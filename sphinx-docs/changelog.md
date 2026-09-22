@@ -2,11 +2,11 @@
 
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
 
-## Unreleased
+## v4.3.0 (2026-09-22)
 
 ### Changed
 
-* Dropped support for Python 3.10 because it has reached end-of-life.
+* Dropped support for Python 3.10 because it has reached end-of-life. [PR #232][pr232]
 
 ## v4.2.2 (2026-01-20)
 
@@ -467,6 +467,7 @@ and false negative data in model exploration. [PR #1][pr1]
 [pr219]: https://github.com/ipums/hlink/pull/219
 [pr222]: https://github.com/ipums/hlink/pull/222
 [pr228]: https://github.com/ipums/hlink/pull/228
+[pr232]: https://github.com/ipums/hlink/pull/232
 
 [household-matching-docs]: config.html#household-matching
 [household-training-docs]: config.html#household-training-and-model-exploration
