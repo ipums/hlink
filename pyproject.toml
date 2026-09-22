@@ -7,12 +7,11 @@ name = "hlink"
 version = "4.2.2"
 description = "Fast supervised pyspark record linkage software"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MPL-2.0-no-copyleft-exception"
 license-files = ["LICENSE.txt"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]

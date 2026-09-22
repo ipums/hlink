@@ -1,7 +1,12 @@
 # Changelog
 
 The format of this changelog is based on [Keep A Changelog][keep-a-changelog].
-Hlink adheres to semantic versioning as much as possible.
+
+## Unreleased
+
+### Changed
+
+* Dropped support for Python 3.10 because it has reached end-of-life.
 
 ## v4.2.2 (2026-01-20)
 
